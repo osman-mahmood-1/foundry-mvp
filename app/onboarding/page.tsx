@@ -133,6 +133,7 @@ export default function OnboardingPage() {
   const [tradeLabel, setTradeLabel] = useState('')
   const [goal, setGoal] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
+  const [clientEmail, setClientEmail] = useState<string>('')
   const [userId, setUserId] = useState<string | null>(null)
   const [clientId, setClientId] = useState<string | null>(null)
 
@@ -149,7 +150,8 @@ export default function OnboardingPage() {
       }
       // Get client ID
       supabase.from('clients').select('id').eq('user_id', user.id).single()
-        .then(({ data }) => { if (data) setClientId(data.id) })
+        .then(({ data }) => { if (data) setClientId(data.id)
+        setClientEmail(user.email ?? '') })
     })
   }, [])
 
@@ -160,20 +162,20 @@ export default function OnboardingPage() {
     const supabase = createClient()
 
     await supabase.from('clients').update({
-  	full_name: firstName.trim(),
-  	client_type: clientType ?? 'other',
-  	trade_label: tradeLabel || tradeLabel,
-  	portal_config: await getPortalConfig(clientType ?? 'other'),
-  	onboarding_complete: true,
-	}).eq('id', clientId)
+      full_name: firstName.trim(),
+      client_type: clientType ?? 'other',
+      trade_label: tradeLabel || tradeLabel,
+      portal_config: await getPortalConfig(clientType ?? 'other'),
+      onboarding_complete: true,
+    }).eq('id', clientId)
 
-	fetch('/api/email/welcome', {
-  	method: 'POST',
-  	headers: { 'Content-Type': 'application/json' },
-  	body: JSON.stringify({ firstName, tradeLabel }),
-	}).catch(() => {})
+    fetch('/api/email/welcome', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ firstName, tradeLabel, email: clientEmail }),
+    }).catch(() => {})
 
-	window.location.href = '/portal'
+    window.location.href = '/portal'
   }
 
   async function getPortalConfig(type: string) {
