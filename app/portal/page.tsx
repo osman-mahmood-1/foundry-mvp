@@ -24,8 +24,13 @@ export default function PortalPage() {
         .eq('user_id', user.id)
         .single()
 
-      setClient(clientData)
-      setLoading(false)
+      	if (!clientData?.onboarding_complete) {
+  	window.location.href = '/onboarding'
+  	return
+	}
+
+setClient(clientData)
+setLoading(false)
     }
 
     loadClient()
