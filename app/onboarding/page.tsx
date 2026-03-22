@@ -160,14 +160,20 @@ export default function OnboardingPage() {
     const supabase = createClient()
 
     await supabase.from('clients').update({
-      full_name: firstName.trim(),
-      client_type: clientType ?? 'other',
-      trade_label: tradeLabel || tradeLabel,
-      portal_config: await getPortalConfig(clientType ?? 'other'),
-      onboarding_complete: true,
-    }).eq('id', clientId)
+  	full_name: firstName.trim(),
+  	client_type: clientType ?? 'other',
+  	trade_label: tradeLabel || tradeLabel,
+  	portal_config: await getPortalConfig(clientType ?? 'other'),
+  	onboarding_complete: true,
+	}).eq('id', clientId)
 
-    window.location.href = '/portal'
+	fetch('/api/email/welcome', {
+  	method: 'POST',
+  	headers: { 'Content-Type': 'application/json' },
+  	body: JSON.stringify({ firstName, tradeLabel }),
+	}).catch(() => {})
+
+	window.location.href = '/portal'
   }
 
   async function getPortalConfig(type: string) {
