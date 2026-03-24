@@ -6,7 +6,7 @@ import { Resend } from 'resend'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 const FROM = process.env.RESEND_FROM_EMAIL ?? 'onboarding@resend.dev'
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://foundry-mvp-beta.vercel.app'
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://taxfoundry.co.uk'
 
 // ─── Welcome / onboarding email ──────────────────────────
 export async function sendWelcomeEmail({
