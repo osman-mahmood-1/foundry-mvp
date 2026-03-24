@@ -102,23 +102,24 @@ export default function WaitlistPage() {
   }
 
   function handleShare() {
-    const text = `${result?.name} is founding member #${String(result?.memberNumber).padStart(3, '0')} at TaxFoundry (${result?.uniqueId}). Tax software built by designers, technologists and accountants. taxfoundry.co.uk`
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(text).then(() => {
-        setCopied(true)
-        setTimeout(() => setCopied(false), 3000)
-      })
-    } else {
-      const ta = document.createElement('textarea')
-      ta.value = text
-      document.body.appendChild(ta)
-      ta.select()
-      document.execCommand('copy')
-      document.body.removeChild(ta)
+  const url = `https://taxfoundry.co.uk/passport/${result?.uniqueId}`
+  const text = `I just claimed founding membership at TaxFoundry (${result?.uniqueId}). Tax software reimagined for MTD — join me: ${url}`
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(() => {
       setCopied(true)
       setTimeout(() => setCopied(false), 3000)
-    }
+    })
+  } else {
+    const ta = document.createElement('textarea')
+    ta.value = text
+    document.body.appendChild(ta)
+    ta.select()
+    document.execCommand('copy')
+    document.body.removeChild(ta)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 3000)
   }
+}
 
   const pips = Array.from({ length: 10 }, (_, i) => i < Math.ceil(memberCount / 10))
   const mrz = result
