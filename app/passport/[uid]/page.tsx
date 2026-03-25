@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase-server'
+import { createAdminClient } from '@/lib/supabase-admin'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 
@@ -7,7 +7,7 @@ interface Props {
 }
 
 export async function generateMetadata({ params }: Props) {
-  const supabase = await createClient()
+  const supabase = await createAdminClient()
   const { data } = await supabase.rpc('get_passport', { p_uid: params.uid })
   const passport = data?.[0]
 
@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: Props) {
 }
 
 export default async function PassportPage({ params }: Props) {
-  const supabase = await createClient()
+  const supabase = await createAdminClient()
 
   const { data: passportData } = await supabase.rpc('get_passport', { p_uid: params.uid })
   const passport = passportData?.[0]
