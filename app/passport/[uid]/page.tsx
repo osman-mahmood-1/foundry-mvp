@@ -3,12 +3,13 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 
 interface Props {
-  params: { uid: string }
+  params: Promise<{ uid: string }>
 }
 
 export async function generateMetadata({ params }: Props) {
+  const { uid } = await params
   const supabase = createAdminClient()
-  const { data } = await supabase.rpc('get_passport', { p_uid: params.uid })
+  const { data } = await supabase.rpc('get_passport', { p_uid: uid })
   const passport = data?.[0]
 
   if (!passport) return { title: 'TaxFoundry — Join the Founding Hundred' }
@@ -19,7 +20,7 @@ export async function generateMetadata({ params }: Props) {
     openGraph: {
       title: `${passport.name} is founding member #${String(passport.member_number).padStart(3, '0')}`,
       description: 'Tax software built by designers, technologists and accountants. Join the founding hundred.',
-      url: `https://taxfoundry.co.uk/passport/${params.uid}`,
+      url: `https://taxfoundry.co.uk/passport/${uid}`,
       siteName: 'TaxFoundry',
       type: 'website',
     },
@@ -32,16 +33,16 @@ export async function generateMetadata({ params }: Props) {
 }
 
 export default async function PassportPage({ params }: Props) {
+  const { uid } = await params
   const supabase = createAdminClient()
 
-  const { data: passportData, error } = await supabase.rpc('get_passport', { p_uid: params.uid })
+  const { data: passportData, error } = await supabase.rpc('get_passport', { p_uid: uid })
 
-  console.log('uid:', params.uid)
+  console.log('uid:', uid)
   console.log('data:', JSON.stringify(passportData))
   console.log('error:', JSON.stringify(error))
 
   const passport = passportData?.[0]
-
   if (!passport) redirect('/waitlist')
 
   const { count } = await supabase
