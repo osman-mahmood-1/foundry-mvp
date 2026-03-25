@@ -7,7 +7,7 @@ interface Props {
 }
 
 export async function generateMetadata({ params }: Props) {
-  const supabase = await createAdminClient()
+  const supabase = createAdminClient()
   const { data } = await supabase.rpc('get_passport', { p_uid: params.uid })
   const passport = data?.[0]
 
@@ -32,9 +32,14 @@ export async function generateMetadata({ params }: Props) {
 }
 
 export default async function PassportPage({ params }: Props) {
-  const supabase = await createAdminClient()
+  const supabase = createAdminClient()
 
-  const { data: passportData } = await supabase.rpc('get_passport', { p_uid: params.uid })
+  const { data: passportData, error } = await supabase.rpc('get_passport', { p_uid: params.uid })
+
+  console.log('uid:', params.uid)
+  console.log('data:', JSON.stringify(passportData))
+  console.log('error:', JSON.stringify(error))
+
   const passport = passportData?.[0]
 
   if (!passport) redirect('/waitlist')
@@ -46,7 +51,7 @@ export default async function PassportPage({ params }: Props) {
   const memberCount = count ?? 1
   const firstName = passport.name.split(' ')[0]
   const issuedDate = new Date(passport.created_at).toLocaleDateString('en-GB', {
-    day: '2-digit', month: 'short', year: 'numeric'
+    day: '2-digit', month: 'short', year: 'numeric',
   })
 
   return (
@@ -56,26 +61,21 @@ export default async function PassportPage({ params }: Props) {
       justifyContent: 'center', padding: '48px 28px 52px', overflow: 'hidden',
       fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
     }}>
-      {/* Orbs */}
       <div style={{ position: 'absolute', width: 420, height: 420, borderRadius: '50%', top: -130, left: -90, background: 'radial-gradient(circle,rgba(255,100,60,0.22) 0%,transparent 68%)', filter: 'blur(50px)', pointerEvents: 'none' }} />
       <div style={{ position: 'absolute', width: 340, height: 340, borderRadius: '50%', bottom: -80, right: -80, background: 'radial-gradient(circle,rgba(160,60,255,0.2) 0%,transparent 70%)', filter: 'blur(48px)', pointerEvents: 'none' }} />
 
       <div style={{ position: 'relative', zIndex: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', maxWidth: 400 }}>
 
-        {/* Eyebrow */}
         <p style={{ fontSize: 10, letterSpacing: '0.24em', color: 'rgba(255,255,255,0.28)', textTransform: 'uppercase', marginBottom: 16, fontFamily: 'monospace' }}>
           taxfoundry · founding member
         </p>
 
-        {/* Passport card */}
         <div style={{ width: '100%', maxWidth: 340, position: 'relative', marginBottom: 24 }}>
           <div style={{ borderRadius: 28, overflow: 'hidden', position: 'relative', background: 'rgba(12,8,18,0.78)' }}>
-
             <div style={{ position: 'absolute', inset: 0, borderRadius: 28, padding: 1, background: 'linear-gradient(135deg,rgba(194,232,226,0.8) 0%,rgba(74,143,160,0.6) 50%,rgba(194,232,226,0.4) 100%)', WebkitMask: 'linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0)', WebkitMaskComposite: 'xor', maskComposite: 'exclude', pointerEvents: 'none' }} />
             <div style={{ position: 'absolute', inset: 0, borderRadius: 28, background: 'radial-gradient(ellipse at 10% 0%,rgba(194,232,226,0.07) 0%,transparent 50%),radial-gradient(ellipse at 90% 100%,rgba(74,143,160,0.07) 0%,transparent 50%)', pointerEvents: 'none' }} />
             <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '42%', borderRadius: '28px 28px 0 0', background: 'linear-gradient(180deg,rgba(255,255,255,0.055) 0%,transparent 100%)', pointerEvents: 'none' }} />
 
-            {/* Top bar */}
             <div style={{ position: 'relative', zIndex: 1, padding: '18px 22px 14px', borderBottom: '1px solid rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div>
                 <p style={{ margin: 0, fontSize: 9, letterSpacing: '0.22em', color: 'rgba(255,255,255,0.24)', textTransform: 'uppercase', fontFamily: 'monospace' }}>Tax</p>
@@ -86,7 +86,6 @@ export default async function PassportPage({ params }: Props) {
               </span>
             </div>
 
-            {/* Body */}
             <div style={{ position: 'relative', zIndex: 1, padding: '20px 22px', display: 'flex', gap: 16 }}>
               <div style={{ position: 'relative', width: 88, height: 88, flexShrink: 0 }}>
                 <svg width="88" height="88" viewBox="0 0 88 88">
@@ -125,7 +124,6 @@ export default async function PassportPage({ params }: Props) {
 
             <hr style={{ margin: '0 22px', border: 'none', borderTop: '1px solid rgba(255,255,255,0.06)' }} />
 
-            {/* Benefits */}
             <div style={{ position: 'relative', zIndex: 1, padding: '14px 22px 18px' }}>
               <p style={{ margin: '0 0 10px', fontSize: 9, letterSpacing: '0.17em', color: 'rgba(255,255,255,0.2)', textTransform: 'uppercase' }}>What this gets you</p>
               {[
@@ -142,7 +140,6 @@ export default async function PassportPage({ params }: Props) {
               ))}
             </div>
 
-            {/* Footer */}
             <div style={{ position: 'relative', zIndex: 1, padding: '11px 22px', borderTop: '1px solid rgba(255,255,255,0.05)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ fontFamily: 'monospace', fontSize: 8, color: 'rgba(255,255,255,0.09)', letterSpacing: '0.07em' }}>
                 {`TF<${passport.name.toUpperCase().replace(/\s+/g, '<')}<<<<<<<<<<<<<<<<<`.substring(0, 24)}
@@ -152,10 +149,9 @@ export default async function PassportPage({ params }: Props) {
           </div>
         </div>
 
-        {/* CTA */}
         <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.42)', textAlign: 'center', lineHeight: 1.7, marginBottom: 20, maxWidth: 300 }}>
           <strong style={{ color: '#ffffff' }}>{firstName}</strong> is one of{' '}
-          <strong style={{ color: '#ffffff' }}>{memberCount}</strong> founding members reimagining how businesses handle their finances.
+          <strong style={{ color: '#ffffff' }}>{memberCount}</strong> founding members reimagining how UK businesses handle their finances.
         </p>
 
         <Link href="/waitlist" style={{
