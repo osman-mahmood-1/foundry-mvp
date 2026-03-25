@@ -18,12 +18,11 @@ export async function joinWaitlist(formData: FormData) {
   if (!name || !email) return { error: 'Name and email are required' }
 
   const supabase = await createClient()
-  const tempUID = generateUID(0)
 
   const { data, error } = await supabase
     .from('waitlist')
-    .insert({ name, email, unique_id: tempUID })
-    .select('member_number, unique_id')
+    .insert({ name, email, unique_id: 'PENDING' })
+    .select('member_number')
     .single()
 
   if (error) {
