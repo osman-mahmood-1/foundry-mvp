@@ -101,7 +101,7 @@ export function Spinner() {
         width:        '24px',
         height:       '24px',
         border:       `2px solid ${colours.borderLight}`,
-        borderTop:    `2px solid ${colours.brand}`,
+        borderTop:    `2px solid ${colours.accent}`,
         borderRadius: radius.circle,
         animation:    'spin 0.8s linear infinite',
       }} />
@@ -166,7 +166,7 @@ export function EmptyState({ icon, headline, sub, action, onAction }: EmptyState
           onClick={onAction}
           style={{
             padding:     `9px 20px`,
-            background:  colours.brand,
+            background:  colours.accent,
             color:       colours.textInverse,
             border:      'none',
             borderRadius: radius.pill,
@@ -294,7 +294,7 @@ interface ButtonProps {
 
 const BUTTON_VARIANTS: Record<ButtonVariant, React.CSSProperties> = {
   primary: {
-    background:  colours.brand,
+    background:  colours.accent,
     color:       colours.textInverse,
     border:      'none',
   },
