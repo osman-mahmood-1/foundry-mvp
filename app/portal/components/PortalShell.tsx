@@ -20,7 +20,7 @@ import { useState } from 'react'
 import type { Client, PortalTab, NavItem } from '@/types'
 import { NAV_ITEMS, NAV_GROUPS } from '@/lib/nav'
 import {
-  colours,
+  light as colours,
   fonts,
   fontSize,
   fontWeight,
@@ -31,7 +31,7 @@ import {
   transition,
   orbs,
   keyframes,
-} from '@/styles/tokens'
+} from '@/styles/tokens/colours'
 import { Divider } from './ui'
 
 // ─── Tab imports ──────────────────────────────────────────────────────────────

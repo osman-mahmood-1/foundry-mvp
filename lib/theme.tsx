@@ -1,18 +1,5 @@
 'use client'
 
-/**
- * lib/theme.tsx
- *
- * Theme context — light/dark mode for the entire portal.
- *
- * Usage:
- *   <ThemeProvider><PortalShell /></ThemeProvider>
- *
- *   const { mode, colours, isDark, toggleMode } = useTheme()
- *
- * Defaults to system preference. Persists choice in localStorage.
- */
-
 import React, { createContext, useContext, useState, useEffect, useMemo } from 'react'
 import { light, dark } from '@/styles/tokens/colours'
 import type { ColourMode } from '@/styles/tokens/colours'
@@ -35,7 +22,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [mode, setMode] = useState<ColourMode>('light')
 
   useEffect(() => {
-    const stored = localStorage.getItem('foundry-theme') as ColourMode | null
+    const stored = localStorage.getItem('foundry-theme')
     if (stored === 'light' || stored === 'dark') {
       setMode(stored)
       return
@@ -45,7 +32,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   function toggleMode() {
-    setMode(prev => {
+    setMode((prev: ColourMode) => {
       const next: ColourMode = prev === 'light' ? 'dark' : 'light'
       localStorage.setItem('foundry-theme', next)
       return next

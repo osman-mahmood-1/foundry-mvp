@@ -1,102 +1,164 @@
-/**
- * styles/tokens/colours.ts
- *
- * All colour values in Foundry. Two layers:
- *
- * 1. Raw palette  — the actual hex values. Nothing references these directly
- *                   outside this file.
- * 2. Semantic     — named by purpose, not appearance. Components use these.
- *
- * To re-skin the entire product: change the semantic aliases below.
- * To change a specific colour: change the raw palette value.
- */
-
-// ─── Raw palette ──────────────────────────────────────────────────────────────
-
 const palette = {
-  navy:        '#051C2C',
-  navyLight:   '#0D2035',
-  navyBorder:  '#1B3A52',
-  teal:        '#00D4AA',
-  tealLight:   '#00F5C4',
-  tealDark:    '#00856A',
-  blue:        '#2563EB',
-  blueLight:   'rgba(37,99,235,0.07)',
-  amber:       '#D97706',
-  amberLight:  'rgba(245,158,11,0.08)',
-  amberDark:   '#92400E',
-  red:         '#DC2626',
-  redLight:    'rgba(239,68,68,0.08)',
-  green:       '#00856A',
-  greenLight:  'rgba(0,212,170,0.08)',
-  slate400:    '#94A3B8',
-  slate500:    '#64748B',
-  slate600:    '#475569',
-  white:       '#ffffff',
-  offWhite:    '#F0F4FA',
+  white:      '#FFFFFF',
+  appleWhite: '#F5F5F7',
+  grey50:     '#FAFAFA',
+  grey100:    '#F5F5F7',
+  grey200:    '#E5E5E7',
+  grey300:    '#D1D1D6',
+  grey400:    '#AEAEB2',
+  grey500:    '#8E8E93',
+  grey600:    '#6E6E73',
+  grey700:    '#3A3A3C',
+  grey800:    '#2C2C2E',
+  grey900:    '#1D1D1F',
+  dark50:     '#0A0A0F',
+  dark100:    '#111116',
+  dark200:    '#16161E',
+  dark300:    '#1C1C28',
+  dark400:    '#252535',
+  dark500:    '#2E2E42',
+  darkText1:  '#F5F5F7',
+  darkText2:  '#98989F',
+  darkText3:  '#48484F',
+  blue:       '#007AFF',
+  blueDark:   '#0A84FF',
+  blueDeep:   '#0062CC',
+  blueLight:  '#3395FF',
+  emerald400: '#34D399',
+  emerald500: '#10B981',
+  emerald600: '#059669',
+  sky400:     '#38BDF8',
+  sky500:     '#0EA5E9',
+  sky600:     '#0284C7',
+  amber400:   '#FCD34D',
+  amber500:   '#F59E0B',
+  amber600:   '#D97706',
+  red400:     '#F87171',
+  red500:     '#EF4444',
+  red600:     '#DC2626',
+  teal400:    '#2DD4BF',
+  teal500:    '#14B8A6',
 } as const
 
-// ─── Semantic colours — use these in components ───────────────────────────────
-
-export const colours = {
-  // Brand
-  brand:         palette.navy,
-  brandLight:    palette.navyLight,
-  accent:        palette.teal,
-  accentLight:   palette.tealLight,
-  accentDark:    palette.tealDark,
-
-  // Backgrounds
-  pageBg:        palette.offWhite,
-  inputBg:       'rgba(255,255,255,0.8)',
-
-  // Text
-  textPrimary:   palette.navy,
-  textSecondary: palette.slate600,
-  textMuted:     palette.slate400,
-  textInverse:   palette.white,
-
-  // Borders
-  borderSubtle:  'rgba(5,28,44,0.06)',
-  borderLight:   'rgba(5,28,44,0.10)',
-  borderMedium:  'rgba(5,28,44,0.12)',
-
-  // Status — income
-  income:        palette.green,
-  incomeLight:   palette.greenLight,
-
-  // Status — expenses
-  expense:       palette.blue,
-  expenseLight:  palette.blueLight,
-
-  // Status — warnings
-  warning:       palette.amber,
-  warningLight:  palette.amberLight,
-  warningDark:   palette.amberDark,
-
-  // Status — errors / urgent
-  danger:        palette.red,
-  dangerLight:   palette.redLight,
-
-  // Status — allowability badges
-  allowable:     palette.tealDark,
-  allowableLight: palette.greenLight,
-  notAllowable:  palette.red,
-  notAllowableLight: palette.redLight,
-  pendingReview: palette.amber,
-  pendingReviewLight: palette.amberLight,
-
-  // Intelligence card severity
-  urgent:        palette.red,
-  urgentLight:   palette.redLight,
-  attention:     palette.amber,
-  attentionLight: palette.amberLight,
-  info:          palette.tealDark,
-  infoLight:     palette.greenLight,
-
-  // Nav
-  navActive:     palette.navy,
-  navInactive:   palette.slate600,
+export const light = {
+  pageBg:           palette.appleWhite,
+  sidebarBg:        palette.white,
+  panelBg:          'rgba(255,255,255,0.78)',
+  panelBgSolid:     palette.white,
+  inputBg:          palette.white,
+  hoverBg:          palette.grey50,
+  borderHairline:   palette.grey200,
+  borderLight:      'rgba(0,0,0,0.06)',
+  borderMedium:     'rgba(0,0,0,0.10)',
+  borderInput:      palette.grey300,
+  textPrimary:      palette.grey900,
+  textSecondary:    palette.grey600,
+  textMuted:        palette.grey400,
+  textInverse:      palette.white,
+  textAccent:       palette.blue,
+  accent:           palette.blue,
+  accentHover:      palette.blueDeep,
+  accentLight:      'rgba(0,122,255,0.08)',
+  accentBorder:     'rgba(0,122,255,0.25)',
+  navActive:        palette.grey900,
+  navActiveBg:      palette.grey100,
+  navInactive:      palette.grey600,
+  navGroupLabel:    palette.grey400,
+  glassBg:          'rgba(255,255,255,0.78)',
+  glassBlur:        'blur(48px)',
+  glassBorder:      '1px solid rgba(255,255,255,0.95)',
+  glassShadow:      '0 4px 24px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,1)',
+  sidebarShadow:    '1px 0 0 rgba(0,0,0,0.06)',
+  incomeGlow:       'rgba(16,185,129,0.06)',
+  expenseGlow:      'rgba(14,165,233,0.06)',
+  intelligenceGlow: 'rgba(0,122,255,0.08)',
+  warningGlow:      'rgba(245,158,11,0.06)',
+  dangerGlow:       'rgba(239,68,68,0.06)',
 } as const
 
-export type ColourToken = keyof typeof colours
+export const dark = {
+  pageBg:           palette.dark50,
+  sidebarBg:        palette.dark100,
+  panelBg:          'rgba(22,22,30,0.80)',
+  panelBgSolid:     palette.dark200,
+  inputBg:          palette.dark300,
+  hoverBg:          palette.dark400,
+  borderHairline:   palette.dark300,
+  borderLight:      'rgba(255,255,255,0.04)',
+  borderMedium:     'rgba(255,255,255,0.08)',
+  borderInput:      palette.dark400,
+  textPrimary:      palette.darkText1,
+  textSecondary:    palette.darkText2,
+  textMuted:        palette.darkText3,
+  textInverse:      palette.grey900,
+  textAccent:       palette.blueDark,
+  accent:           palette.blueDark,
+  accentHover:      palette.blueLight,
+  accentLight:      'rgba(10,132,255,0.15)',
+  accentBorder:     'rgba(10,132,255,0.30)',
+  navActive:        palette.darkText1,
+  navActiveBg:      palette.dark400,
+  navInactive:      palette.darkText2,
+  navGroupLabel:    palette.darkText3,
+  glassBg:          'rgba(22,22,30,0.80)',
+  glassBlur:        'blur(48px)',
+  glassBorder:      '1px solid rgba(255,255,255,0.07)',
+  glassShadow:      '0 4px 32px rgba(0,0,0,0.40), inset 0 1px 0 rgba(255,255,255,0.06)',
+  sidebarShadow:    '1px 0 0 rgba(255,255,255,0.04)',
+  incomeGlow:       'rgba(16,185,129,0.15)',
+  expenseGlow:      'rgba(14,165,233,0.15)',
+  intelligenceGlow: 'rgba(10,132,255,0.20)',
+  warningGlow:      'rgba(245,158,11,0.15)',
+  dangerGlow:       'rgba(239,68,68,0.15)',
+} as const
+
+export const semantic = {
+  income:             palette.emerald500,
+  incomeLight:        'rgba(16,185,129,0.10)',
+  expense:            palette.sky500,
+  expenseLight:       'rgba(14,165,233,0.10)',
+  warning:            palette.amber500,
+  warningLight:       'rgba(245,158,11,0.10)',
+  warningDark:        palette.amber600,
+  danger:             palette.red500,
+  dangerLight:        'rgba(239,68,68,0.10)',
+  allowable:          palette.emerald500,
+  allowableLight:     'rgba(16,185,129,0.10)',
+  notAllowable:       palette.red500,
+  notAllowableLight:  'rgba(239,68,68,0.10)',
+  pendingReview:      palette.amber500,
+  pendingReviewLight: 'rgba(245,158,11,0.10)',
+  urgent:             palette.red500,
+  urgentLight:        'rgba(239,68,68,0.10)',
+  attention:          palette.amber500,
+  attentionLight:     'rgba(245,158,11,0.10)',
+  info:               palette.blue,
+  infoLight:          'rgba(0,122,255,0.10)',
+  teal:               palette.teal500,
+  tealLight:          'rgba(20,184,166,0.10)',
+} as const
+
+export const gradients = {
+  accent:       'linear-gradient(135deg, #007AFF 0%, #0EA5E9 100%)',
+  accentDark:   'linear-gradient(135deg, #0A84FF 0%, #38BDF8 100%)',
+  accentHover:  'linear-gradient(135deg, #0062CC 0%, #0284C7 100%)',
+  accentSoft:   'linear-gradient(135deg, rgba(0,122,255,0.12) 0%, rgba(14,165,233,0.12) 100%)',
+  accentText:   'linear-gradient(135deg, #007AFF 0%, #0EA5E9 100%)',
+  income:       'radial-gradient(ellipse at 20% 50%, rgba(16,185,129,0.22) 0%, transparent 70%)',
+  expense:      'radial-gradient(ellipse at 80% 50%, rgba(14,165,233,0.22) 0%, transparent 70%)',
+  intelligence: 'radial-gradient(ellipse at 50% 0%, rgba(0,122,255,0.28) 0%, rgba(14,165,233,0.18) 50%, transparent 80%)',
+  warning:      'radial-gradient(ellipse at 50% 0%, rgba(245,158,11,0.22) 0%, transparent 70%)',
+  danger:       'radial-gradient(ellipse at 50% 0%, rgba(239,68,68,0.22) 0%, transparent 70%)',
+  overview:     'radial-gradient(ellipse at 50% 0%, rgba(0,122,255,0.18) 0%, rgba(20,184,166,0.12) 60%, transparent 90%)',
+  orbAccent:    'radial-gradient(circle, rgba(0,122,255,0.08) 0%, transparent 70%)',
+  orbSky:       'radial-gradient(circle, rgba(14,165,233,0.06) 0%, transparent 70%)',
+  incomeText:   'linear-gradient(135deg, #10B981 0%, #34D399 100%)',
+  expenseText:  'linear-gradient(135deg, #0EA5E9 0%, #38BDF8 100%)',
+  healthRing:   'linear-gradient(135deg, #007AFF 0%, #0EA5E9 50%, #14B8A6 100%)',
+  tealBar:      'linear-gradient(90deg, #14B8A6, #2DD4BF)',
+} as const
+
+export const colours = light
+
+export type ColourMode = 'light' | 'dark'
+export type ColourToken = keyof typeof light
