@@ -6,7 +6,7 @@ import type { ColourMode } from '@/styles/tokens/colours'
 
 interface ThemeContextValue {
   mode:       ColourMode
-  colours:    typeof light
+  colours:    typeof light | typeof dark
   isDark:     boolean
   toggleMode: () => void
 }
