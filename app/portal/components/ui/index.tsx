@@ -100,7 +100,7 @@ export function Spinner() {
       <div style={{
         width:        '24px',
         height:       '24px',
-        border:       `2px solid ${colours.borderSubtle}`,
+        border:       `2px solid ${colours.borderLight}`,
         borderTop:    `2px solid ${colours.brand}`,
         borderRadius: radius.circle,
         animation:    'spin 0.8s linear infinite',
@@ -503,7 +503,7 @@ export function Divider() {
   return (
     <div style={{
       height:     '1px',
-      background: colours.borderSubtle,
+      background: colours.borderLight,
       margin:     `0 ${spacing.sidebar.padding}`,
     }} />
   )
