@@ -41,7 +41,64 @@ const palette = {
 } as const
 
 export const light = {
-  // ── Semantic tokens ──────────────────────────────────────────
+  // ── Structure ─────────────────────────────────────────────────
+  pageBg:             '#F5F5F7',
+  sidebarBg:          '#FFFFFF',
+  panelBg:            'rgba(255,255,255,0.78)',
+  panelBgSolid:       '#FFFFFF',
+  inputBg:            '#FFFFFF',
+  hoverBg:            '#FAFAFA',
+  accent:             '#007AFF',
+  accentHover:        '#0066CC',
+  accentLight:        'rgba(0,122,255,0.10)',
+  accentSoft:         'rgba(0,122,255,0.06)',
+  accentBorder:       'rgba(0,122,255,0.30)',
+  accentDark:         '#0055AA',
+  accentText:         '#007AFF',
+  // ── Text ──────────────────────────────────────────────────────
+  textPrimary:        '#1D1D1F',
+  textSecondary:      '#6E6E73',
+  textMuted:          '#AEAEB2',
+  textInverse:        '#FFFFFF',
+  textAccent:         '#007AFF',
+  // ── Borders ───────────────────────────────────────────────────
+  borderHairline:     '#E5E5EA',
+  borderLight:        'rgba(0,0,0,0.06)',
+  borderMedium:       'rgba(0,0,0,0.10)',
+  borderInput:        '#C7C7CC',
+  // ── Nav ───────────────────────────────────────────────────────
+  navActive:          '#007AFF',
+  navActiveBg:        'rgba(0,122,255,0.08)',
+  navInactive:        '#6E6E73',
+  navGroupLabel:      '#AEAEB2',
+  // ── Sidebar / misc ────────────────────────────────────────────
+  sidebarShadow:      'rgba(0,0,0,0.06)',
+  appleWhite:         '#FFFFFF',
+  white:              '#FFFFFF',
+  // ── Glows / feature colours ───────────────────────────────────
+  incomeGlow:         'rgba(16,185,129,0.06)',
+  expenseGlow:        'rgba(14,165,233,0.06)',
+  warningGlow:        'rgba(245,158,11,0.06)',
+  dangerGlow:         'rgba(239,68,68,0.06)',
+  intelligenceGlow:   'rgba(0,122,255,0.06)',
+  expenseText:        '#0EA5E9',
+  incomeText:         '#10B981',
+  // ── Misc tokens ───────────────────────────────────────────────
+  overview:           '#007AFF',
+  healthRing:         '#34C759',
+  intelligence:       '#007AFF',
+  glassBg:            'rgba(255,255,255,0.78)',
+  glassBlur:          'blur(48px)',
+  glassBorder:        'rgba(255,255,255,0.95)',
+  glassShadow:        'rgba(0,0,0,0.06)',
+  orbAccent:          'rgba(0,122,255,0.15)',
+  orbSky:             'rgba(14,165,233,0.10)',
+  blue:               '#007AFF',
+  blueLight:          'rgba(0,122,255,0.10)',
+  blueDark:           '#0055AA',
+  blueDeep:           '#003D99',
+  tealBar:            '#14B8A6',
+  // ── Semantic tokens ───────────────────────────────────────────
   income:             'rgba(16,185,129,1)',
   incomeLight:        'rgba(16,185,129,0.10)',
   expense:            'rgba(14,165,233,1)',
