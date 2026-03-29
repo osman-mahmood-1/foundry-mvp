@@ -1,40 +1,31 @@
 /**
  * lib/nav.ts
  *
- * Single source of truth for the portal navigation structure.
+ * Single source of truth for the Foundry portal navigation.
  *
- * Adding a new tab = add one entry here.
- * Removing a tab = remove one entry here.
- * Marking a tab coming soon = set comingSoon: true.
+ * Rules:
+ * - Adding a tab  → add one entry here, add a case to TabRenderer
+ * - Removing a tab → remove one entry here
+ * - Coming soon   → set comingSoon: true (greyed, non-clickable)
+ * - Group order   → Overview → Money → Invoices → Workspace → Filing
  *
- * The sidebar, routing, and any breadcrumb components all
- * derive from this list — nothing is duplicated.
+ * Settings lives in the sidebar footer (not here).
+ * Calendar is hidden from nav but kept in PortalTab for deep-linking.
  */
 
 import type { NavItem } from '@/types'
 
 export const NAV_ITEMS: NavItem[] = [
-  // ─── Overview group ──────────────────────────────────────────────
+
+  // ─── Overview ────────────────────────────────────────────────────
   {
     id:    'overview',
     label: 'Overview',
     icon:  '▦',
     group: 'overview',
   },
-  {
-    id:    'calendar',
-    label: 'Calendar',
-    icon:  '◎',
-    group: 'overview',
-  },
-  {
-    id:    'transactions',
-    label: 'Transactions',
-    icon:  '⇅',
-    group: 'overview',
-  },
 
-  // ─── Money group ─────────────────────────────────────────────────
+  // ─── Money ───────────────────────────────────────────────────────
   {
     id:    'income',
     label: 'Income',
@@ -48,50 +39,85 @@ export const NAV_ITEMS: NavItem[] = [
     group: 'money',
   },
   {
-    id:         'invoices',
-    label:      'Invoices',
-    icon:       '□',
+    id:         'transactions',
+    label:      'Transactions',
+    icon:       '⇅',
     group:      'money',
     comingSoon: true,
   },
 
-  // ─── Tools group ─────────────────────────────────────────────────
+  // ─── Invoices ────────────────────────────────────────────────────
+  {
+    id:         'invoices',
+    label:      'Invoices',
+    icon:       '□',
+    group:      'invoices',
+    comingSoon: true,
+  },
+  {
+    id:         'clients',
+    label:      'Clients',
+    icon:       '◎',
+    group:      'invoices',
+    comingSoon: true,
+  },
+
+  // ─── Workspace ───────────────────────────────────────────────────
   {
     id:    'documents',
     label: 'Documents',
     icon:  '◈',
-    group: 'tools',
+    group: 'workspace',
+  },
+  {
+    id:    'messages',
+    label: 'Messages',
+    icon:  '◇',
+    group: 'workspace',
   },
   {
     id:    'intelligence',
     label: 'Foundry Intelligence',
-    icon:  '◇',
-    group: 'tools',
+    icon:  '✦',
+    group: 'workspace',
   },
+
+  // ─── Filing ──────────────────────────────────────────────────────
   {
-    id:         'health',
-    label:      'Health Score',
-    icon:       '△',
-    group:      'tools',
+    id:         'submission',
+    label:      'Submission Centre',
+    icon:       '⬡',
+    group:      'filing',
     comingSoon: true,
   },
   {
-    id:         'integrations',
-    label:      'Integrations',
-    icon:       '⬡',
-    group:      'tools',
+    id:         'prior-returns',
+    label:      'Prior Returns',
+    icon:       '△',
+    group:      'filing',
     comingSoon: true,
   },
 ]
 
-/** Group labels shown as dividers in the sidebar */
+/** Display labels for nav group dividers */
 export const NAV_GROUPS: Record<NavItem['group'], string> = {
-  overview: 'Overview',
-  money:    'Money',
-  tools:    'Tools',
+  overview:  '',           // no divider label for top group
+  money:     'Money',
+  invoices:  'Invoices',
+  workspace: 'Workspace',
+  filing:    'Filing',
 }
 
-/** Derive which tabs are active (not coming soon) */
+/** Ordered list of groups for sidebar rendering */
+export const NAV_GROUP_ORDER: NavItem['group'][] = [
+  'overview',
+  'money',
+  'invoices',
+  'workspace',
+  'filing',
+]
+
+/** All active (non-comingSoon) tab IDs */
 export const ACTIVE_TABS = NAV_ITEMS
   .filter(item => !item.comingSoon)
   .map(item => item.id)

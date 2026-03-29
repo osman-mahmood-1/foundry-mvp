@@ -555,15 +555,17 @@ export interface WaitlistEntry {
 /** Which tab is currently active in the portal */
 export type PortalTab =
   | 'overview'
-  | 'calendar'
-  | 'transactions'
   | 'income'
   | 'expenses'
+  | 'transactions'
   | 'invoices'
+  | 'clients'
   | 'documents'
+  | 'messages'
   | 'intelligence'
-  | 'health'
-  | 'integrations'
+  | 'submission'
+  | 'prior-returns'
+  | 'calendar'
 
 /** Nav item definition for the sidebar */
 export interface NavItem {
@@ -571,7 +573,7 @@ export interface NavItem {
   label: string
   icon: string
   comingSoon?: boolean
-  group: 'overview' | 'money' | 'tools'
+  group: 'overview' | 'money' | 'invoices' | 'workspace' | 'filing'
 }
 
 /** Form state for adding income — subset of Income */
