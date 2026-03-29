@@ -270,16 +270,23 @@ export default function PortalShell({ client }: Props) {
 
                 {/* Group divider label — shown for all groups except the first */}
                 {groupIdx > 0 && groupLabel && (
+                  <div style={{ marginTop: '6px' }}>
                   <div style={{
-                    fontSize:      fontSize.label,
+                    height:     '1px',
+                    background: colours.borderHairline,
+                    margin:     '0 4px 10px',
+                  }} />
+                  <div style={{
+                    fontSize:      fontSize.xs,
                     color:         colours.navGroupLabel,
-                    fontFamily:    fonts.mono,
-                    letterSpacing: letterSpacing.widest,
-                    textTransform: 'uppercase' as const,
-                    padding:       '14px 10px 5px',
+                    fontFamily:    fonts.sans,
+                    fontWeight:    fontWeight.medium,
+                    letterSpacing: '0.01em',
+                    padding:       '0 10px 5px',
                   }}>
                     {groupLabel}
                   </div>
+                </div>
                 )}
 
                 {/* Nav items */}
