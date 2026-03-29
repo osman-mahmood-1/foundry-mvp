@@ -8,10 +8,10 @@ import { fonts, fontSize, fontWeight, letterSpacing } from '@/styles/tokens/typo
 import { glassStatic, orbs } from '@/styles/tokens/effects'
 import { radius, transition, keyframes } from '@/styles/tokens'
 import { spacing } from '@/styles/tokens/spacing'
-import OverviewTab   from './tabs/OverviewTab'
-import IncomeTab     from './tabs/IncomeTab'
-import ExpensesTab   from './tabs/ExpensesTab'
-import DocumentsTab  from './tabs/DocumentsTab'
+import OverviewTab  from './tabs/OverviewTab'
+import IncomeTab    from './tabs/IncomeTab'
+import ExpensesTab  from './tabs/ExpensesTab'
+import DocumentsTab from './tabs/DocumentsTab'
 import MessagesTab  from './tabs/MessagesTab'
 
 // ─── Stub component for tabs not yet built ───────────────────────────────────
@@ -57,30 +57,28 @@ function ComingSoonTab({ id }: { id: string }) {
 
 function TabRenderer({ activeTab, client }: { activeTab: PortalTab; client: Client }) {
   switch (activeTab) {
-    case 'overview':   return <OverviewTab  clientId={client.id} />
-    case 'income':     return <IncomeTab    client={client} />
-    case 'expenses':   return <ExpensesTab  client={client} />
-    case 'documents':  return <DocumentsTab client={client} />
-    default:           return <ComingSoonTab id={activeTab} />
+    case 'overview':  return <OverviewTab  clientId={client.id} />
+    case 'income':    return <IncomeTab    client={client} />
+    case 'expenses':  return <ExpensesTab  client={client} />
+    case 'documents': return <DocumentsTab client={client} />
+    case 'messages':  return <MessagesTab  client={client} />
+    default:          return <ComingSoonTab id={activeTab} />
   }
 }
 
 // ─── Sidebar footer popover ──────────────────────────────────────────────────
 
 interface FooterPopoverProps {
-  client:   Client
-  onClose:  () => void
+  client:  Client
+  onClose: () => void
 }
 
 function FooterPopover({ client, onClose }: FooterPopoverProps) {
   const ref = useRef<HTMLDivElement>(null)
 
-  // Close on outside click
   useEffect(() => {
     function handler(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        onClose()
-      }
+      if (ref.current && !ref.current.contains(e.target as Node)) onClose()
     }
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
@@ -135,7 +133,6 @@ function FooterPopover({ client, onClose }: FooterPopoverProps) {
         animation:    'fadeUp 0.2s ease',
       }}
     >
-      {/* Email */}
       <div style={{
         padding:      '12px 14px',
         fontSize:     fontSize.xs,
@@ -146,7 +143,6 @@ function FooterPopover({ client, onClose }: FooterPopoverProps) {
         {client.email}
       </div>
 
-      {/* Menu items */}
       <div style={{ padding: '6px' }}>
         {menuItem('Settings', '⚙', () => { window.location.href = '/settings' })}
       </div>
@@ -154,11 +150,7 @@ function FooterPopover({ client, onClose }: FooterPopoverProps) {
       <div style={{ height: '1px', background: colours.borderHairline, margin: '0 12px' }} />
 
       <div style={{ padding: '6px' }}>
-        {menuItem(
-          'Upgrade plan',
-          '↑',
-          () => { window.location.href = '/settings/billing' },
-        )}
+        {menuItem('Upgrade plan', '↑', () => { window.location.href = '/settings/billing' })}
       </div>
 
       <div style={{ height: '1px', background: colours.borderHairline, margin: '0 12px' }} />
@@ -168,7 +160,7 @@ function FooterPopover({ client, onClose }: FooterPopoverProps) {
           const { createClient } = await import('@/lib/supabase')
           await createClient().auth.signOut()
           window.location.href = '/login'
-        }, false)}
+        })}
       </div>
     </div>
   )
@@ -181,8 +173,8 @@ interface Props {
 }
 
 export default function PortalShell({ client }: Props) {
-  const [activeTab,     setActiveTab]     = useState<PortalTab>('overview')
-  const [popoverOpen,   setPopoverOpen]   = useState(false)
+  const [activeTab,   setActiveTab]   = useState<PortalTab>('overview')
+  const [popoverOpen, setPopoverOpen] = useState(false)
 
   const firstName = client.full_name?.split(' ')[0] ?? 'there'
   const initial   = firstName.charAt(0).toUpperCase()
@@ -216,7 +208,7 @@ export default function PortalShell({ client }: Props) {
         display:       'flex',
         flexDirection: 'column',
         zIndex:        10,
-        overflow:      'visible', // allows popover to escape
+        overflow:      'visible',
         position:      'relative',
       }}>
 
@@ -265,16 +257,18 @@ export default function PortalShell({ client }: Props) {
 
         {/* Nav */}
         <nav style={{
-          padding:    `${spacing.sidebar.padding} 10px`,
-          flex:       1,
-          overflowY:  'auto',
-          overflowX:  'visible',
+          padding:   `${spacing.sidebar.padding} 10px`,
+          flex:      1,
+          overflowY: 'auto',
+          overflowX: 'visible',
         }}>
           {NAV_GROUP_ORDER.map((group, groupIdx) => {
-            const items = NAV_ITEMS.filter(i => i.group === group)
+            const items      = NAV_ITEMS.filter(i => i.group === group)
             const groupLabel = NAV_GROUPS[group]
             return (
-              <div key={group}>
+              <div key={group} style={{ marginBottom: '4px' }}>
+
+                {/* Group divider label — shown for all groups except the first */}
                 {groupIdx > 0 && groupLabel && (
                   <div style={{
                     fontSize:      fontSize.label,
@@ -282,11 +276,13 @@ export default function PortalShell({ client }: Props) {
                     fontFamily:    fonts.mono,
                     letterSpacing: letterSpacing.widest,
                     textTransform: 'uppercase' as const,
-                    padding:       '10px 10px 4px',
+                    padding:       '14px 10px 5px',
                   }}>
                     {groupLabel}
                   </div>
                 )}
+
+                {/* Nav items */}
                 {items.map(item => {
                   const isSoon   = item.comingSoon === true
                   const isActive = activeTab === item.id && !isSoon
@@ -299,7 +295,7 @@ export default function PortalShell({ client }: Props) {
                         display:      'flex',
                         alignItems:   'center',
                         gap:          '9px',
-                        padding:      '8px 10px',
+                        padding:      '9px 10px',
                         borderRadius: radius.sm,
                         background:   isActive ? colours.navActiveBg : 'transparent',
                         border:       'none',
@@ -311,7 +307,7 @@ export default function PortalShell({ client }: Props) {
                         fontSize:     fontSize.base,
                         fontWeight:   isActive ? fontWeight.medium : fontWeight.regular,
                         cursor:       isSoon ? 'default' : 'pointer',
-                        marginBottom: '1px',
+                        marginBottom: '2px',
                         transition:   transition.snap,
                         textAlign:    'left' as const,
                         fontFamily:   fonts.sans,
@@ -346,16 +342,14 @@ export default function PortalShell({ client }: Props) {
 
         <div style={{ height: '1px', background: colours.borderHairline, margin: '0 18px' }} />
 
-        {/* Footer — Claude-style user card + popover */}
+        {/* Footer — user card + popover */}
         <div style={{ padding: '10px', position: 'relative' }}>
-
           {popoverOpen && (
             <FooterPopover
               client={client}
               onClose={() => setPopoverOpen(false)}
             />
           )}
-
           <button
             onClick={() => setPopoverOpen(o => !o)}
             style={{
@@ -378,7 +372,6 @@ export default function PortalShell({ client }: Props) {
               if (!popoverOpen) e.currentTarget.style.background = 'transparent'
             }}
           >
-            {/* Avatar */}
             <div style={{
               width:          '28px',
               height:         '28px',
@@ -394,7 +387,6 @@ export default function PortalShell({ client }: Props) {
             }}>
               {initial}
             </div>
-            {/* Name + plan */}
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{
                 fontSize:     fontSize.sm,
@@ -415,7 +407,6 @@ export default function PortalShell({ client }: Props) {
                  (client.plan ?? 'foundation').slice(1)}
               </div>
             </div>
-            {/* Chevron */}
             <span style={{
               fontSize:   '10px',
               color:      colours.textMuted,
@@ -436,7 +427,6 @@ export default function PortalShell({ client }: Props) {
         position:  'relative',
         zIndex:    1,
       }}>
-        {/* Greeting */}
         <div style={{ marginBottom: '20px', padding: '4px' }}>
           <div style={{
             fontSize:      fontSize.label,
@@ -460,7 +450,6 @@ export default function PortalShell({ client }: Props) {
           </h1>
         </div>
 
-        {/* Active tab content */}
         <div key={activeTab} style={{ animation: 'fadeUp 0.4s ease' }}>
           <TabRenderer activeTab={activeTab} client={client} />
         </div>

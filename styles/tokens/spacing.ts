@@ -36,8 +36,12 @@ export const spacing = {
     paddingTight: space[5],   // 20px — compact panels
   },
   sidebar: {
-    padding:      space[3],   // 12px — nav item padding
-    userPadding:  space[6],   // 24px — user identity section top padding
+    padding:       space[3],    // 12px — outer horizontal padding
+    userPadding:   space[6],    // 24px — user identity section top padding
+    itemPaddingV:  '9px',       // vertical padding on each nav item
+    itemPaddingH:  '10px',      // horizontal padding on each nav item
+    groupGap:      space[3],    // 12px — space above each group label
+    itemGap:       '2px',       // gap between individual nav items
   },
   form: {
     fieldGap:     space[3],   // 12px — between form fields
