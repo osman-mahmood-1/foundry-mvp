@@ -8,8 +8,11 @@ import { fonts, fontSize, fontWeight, letterSpacing } from '@/styles/tokens/typo
 import { glassStatic, orbs } from '@/styles/tokens/effects'
 import { radius, transition, keyframes } from '@/styles/tokens'
 import { spacing } from '@/styles/tokens/spacing'
-import OverviewTab    from './tabs/OverviewTab'
-import IncomeTab      from './tabs/IncomeTab'
+import OverviewTab   from './tabs/OverviewTab'
+import IncomeTab     from './tabs/IncomeTab'
+import ExpensesTab   from './tabs/ExpensesTab'
+import DocumentsTab  from './tabs/DocumentsTab'
+import MessagesTab  from './tabs/MessagesTab'
 
 // ─── Stub component for tabs not yet built ───────────────────────────────────
 
@@ -54,9 +57,11 @@ function ComingSoonTab({ id }: { id: string }) {
 
 function TabRenderer({ activeTab, client }: { activeTab: PortalTab; client: Client }) {
   switch (activeTab) {
-    case 'overview':  return <OverviewTab clientId={client.id} />
-    case 'income':    return <IncomeTab   client={client} />
-    default:          return <ComingSoonTab id={activeTab} />
+    case 'overview':   return <OverviewTab  clientId={client.id} />
+    case 'income':     return <IncomeTab    client={client} />
+    case 'expenses':   return <ExpensesTab  client={client} />
+    case 'documents':  return <DocumentsTab client={client} />
+    default:           return <ComingSoonTab id={activeTab} />
   }
 }
 
