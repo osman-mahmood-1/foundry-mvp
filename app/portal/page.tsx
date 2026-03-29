@@ -1,80 +1,45 @@
-'use client'
-
 /**
  * app/portal/page.tsx
  *
- * Entry point for the authenticated portal.
+ * Server component entry point for the authenticated portal.
+ *
  * Responsibilities:
- *   1. Verify the user is authenticated — redirect to /login if not
- *   2. Load the client record from Supabase
+ *   1. Verify the user session server-side — redirect to /login if not authenticated
+ *   2. Load the client record from Supabase using the server client
  *   3. Redirect to /onboarding if onboarding is incomplete
- *   4. Hand off to PortalShell with the client record
+ *   4. Hand off to PortalShell (client component) with the typed client record
  *
  * This file does nothing else. No UI. No data transformation.
  * All layout and tab rendering lives in PortalShell.
+ *
+ * force-dynamic: this page is always server-rendered on demand.
+ * It must never be statically generated — it serves authenticated,
+ * personalised data.
  */
 
-import { useEffect, useState } from 'react'
-import { createClient } from '@/lib/supabase'
+import { redirect } from 'next/navigation'
+import { createClient } from '@/lib/supabase-server'
 import PortalShell from './components/PortalShell'
 import type { Client } from '@/types'
 
-export default function PortalPage() {
-  const [client, setClient] = useState<Client | null>(null)
-  const [loading, setLoading] = useState(true)
+export const dynamic = 'force-dynamic'
 
-  useEffect(() => {
-    const supabase = createClient()
+export default async function PortalPage() {
+  const supabase = await createClient()
 
-    async function loadClient() {
-      const { data: { user } } = await supabase.auth.getUser()
+  // ── Auth check ────────────────────────────────────────────────
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/login')
 
-      if (!user) {
-        window.location.href = '/login'
-        return
-      }
+  // ── Client record ─────────────────────────────────────────────
+  const { data: clientData } = await supabase
+    .from('clients')
+    .select('*')
+    .eq('user_id', user.id)
+    .single()
 
-      const { data: clientData } = await supabase
-        .from('clients')
-        .select('*')
-        .eq('user_id', user.id)
-        .single()
+  // ── Onboarding guard ──────────────────────────────────────────
+  if (!clientData?.onboarding_complete) redirect('/onboarding')
 
-      if (!clientData?.onboarding_complete) {
-        window.location.href = '/onboarding'
-        return
-      }
-
-      setClient(clientData as Client)
-      setLoading(false)
-    }
-
-    loadClient()
-  }, [])
-
-  if (loading) {
-    return (
-      <div style={{
-        minHeight:      '100vh',
-        background:     '#F0F4FA',
-        display:        'flex',
-        alignItems:     'center',
-        justifyContent: 'center',
-      }}>
-        <div style={{
-          width:        '32px',
-          height:       '32px',
-          border:       '2px solid rgba(5,28,44,0.1)',
-          borderTop:    '2px solid #051C2C',
-          borderRadius: '50%',
-          animation:    'spin 0.8s linear infinite',
-        }} />
-        <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
-      </div>
-    )
-  }
-
-  if (!client) return null
-
-  return <PortalShell client={client} />
+  return <PortalShell client={clientData as Client} />
 }
