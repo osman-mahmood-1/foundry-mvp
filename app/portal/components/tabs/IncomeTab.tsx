@@ -9,7 +9,6 @@
  * - No Supabase imports. No data fetching. All data via useIncome().
  * - All design values from @/styles/tokens — no hardcoded values.
  * - Uses shared UI primitives from ../ui/index.tsx throughout.
- * - A senior dev can understand every section in under 60 seconds.
  */
 
 import { useState } from 'react'
@@ -42,6 +41,13 @@ const INCOME_CATEGORIES: { value: IncomeCategory; label: string }[] = [
   { value: 'other',        label: 'Other income' },
 ]
 
+// ─── Month helper ─────────────────────────────────────────────────────────────
+
+function formatMonthLabel(ym: string): string {
+  const [y, m] = ym.split('-').map(Number)
+  return new Date(y, m - 1, 1).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })
+}
+
 // ─── Props ────────────────────────────────────────────────────────────────────
 
 interface Props {
@@ -57,6 +63,11 @@ export default function IncomeTab({ client }: Props) {
     income,
     totalPence,
     entryCount,
+    availableMonths,
+    loadedMonths,
+    hasMore,
+    loadingMore,
+    loadMonth,
     loading,
     saving,
     error,
@@ -78,6 +89,18 @@ export default function IncomeTab({ client }: Props) {
     resetForm()
     setShowForm(false)
   }
+
+  // ── Month grouping ──────────────────────────────────────────────
+  const groups: Record<string, typeof income> = {}
+  for (const item of income) {
+    const m = item.date.slice(0, 7)
+    if (!groups[m]) groups[m] = []
+    groups[m].push(item)
+  }
+  const sortedGroupKeys = Object.keys(groups).sort((a, b) => b.localeCompare(a))
+
+  // Next month to load
+  const nextMonth = availableMonths.find(m => !loadedMonths.includes(m))
 
   if (loading) return <Spinner />
 
@@ -138,17 +161,10 @@ export default function IncomeTab({ client }: Props) {
             />
 
             <div style={{ display: 'flex', gap: '10px', marginTop: '4px' }}>
-              <Button
-                onClick={handleAdd}
-                disabled={saving || !isFormValid}
-              >
+              <Button onClick={handleAdd} disabled={saving || !isFormValid}>
                 {saving ? 'Saving…' : 'Save entry'}
               </Button>
-              <Button
-                variant="secondary"
-                onClick={handleCancel}
-                disabled={saving}
-              >
+              <Button variant="secondary" onClick={handleCancel} disabled={saving}>
                 Cancel
               </Button>
             </div>
@@ -168,17 +184,14 @@ export default function IncomeTab({ client }: Props) {
         }}>
           <Label>Income · {client.tax_year}</Label>
           {!showForm && (
-            <Button
-              size="sm"
-              onClick={() => setShowForm(true)}
-            >
+            <Button size="sm" onClick={() => setShowForm(true)}>
               + Add entry
             </Button>
           )}
         </div>
 
         {/* Empty state */}
-        {income.length === 0 && (
+        {income.length === 0 && entryCount === 0 && (
           <EmptyState
             icon="↑"
             headline="No income logged yet."
@@ -188,15 +201,72 @@ export default function IncomeTab({ client }: Props) {
           />
         )}
 
-        {/* Rows */}
-        {income.map((item, idx) => (
-          <IncomeRow
-            key={item.id}
-            item={item}
-            isLast={idx === income.length - 1}
-            onDelete={() => deleteIncome(item.id)}
-          />
-        ))}
+        {/* Month groups */}
+        {sortedGroupKeys.map(month => {
+          const rows      = groups[month]
+          const subtotal  = rows.reduce((s, r) => s + r.amount_pence, 0)
+          return (
+            <div key={month}>
+              {/* Month header */}
+              <div style={{
+                display:        'flex',
+                alignItems:     'center',
+                justifyContent: 'space-between',
+                padding:        `8px ${spacing.panel.padding}`,
+                background:     colours.hoverBg,
+                borderBottom:   `1px solid ${colours.borderHairline}`,
+              }}>
+                <span style={{
+                  fontSize:      fontSize.xs,
+                  fontWeight:    fontWeight.medium,
+                  color:         colours.textSecondary,
+                  letterSpacing: '0.04em',
+                }}>
+                  {formatMonthLabel(month)}
+                  <span style={{ opacity: 0.5, margin: '0 6px' }}>·</span>
+                  {rows.length} entr{rows.length === 1 ? 'y' : 'ies'}
+                </span>
+                <span style={{
+                  fontFamily:    fonts.mono,
+                  fontSize:      fontSize.xs,
+                  fontWeight:    fontWeight.semibold,
+                  color:         colours.income,
+                  letterSpacing: letterSpacing.tight,
+                }}>
+                  {formatGBP(subtotal)}
+                </span>
+              </div>
+              {/* Rows */}
+              {rows.map((item, idx) => (
+                <IncomeRow
+                  key={item.id}
+                  item={item}
+                  isLast={idx === rows.length - 1}
+                  onDelete={() => deleteIncome(item.id, item.amount_pence)}
+                />
+              ))}
+            </div>
+          )
+        })}
+
+        {/* Load more month */}
+        {hasMore && nextMonth && (
+          <div style={{
+            borderTop:      `1px solid ${colours.borderHairline}`,
+            padding:        '14px',
+            display:        'flex',
+            justifyContent: 'center',
+          }}>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={loadMonth}
+              disabled={loadingMore}
+            >
+              {loadingMore ? 'Loading…' : `Load ${formatMonthLabel(nextMonth)}`}
+            </Button>
+          </div>
+        )}
       </Panel>
     </div>
   )
@@ -275,10 +345,10 @@ function IncomeRow({ item, isLast, onDelete }: IncomeRowProps) {
       {/* Right — amount + delete */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
         <div style={{
-          fontFamily:  fonts.mono,
-          fontSize:    fontSize.base,
-          fontWeight:  fontWeight.semibold,
-          color:       colours.income,
+          fontFamily:    fonts.mono,
+          fontSize:      fontSize.base,
+          fontWeight:    fontWeight.semibold,
+          color:         colours.income,
           letterSpacing: letterSpacing.tight,
         }}>
           {formatGBP(item.amount_pence)}
@@ -288,19 +358,19 @@ function IncomeRow({ item, isLast, onDelete }: IncomeRowProps) {
             onClick={onDelete}
             title="Remove entry"
             style={{
-              width:        '24px',
-              height:       '24px',
-              borderRadius: radius.circle,
-              background:   colours.dangerLight,
-              border:       'none',
-              color:        colours.danger,
-              fontSize:     '11px',
-              cursor:       'pointer',
-              display:      'flex',
-              alignItems:   'center',
+              width:          '24px',
+              height:         '24px',
+              borderRadius:   radius.circle,
+              background:     colours.dangerLight,
+              border:         'none',
+              color:          colours.danger,
+              fontSize:       '11px',
+              cursor:         'pointer',
+              display:        'flex',
+              alignItems:     'center',
               justifyContent: 'center',
-              transition:   transition.snap,
-              flexShrink:   0,
+              transition:     transition.snap,
+              flexShrink:     0,
             }}
           >
             ✕

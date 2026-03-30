@@ -61,7 +61,14 @@ const EXPENSE_CATEGORIES: { value: ExpenseCategory; label: string }[] = [
   { value: 'other',               label: 'Other expense' },
 ]
 
-// ─── Allowability badge helper ────────────────────────────────────────────────
+// ─── Month helper ─────────────────────────────────────────────────────────────
+
+function formatMonthLabel(ym: string): string {
+  const [y, m] = ym.split('-').map(Number)
+  return new Date(y, m - 1, 1).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })
+}
+
+// ─── Allowability badge ───────────────────────────────────────────────────────
 
 function AllowableBadge({ allowable }: { allowable: boolean | null }) {
   if (allowable === true)  return <Badge variant="success">Allowable</Badge>
@@ -84,6 +91,11 @@ export default function ExpensesTab({ client }: Props) {
     expenses,
     totalPence,
     entryCount,
+    availableMonths,
+    loadedMonths,
+    hasMore,
+    loadingMore,
+    loadMonth,
     loading,
     saving,
     error,
@@ -104,6 +116,17 @@ export default function ExpensesTab({ client }: Props) {
     resetForm()
     setShowForm(false)
   }
+
+  // ── Month grouping ──────────────────────────────────────────────
+  const groups: Record<string, typeof expenses> = {}
+  for (const item of expenses) {
+    const m = item.date.slice(0, 7)
+    if (!groups[m]) groups[m] = []
+    groups[m].push(item)
+  }
+  const sortedGroupKeys = Object.keys(groups).sort((a, b) => b.localeCompare(a))
+
+  const nextMonth = availableMonths.find(m => !loadedMonths.includes(m))
 
   if (loading) return <Spinner />
 
@@ -204,7 +227,7 @@ export default function ExpensesTab({ client }: Props) {
           )}
         </div>
 
-        {expenses.length === 0 && (
+        {expenses.length === 0 && entryCount === 0 && (
           <EmptyState
             icon="↓"
             headline="No expenses logged yet."
@@ -214,14 +237,70 @@ export default function ExpensesTab({ client }: Props) {
           />
         )}
 
-        {expenses.map((item, idx) => (
-          <ExpenseRow
-            key={item.id}
-            item={item}
-            isLast={idx === expenses.length - 1}
-            onDelete={() => deleteExpense(item.id)}
-          />
-        ))}
+        {/* Month groups */}
+        {sortedGroupKeys.map(month => {
+          const rows     = groups[month]
+          const subtotal = rows.reduce((s, r) => s + r.amount_pence, 0)
+          return (
+            <div key={month}>
+              <div style={{
+                display:        'flex',
+                alignItems:     'center',
+                justifyContent: 'space-between',
+                padding:        `8px ${spacing.panel.padding}`,
+                background:     colours.hoverBg,
+                borderBottom:   `1px solid ${colours.borderHairline}`,
+              }}>
+                <span style={{
+                  fontSize:      fontSize.xs,
+                  fontWeight:    fontWeight.medium,
+                  color:         colours.textSecondary,
+                  letterSpacing: '0.04em',
+                }}>
+                  {formatMonthLabel(month)}
+                  <span style={{ opacity: 0.5, margin: '0 6px' }}>·</span>
+                  {rows.length} entr{rows.length === 1 ? 'y' : 'ies'}
+                </span>
+                <span style={{
+                  fontFamily:    fonts.mono,
+                  fontSize:      fontSize.xs,
+                  fontWeight:    fontWeight.semibold,
+                  color:         colours.expense,
+                  letterSpacing: letterSpacing.tight,
+                }}>
+                  {formatGBP(subtotal)}
+                </span>
+              </div>
+              {rows.map((item, idx) => (
+                <ExpenseRow
+                  key={item.id}
+                  item={item}
+                  isLast={idx === rows.length - 1}
+                  onDelete={() => deleteExpense(item.id, item.amount_pence)}
+                />
+              ))}
+            </div>
+          )
+        })}
+
+        {/* Load more month */}
+        {hasMore && nextMonth && (
+          <div style={{
+            borderTop:      `1px solid ${colours.borderHairline}`,
+            padding:        '14px',
+            display:        'flex',
+            justifyContent: 'center',
+          }}>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={loadMonth}
+              disabled={loadingMore}
+            >
+              {loadingMore ? 'Loading…' : `Load ${formatMonthLabel(nextMonth)}`}
+            </Button>
+          </div>
+        )}
       </Panel>
 
     </div>

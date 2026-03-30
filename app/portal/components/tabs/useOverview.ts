@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase'
 import { APP_ERRORS } from '@/lib/errors'
 import type { AppError } from '@/lib/errors'
+import { estimateTax } from '@/lib/tax'
 
 export interface OverviewStats {
   incomePence:       number
@@ -31,17 +32,6 @@ export interface OverviewData {
   error:      AppError | null
 }
 
-function estimateTax(incomePence: number, expensesPence: number): number {
-  const profitGBP  = Math.max(0, incomePence - expensesPence) / 100
-  const taxable    = Math.max(0, profitGBP - 12_570)
-  const basicBand  = Math.min(taxable, 37_700)
-  const higherBand = Math.max(0, taxable - 37_700)
-  const incomeTax  = basicBand * 0.20 + higherBand * 0.40
-  const ni4Base    = Math.min(Math.max(0, profitGBP - 12_570), 37_700)
-  const ni4Higher  = Math.max(0, profitGBP - 50_270)
-  const ni4        = ni4Base * 0.09 + ni4Higher * 0.02
-  return Math.round((incomeTax + ni4) * 100)
-}
 
 export function useOverview(clientId: string | null): OverviewData {
   const [data, setData] = useState<OverviewData>({
@@ -101,7 +91,7 @@ export function useOverview(clientId: string | null): OverviewData {
         setData({
           stats: {
             incomePence, expensesPence,
-            estTaxPence: estimateTax(incomePence, expensesPence),
+            estTaxPence: estimateTax(incomePence, expensesPence, taxYear),
             docsNeedingReview: docsCount ?? 0,
             openTasks: tasksCount ?? 0,
           },
