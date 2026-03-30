@@ -16,7 +16,7 @@
  * in under 30 seconds and understand exactly what it renders.
  */
 
-import React, { useState } from 'react'
+import React, { useState, Component } from 'react'
 import {
   colours,
   fonts,
@@ -115,6 +115,109 @@ export function ErrorBanner({ error }: { error: AppError }) {
       </button>
     </div>
   )
+}
+
+
+// ─── TabErrorBoundary ─────────────────────────────────────────────────────────
+
+interface TabErrorBoundaryState {
+  caught: boolean
+  code:   string
+}
+
+/**
+ * Class-based error boundary wrapping each portal tab.
+ *
+ * If a tab throws during render, this catches it and shows a calm recovery
+ * UI instead of crashing the entire portal. The user can navigate to other
+ * tabs normally. Switching tabs resets the boundary (via key prop in caller).
+ *
+ * Error boundaries must be class components — React does not support them
+ * as function components.
+ */
+export class TabErrorBoundary extends Component<
+  { children: React.ReactNode },
+  TabErrorBoundaryState
+> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props)
+    this.state = { caught: false, code: '' }
+  }
+
+  static getDerivedStateFromError(error: unknown): TabErrorBoundaryState {
+    const msg  = error instanceof Error ? error.message : String(error)
+    const code = `UI-${Math.abs(
+      msg.split('').reduce((h, c) => ((h << 5) - h + c.charCodeAt(0)) | 0, 0),
+    ).toString(16).toUpperCase().slice(0, 6)}`
+    return { caught: true, code }
+  }
+
+  componentDidCatch(error: unknown, info: React.ErrorInfo) {
+    console.error(this.state.code, error, info.componentStack)
+  }
+
+  render() {
+    if (!this.state.caught) return this.props.children
+
+    return (
+      <div style={{
+        ...glass.panel,
+        padding:        '48px 36px',
+        display:        'flex',
+        flexDirection:  'column',
+        alignItems:     'center',
+        justifyContent: 'center',
+        minHeight:      '320px',
+        textAlign:      'center',
+        gap:            '12px',
+      }}>
+        <div style={{ fontSize: '22px', opacity: 0.2 }}>◈</div>
+        <div style={{
+          fontFamily: fonts.serif,
+          fontSize:   '18px',
+          fontWeight: fontWeight.medium,
+          color:      colours.textPrimary,
+        }}>
+          This section hit a snag.
+        </div>
+        <div style={{
+          fontSize:   fontSize.sm,
+          color:      colours.textMuted,
+          lineHeight: 1.6,
+          maxWidth:   '300px',
+        }}>
+          We've spotted a hiccup on our end. We're reviewing it and will have this resolved shortly.
+          Switch to another tab to continue, or reload the page.
+        </div>
+        <button
+          onClick={() => window.location.reload()}
+          style={{
+            marginTop:     '8px',
+            padding:       '8px 20px',
+            background:    'transparent',
+            border:        `1px solid ${colours.borderMedium}`,
+            borderRadius:  radius.pill,
+            fontSize:      fontSize.sm,
+            color:         colours.textSecondary,
+            fontFamily:    fonts.sans,
+            cursor:        'pointer',
+            transition:    transition.snap,
+          }}
+        >
+          Reload page
+        </button>
+        <div style={{
+          fontFamily:    fonts.mono,
+          fontSize:      '10px',
+          color:         colours.textMuted,
+          letterSpacing: '0.08em',
+          opacity:       0.6,
+        }}>
+          {this.state.code}
+        </div>
+      </div>
+    )
+  }
 }
 
 

@@ -13,6 +13,7 @@ import IncomeTab    from './tabs/IncomeTab'
 import ExpensesTab  from './tabs/ExpensesTab'
 import DocumentsTab from './tabs/DocumentsTab'
 import MessagesTab  from './tabs/MessagesTab'
+import { TabErrorBoundary } from './ui'
 
 // ─── Stub component for tabs not yet built ───────────────────────────────────
 
@@ -463,7 +464,9 @@ export default function PortalShell({ client }: Props) {
         </div>
 
         <div key={activeTab} style={{ animation: 'fadeUp 0.4s ease' }}>
-          <TabRenderer activeTab={activeTab} client={client} />
+          <TabErrorBoundary key={activeTab}>
+            <TabRenderer activeTab={activeTab} client={client} />
+          </TabErrorBoundary>
         </div>
       </main>
     </div>
