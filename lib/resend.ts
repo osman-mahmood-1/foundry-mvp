@@ -4,9 +4,14 @@
 
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-const FROM = process.env.RESEND_FROM_EMAIL ?? 'onboarding@resend.dev'
+const FROM    = process.env.RESEND_FROM_EMAIL ?? 'onboarding@resend.dev'
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://taxfoundry.co.uk'
+
+// Initialised lazily inside each function so the module can be imported
+// without RESEND_API_KEY being present (e.g. local dev without email configured).
+function getResend() {
+  return new Resend(process.env.RESEND_API_KEY)
+}
 
 // ─── Welcome / onboarding email ──────────────────────────
 export async function sendWelcomeEmail({
@@ -185,7 +190,7 @@ export async function sendWelcomeEmail({
 </html>
   `
 
-  return resend.emails.send({
+  return getResend().emails.send({
     from: `Foundry <${FROM}>`,
     to,
     subject: `${firstName}, your portal is ready.`,
@@ -207,7 +212,7 @@ export async function sendDocumentReadyEmail({
   firstName: string
   documentName: string
 }) {
-  return resend.emails.send({
+  return getResend().emails.send({
     from: `Foundry <${FROM}>`,
     to,
     subject: `Your document is ready — ${documentName}`,
@@ -232,7 +237,7 @@ export async function sendMessageNotificationEmail({
   firstName: string
   preview: string
 }) {
-  return resend.emails.send({
+  return getResend().emails.send({
     from: `Foundry <${FROM}>`,
     to,
     subject: `New message from your accountant`,
