@@ -39,13 +39,22 @@ not an afterthought.
 
 ## RLS Audit Trail
 
-| Date       | Auditor      | Finding                                      | Status  |
-|------------|--------------|----------------------------------------------|---------|
-| 2026-03-30 | Claude Code  | waitlist SELECT exposed 14 PII rows to anon  | Fixed   |
-| 2026-03-30 | Claude Code  | All core portal tables: anon blocked ✓       | Verified |
-| 2026-03-30 | Claude Code  | documents storage bucket: anon accessible    | Migrated |
+| Date       | Auditor      | Finding                                                              | Status   |
+|------------|--------------|----------------------------------------------------------------------|----------|
+| 2026-03-30 | Claude Code  | waitlist SELECT exposed 14 PII rows to anon                          | Fixed    |
+| 2026-03-30 | Claude Code  | All core portal tables: anon blocked ✓                               | Verified |
+| 2026-03-30 | Claude Code  | documents storage bucket: anon accessible                            | Fixed    |
+| 2026-03-30 | Claude Code  | waitlist old policies ("public read by uid only", "count only" etc.) still active after first migration — actual policy names differed from assumed names | Fixed    |
+| 2026-03-30 | Claude Code  | audit_log INSERT open to {public} — anyone could inject fake entries | Fixed    |
+| 2026-03-30 | Claude Code  | Redundant ALL {public} policies on clients/income/expenses/documents/messages/tasks alongside scoped {authenticated} policies | Cleaned  |
+| 2026-03-30 | Claude Code  | Full pentest: 14/14 passed — all tables locked, waitlist PII blocked | Verified |
 
-Migration: `supabase/migrations/20260330_rls_hardening.sql`
+Migrations applied:
+- `supabase/migrations/20260330_rls_hardening.sql` — initial hardening
+- `supabase/migrations/20260330_rls_cleanup.sql` — drop stale public policies, fix audit_log INSERT
+
+**LESSON: Always query `pg_policies` after a migration to verify policy names matched.
+  Never assume DROP POLICY IF EXISTS succeeded — confirm with a SELECT.**
 
 ---
 
