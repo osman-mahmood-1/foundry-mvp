@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase-server'
+import { createAdminClient } from '@/lib/supabase-admin'
 import { Resend } from 'resend'
 
 function generateUID(memberNumber: number): string {
@@ -88,7 +89,9 @@ export async function joinWaitlist(formData: FormData) {
 }
 
 export async function getMemberCount() {
-  const supabase = await createClient()
+  // Admin client required — waitlist SELECT is restricted to service_role only.
+  // The anon key cannot read this table to prevent PII exposure.
+  const supabase = createAdminClient()
   const { count } = await supabase
     .from('waitlist')
     .select('*', { count: 'exact', head: true })
