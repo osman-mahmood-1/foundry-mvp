@@ -19,6 +19,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { createClient } from '@/lib/supabase'
 import { APP_ERRORS } from '@/lib/errors'
+import { logAudit } from '@/lib/audit'
 import type { Message, SenderRole } from '@/types'
 import type { AppError } from '@/lib/errors'
 
@@ -118,6 +119,7 @@ export function useMessages(
       console.error('MSG_002', err)
       setError(APP_ERRORS.MSG_002)
     } else {
+      void logAudit({ actorId: userId, clientId, action: 'message.sent', targetType: 'messages', targetId: clientId })
       setDraft('')
     }
     setSending(false)

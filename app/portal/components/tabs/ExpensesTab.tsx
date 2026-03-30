@@ -93,7 +93,7 @@ export default function ExpensesTab({ client }: Props) {
     addExpense,
     deleteExpense,
     resetForm,
-  } = useExpenses(client.id, client.tax_year)
+  } = useExpenses(client.id, client.tax_year, client.user_id)
 
   async function handleAdd() {
     await addExpense()

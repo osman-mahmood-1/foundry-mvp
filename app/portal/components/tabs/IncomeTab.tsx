@@ -66,7 +66,7 @@ export default function IncomeTab({ client }: Props) {
     addIncome,
     deleteIncome,
     resetForm,
-  } = useIncome(client.id, client.tax_year)
+  } = useIncome(client.id, client.tax_year, client.user_id)
 
   // ── Handlers ───────────────────────────────────────────────────
   async function handleAdd() {

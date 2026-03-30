@@ -13,6 +13,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase'
 import { APP_ERRORS } from '@/lib/errors'
+import { logAudit } from '@/lib/audit'
 import type { Expense, ExpenseFormState, ExpenseCategory } from '@/types'
 import type { AppError } from '@/lib/errors'
 
@@ -47,6 +48,7 @@ const DEFAULT_FORM: ExpenseFormState = {
 export function useExpenses(
   clientId: string,
   taxYear:  string,
+  userId:   string,
 ): UseExpensesResult {
   const supabase = createClient()
 
@@ -86,7 +88,7 @@ export function useExpenses(
 
     const amountPence = Math.round(parseFloat(form.amount) * 100)
 
-    const { error: err } = await supabase
+    const { data: inserted, error: err } = await supabase
       .from('expenses')
       .insert({
         client_id:       clientId,
@@ -101,11 +103,14 @@ export function useExpenses(
         allowable:       null,     // pending accountant review
         is_pending:      false,
       })
+      .select('id')
+      .single()
 
     if (err) {
       console.error('EXPENSE_002', err)
       setError(APP_ERRORS.EXPENSE_002)
     } else {
+      void logAudit({ actorId: userId, clientId, action: 'expense.created', targetType: 'expenses', targetId: inserted.id })
       setForm(() => DEFAULT_FORM)
       await load()
     }
@@ -125,9 +130,10 @@ export function useExpenses(
       console.error('EXPENSE_003', err)
       setError(APP_ERRORS.EXPENSE_003)
     } else {
+      void logAudit({ actorId: userId, clientId, action: 'expense.deleted', targetType: 'expenses', targetId: id })
       setExpenses(prev => prev.filter(e => e.id !== id))
     }
-  }, [clientId])
+  }, [clientId, userId])
 
   // ── Derived ─────────────────────────────────────────────────────
   const totalPence = expenses.reduce((sum, e) => sum + e.amount_pence, 0)

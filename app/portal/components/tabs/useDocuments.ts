@@ -16,6 +16,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase'
 import { APP_ERRORS } from '@/lib/errors'
+import { logAudit } from '@/lib/audit'
 import type { Document as FoundryDocument, DocumentCategory } from '@/types'
 import type { AppError } from '@/lib/errors'
 
@@ -112,6 +113,7 @@ export function useDocuments(
       return
     }
 
+    void logAudit({ actorId: userId, clientId, action: 'document.uploaded', targetType: 'documents', targetId: storagePath })
     await load()
     setUploading(false)
   }, [clientId, taxYear, userId, load])
@@ -134,9 +136,10 @@ export function useDocuments(
       console.error('DOC_004', err)
       setError(APP_ERRORS.DOC_004)
     } else {
+      void logAudit({ actorId: userId, clientId, action: 'document.deleted', targetType: 'documents', targetId: id })
       setDocuments(prev => prev.filter(d => d.id !== id))
     }
-  }, [clientId])
+  }, [clientId, userId])
 
   return {
     documents,

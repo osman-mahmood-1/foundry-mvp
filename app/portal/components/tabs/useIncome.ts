@@ -18,6 +18,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase'
 import { APP_ERRORS } from '@/lib/errors'
+import { logAudit } from '@/lib/audit'
 import type { Income, IncomeFormState, IncomeCategory } from '@/types'
 import type { AppError } from '@/lib/errors'
 
@@ -56,6 +57,7 @@ const DEFAULT_FORM: IncomeFormState = {
 export function useIncome(
   clientId: string,
   taxYear:  string,
+  userId:   string,
 ): UseIncomeResult {
   const supabase = createClient()
 
@@ -95,7 +97,7 @@ export function useIncome(
 
     const amountPence = Math.round(parseFloat(form.amount) * 100)
 
-    const { error: err } = await supabase
+    const { data: inserted, error: err } = await supabase
       .from('income')
       .insert({
         client_id:       clientId,
@@ -108,11 +110,14 @@ export function useIncome(
         source:          'manual',
         status:          'confirmed',
       })
+      .select('id')
+      .single()
 
     if (err) {
       console.error('INCOME_002', err)
       setError(APP_ERRORS.INCOME_002)
     } else {
+      void logAudit({ actorId: userId, clientId, action: 'income.created', targetType: 'income', targetId: inserted.id })
       setForm(() => DEFAULT_FORM)
       await load()
     }
@@ -132,9 +137,10 @@ export function useIncome(
       console.error('INCOME_003', err)
       setError(APP_ERRORS.INCOME_003)
     } else {
+      void logAudit({ actorId: userId, clientId, action: 'income.deleted', targetType: 'income', targetId: id })
       setIncome(prev => prev.filter(i => i.id !== id))
     }
-  }, [clientId])
+  }, [clientId, userId])
 
   // ── Derived ─────────────────────────────────────────────────────
   const totalPence = income.reduce((sum, i) => sum + i.amount_pence, 0)
