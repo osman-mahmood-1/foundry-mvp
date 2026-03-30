@@ -133,6 +133,7 @@ export default function OnboardingPage() {
   const [tradeLabel, setTradeLabel] = useState('')
   const [goal, setGoal] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
   const [clientEmail, setClientEmail] = useState<string>('')
   const [userId, setUserId] = useState<string | null>(null)
   const [clientId, setClientId] = useState<string | null>(null)
@@ -157,17 +158,57 @@ export default function OnboardingPage() {
 
   // ─── Save + continue ──────────────────────────────────
   async function handleComplete(skipGoal = false) {
-    if (!clientId) return
+    if (!userId) return
     setSaving(true)
+    setSaveError(null)
     const supabase = createClient()
+    const config   = await getPortalConfig(clientType ?? 'other')
 
-    await supabase.from('clients').update({
-      full_name: firstName.trim(),
-      client_type: clientType ?? 'other',
-      trade_label: tradeLabel || tradeLabel,
-      portal_config: await getPortalConfig(clientType ?? 'other'),
-      onboarding_complete: true,
-    }).eq('id', clientId)
+    let resolvedClientId = clientId
+
+    if (!resolvedClientId) {
+      // New user — no client record yet, create one now
+      const { data, error } = await supabase
+        .from('clients')
+        .insert({
+          user_id:             userId,
+          full_name:           firstName.trim(),
+          client_type:         clientType ?? 'other',
+          trade_label:         tradeLabel,
+          portal_config:       config,
+          onboarding_complete: true,
+          tax_year:            '2024-25',
+        })
+        .select('id')
+        .single()
+
+      if (error || !data) {
+        console.error('ONBOARDING_001', error)
+        setSaveError('Your portal is temporarily unavailable. Reload the page and try again.')
+        setSaving(false)
+        return
+      }
+      resolvedClientId = data.id
+    } else {
+      // Existing user — update record
+      const { error } = await supabase
+        .from('clients')
+        .update({
+          full_name:           firstName.trim(),
+          client_type:         clientType ?? 'other',
+          trade_label:         tradeLabel,
+          portal_config:       config,
+          onboarding_complete: true,
+        })
+        .eq('id', resolvedClientId)
+
+      if (error) {
+        console.error('ONBOARDING_002', error)
+        setSaveError('Your portal is temporarily unavailable. Reload the page and try again.')
+        setSaving(false)
+        return
+      }
+    }
 
     fetch('/api/email/welcome', {
       method: 'POST',
@@ -577,6 +618,22 @@ export default function OnboardingPage() {
               }}>
                 This can be changed anytime · All responses are editable in settings.
               </p>
+
+              {saveError && (
+                <div style={{
+                  background:   'rgba(255,183,0,0.08)',
+                  border:       '1px solid rgba(255,183,0,0.25)',
+                  borderLeft:   '3px solid rgba(255,183,0,0.6)',
+                  borderRadius: '10px',
+                  padding:      '12px 14px',
+                  marginBottom: '16px',
+                  fontSize:     '13px',
+                  color:        '#7A6030',
+                  lineHeight:   1.5,
+                }}>
+                  {saveError}
+                </div>
+              )}
 
               <button
                 onClick={() => handleComplete()}

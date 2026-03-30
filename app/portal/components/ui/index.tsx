@@ -16,7 +16,7 @@
  * in under 30 seconds and understand exactly what it renders.
  */
 
-import React from 'react'
+import React, { useState } from 'react'
 import {
   colours,
   fonts,
@@ -29,6 +29,93 @@ import {
   transition,
   shadows,
 } from '@/styles/tokens'
+import type { AppError } from '@/lib/errors'
+
+
+// ─── ErrorBanner ──────────────────────────────────────────────────────────────
+
+/**
+ * Renders a structured error banner from an AppError.
+ *
+ * - Non-internal: amber left-border, shows title + message + action + copyable code
+ * - Internal:     blue left-border, "we're reviewing it" tone + copyable code
+ *
+ * The reference code is copyable so users can quote it to support.
+ * Every render also console.errors the code for Vercel log visibility.
+ */
+export function ErrorBanner({ error }: { error: AppError }) {
+  const [copied, setCopied] = useState(false)
+
+  function copyCode() {
+    navigator.clipboard.writeText(error.code).catch(() => {/* clipboard unavailable */})
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  const borderColour = error.internal ? colours.info            : colours.pendingReview
+  const bgColour     = error.internal ? colours.infoLight       : colours.pendingReviewLight
+  const codeColour   = error.internal ? colours.info            : colours.pendingReview
+
+  return (
+    <div style={{
+      background:   bgColour,
+      border:       `1px solid ${borderColour}`,
+      borderLeft:   `3px solid ${borderColour}`,
+      borderRadius: radius.md,
+      padding:      '12px 14px',
+      display:      'flex',
+      alignItems:   'flex-start',
+      gap:          '12px',
+      justifyContent: 'space-between',
+    }}>
+      <div style={{ flex: 1 }}>
+        <div style={{
+          fontFamily:   fonts.sans,
+          fontWeight:   fontWeight.medium,
+          fontSize:     fontSize.sm,
+          color:        colours.textPrimary,
+          marginBottom: '2px',
+        }}>
+          {error.title}
+        </div>
+        <div style={{
+          fontFamily: fonts.sans,
+          fontSize:   fontSize.sm,
+          color:      colours.textSecondary,
+          lineHeight: 1.5,
+        }}>
+          {error.message}
+          {error.action && (
+            <span style={{ color: colours.textMuted }}> {error.action}</span>
+          )}
+        </div>
+      </div>
+
+      {/* Copyable reference code */}
+      <button
+        onClick={copyCode}
+        title="Copy reference code"
+        style={{
+          fontFamily:    fonts.mono,
+          fontSize:      '10px',
+          color:         copied ? colours.allowable : codeColour,
+          background:    'transparent',
+          border:        `1px solid ${copied ? colours.allowable : borderColour}`,
+          borderRadius:  radius.sm,
+          padding:       '3px 8px',
+          cursor:        'pointer',
+          flexShrink:    0,
+          transition:    transition.snap,
+          letterSpacing: '0.04em',
+          whiteSpace:    'nowrap' as const,
+          alignSelf:     'flex-start',
+        }}
+      >
+        {copied ? '✓ copied' : error.code}
+      </button>
+    </div>
+  )
+}
 
 
 // ─── Panel ────────────────────────────────────────────────────────────────────

@@ -20,7 +20,7 @@
 import { useEffect, useRef } from 'react'
 import type { Client } from '@/types'
 import { useMessages } from './useMessages'
-import { Spinner, EmptyState } from '../ui'
+import { Spinner, EmptyState, ErrorBanner } from '../ui'
 import { light as colours } from '@/styles/tokens/colours'
 import { fonts, fontSize, fontWeight } from '@/styles/tokens/typography'
 import { radius, transition, spacing } from '@/styles/tokens'
@@ -99,18 +99,7 @@ export default function MessagesTab({ client }: Props) {
       </div>
 
       {/* ── Error banner ── */}
-      {error && (
-        <div style={{
-          padding:      '10px 14px',
-          background:   colours.dangerLight,
-          border:       `1px solid ${colours.danger}`,
-          borderRadius: radius.md,
-          fontSize:     fontSize.sm,
-          color:        colours.danger,
-        }}>
-          {error}
-        </div>
-      )}
+      {error && <ErrorBanner error={error} />}
 
       {/* ── Compose area ── */}
       <div style={{

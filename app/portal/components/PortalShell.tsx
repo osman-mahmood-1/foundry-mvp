@@ -158,7 +158,12 @@ function FooterPopover({ client, onClose }: FooterPopoverProps) {
       <div style={{ padding: '6px' }}>
         {menuItem('Sign out', '↪', async () => {
           const { createClient } = await import('@/lib/supabase')
-          await createClient().auth.signOut()
+          const { error } = await createClient().auth.signOut()
+          if (error) {
+            console.error('AUTH_003', error)
+            alert(`AUTH_003 — We couldn't complete your sign-out. Close this tab or clear your browser cookies if you need to sign out immediately.`)
+            return
+          }
           window.location.href = '/login'
         })}
       </div>

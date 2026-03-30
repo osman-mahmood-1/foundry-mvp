@@ -1,6 +1,7 @@
 'use client'
 import React from 'react'
 import { useOverview } from './useOverview'
+import { ErrorBanner } from '../ui'
 import { light as colours } from '@/styles/tokens/colours'
 import { fonts, fontSize, fontWeight } from '@/styles/tokens/typography'
 import { radius } from '@/styles/tokens'
@@ -251,16 +252,8 @@ export default function OverviewTab({ clientId }: { clientId: string | null }) {
   )
 
   if (error) return (
-    <div style={{
-      padding:      '24px',
-      color:        colours.danger,
-      fontFamily:   fonts.sans,
-      fontSize:     fontSize.sm,
-      background:   colours.dangerLight,
-      borderRadius: radius.lg,
-      margin:       '24px',
-    }}>
-      {error}
+    <div style={{ padding: '24px' }}>
+      <ErrorBanner error={error} />
     </div>
   )
 

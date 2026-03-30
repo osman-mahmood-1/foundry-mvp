@@ -17,7 +17,9 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase'
+import { APP_ERRORS } from '@/lib/errors'
 import type { Income, IncomeFormState, IncomeCategory } from '@/types'
+import type { AppError } from '@/lib/errors'
 
 // ─── Return type ─────────────────────────────────────────────────────────────
 
@@ -29,7 +31,7 @@ export interface UseIncomeResult {
   // Loading states
   loading:       boolean
   saving:        boolean
-  error:         string | null
+  error:         AppError | null
   // Form state
   form:          IncomeFormState
   setForm:       (updater: (prev: IncomeFormState) => IncomeFormState) => void
@@ -60,7 +62,7 @@ export function useIncome(
   const [income,  setIncome]  = useState<Income[]>([])
   const [loading, setLoading] = useState(true)
   const [saving,  setSaving]  = useState(false)
-  const [error,   setError]   = useState<string | null>(null)
+  const [error,   setError]   = useState<AppError | null>(null)
   const [form,    setForm]    = useState<IncomeFormState>(DEFAULT_FORM)
 
   // ── Fetch ───────────────────────────────────────────────────────
@@ -75,7 +77,8 @@ export function useIncome(
       .neq('status', 'excluded')           // excluded = soft-deleted
       .order('date', { ascending: false })
     if (err) {
-      setError('Failed to load income. Please refresh.')
+      console.error('INCOME_001', err)
+      setError(APP_ERRORS.INCOME_001)
     } else {
       setIncome(data ?? [])
     }
@@ -107,7 +110,8 @@ export function useIncome(
       })
 
     if (err) {
-      setError('Failed to save. Please try again.')
+      console.error('INCOME_002', err)
+      setError(APP_ERRORS.INCOME_002)
     } else {
       setForm(() => DEFAULT_FORM)
       await load()
@@ -125,7 +129,8 @@ export function useIncome(
       .eq('client_id', clientId)      // RLS belt-and-braces
 
     if (err) {
-      setError('Failed to remove entry. Please try again.')
+      console.error('INCOME_003', err)
+      setError(APP_ERRORS.INCOME_003)
     } else {
       setIncome(prev => prev.filter(i => i.id !== id))
     }

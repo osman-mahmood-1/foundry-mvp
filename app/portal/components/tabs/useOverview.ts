@@ -1,6 +1,8 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase'
+import { APP_ERRORS } from '@/lib/errors'
+import type { AppError } from '@/lib/errors'
 
 export interface OverviewStats {
   incomePence:       number
@@ -26,7 +28,7 @@ export interface OverviewData {
   taxYear:    string
   clientName: string | null
   loading:    boolean
-  error:      string | null
+  error:      AppError | null
 }
 
 function estimateTax(incomePence: number, expensesPence: number): number {
@@ -106,9 +108,10 @@ export function useOverview(clientId: string | null): OverviewData {
           recent, taxYear, clientName: client.full_name, loading: false, error: null,
         })
       } catch (err: unknown) {
+        console.error('OVR_001', err)
         setData(prev => ({
           ...prev, loading: false,
-          error: err instanceof Error ? err.message : 'Failed to load overview',
+          error: APP_ERRORS.OVR_001,
         }))
       }
     }

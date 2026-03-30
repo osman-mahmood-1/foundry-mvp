@@ -15,7 +15,9 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase'
+import { APP_ERRORS } from '@/lib/errors'
 import type { Document as FoundryDocument, DocumentCategory } from '@/types'
+import type { AppError } from '@/lib/errors'
 
 // ─── Return type ─────────────────────────────────────────────────────────────
 
@@ -23,7 +25,7 @@ export interface UseDocumentsResult {
   documents:      FoundryDocument[]
   loading:        boolean
   uploading:      boolean
-  error:          string | null
+  error:          AppError | null
   uploadDocument: (file: File, category: DocumentCategory) => Promise<void>
   deleteDocument: (id: string, storagePath: string) => Promise<void>
 }
@@ -40,7 +42,7 @@ export function useDocuments(
   const [documents, setDocuments] = useState<FoundryDocument[]>([])
   const [loading,   setLoading]   = useState(true)
   const [uploading, setUploading] = useState(false)
-  const [error,     setError]     = useState<string | null>(null)
+  const [error,     setError]     = useState<AppError | null>(null)
 
   // ── Fetch ───────────────────────────────────────────────────────
   const load = useCallback(async () => {
@@ -53,7 +55,8 @@ export function useDocuments(
       .eq('tax_year', taxYear)
       .order('created_at', { ascending: false })
     if (err) {
-      setError('Failed to load documents. Please refresh.')
+      console.error('DOC_001', err)
+      setError(APP_ERRORS.DOC_001)
     } else {
       setDocuments(data ?? [])
     }
@@ -80,7 +83,8 @@ export function useDocuments(
       .upload(storagePath, file, { upsert: false })
 
     if (uploadErr) {
-      setError('Upload failed. Please try again.')
+      console.error('DOC_002', uploadErr)
+      setError(APP_ERRORS.DOC_002)
       setUploading(false)
       return
     }
@@ -102,7 +106,8 @@ export function useDocuments(
       })
 
     if (insertErr) {
-      setError('File uploaded but metadata failed to save. Contact support.')
+      console.error('DOC_003', insertErr)
+      setError(APP_ERRORS.DOC_003)
       setUploading(false)
       return
     }
@@ -126,7 +131,8 @@ export function useDocuments(
       .eq('client_id', clientId)
 
     if (err) {
-      setError('Failed to remove document. Please try again.')
+      console.error('DOC_004', err)
+      setError(APP_ERRORS.DOC_004)
     } else {
       setDocuments(prev => prev.filter(d => d.id !== id))
     }

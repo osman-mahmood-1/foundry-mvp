@@ -12,7 +12,9 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase'
+import { APP_ERRORS } from '@/lib/errors'
 import type { Expense, ExpenseFormState, ExpenseCategory } from '@/types'
+import type { AppError } from '@/lib/errors'
 
 // ─── Return type ─────────────────────────────────────────────────────────────
 
@@ -22,7 +24,7 @@ export interface UseExpensesResult {
   entryCount:    number
   loading:       boolean
   saving:        boolean
-  error:         string | null
+  error:         AppError | null
   form:          ExpenseFormState
   setForm:       (updater: (prev: ExpenseFormState) => ExpenseFormState) => void
   isFormValid:   boolean
@@ -51,7 +53,7 @@ export function useExpenses(
   const [expenses, setExpenses] = useState<Expense[]>([])
   const [loading,  setLoading]  = useState(true)
   const [saving,   setSaving]   = useState(false)
-  const [error,    setError]    = useState<string | null>(null)
+  const [error,    setError]    = useState<AppError | null>(null)
   const [form,     setForm]     = useState<ExpenseFormState>(DEFAULT_FORM)
 
   // ── Fetch ───────────────────────────────────────────────────────
@@ -66,7 +68,8 @@ export function useExpenses(
       .neq('status', 'excluded')
       .order('date', { ascending: false })
     if (err) {
-      setError('Failed to load expenses. Please refresh.')
+      console.error('EXPENSE_001', err)
+      setError(APP_ERRORS.EXPENSE_001)
     } else {
       setExpenses(data ?? [])
     }
@@ -100,7 +103,8 @@ export function useExpenses(
       })
 
     if (err) {
-      setError('Failed to save. Please try again.')
+      console.error('EXPENSE_002', err)
+      setError(APP_ERRORS.EXPENSE_002)
     } else {
       setForm(() => DEFAULT_FORM)
       await load()
@@ -118,7 +122,8 @@ export function useExpenses(
       .eq('client_id', clientId)
 
     if (err) {
-      setError('Failed to remove entry. Please try again.')
+      console.error('EXPENSE_003', err)
+      setError(APP_ERRORS.EXPENSE_003)
     } else {
       setExpenses(prev => prev.filter(e => e.id !== id))
     }

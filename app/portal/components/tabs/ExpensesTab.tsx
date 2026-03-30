@@ -19,7 +19,7 @@ import { useExpenses } from './useExpenses'
 import {
   Panel, Label, StatCard, EmptyState,
   Spinner, Badge, Button, Input, Select,
-  formatGBP, formatDate,
+  ErrorBanner, formatGBP, formatDate,
 } from '../ui'
 import { light as colours } from '@/styles/tokens/colours'
 import { fonts, fontSize, fontWeight, letterSpacing } from '@/styles/tokens/typography'
@@ -124,18 +124,7 @@ export default function ExpensesTab({ client }: Props) {
       </div>
 
       {/* ── Error banner ── */}
-      {error && (
-        <div style={{
-          padding:      '12px 16px',
-          background:   colours.dangerLight,
-          border:       `1px solid ${colours.danger}`,
-          borderRadius: radius.md,
-          fontSize:     fontSize.sm,
-          color:        colours.danger,
-        }}>
-          {error}
-        </div>
-      )}
+      {error && <ErrorBanner error={error} />}
 
       {/* ── Add entry form ── */}
       {showForm && (

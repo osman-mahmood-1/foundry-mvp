@@ -18,7 +18,9 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { createClient } from '@/lib/supabase'
+import { APP_ERRORS } from '@/lib/errors'
 import type { Message, SenderRole } from '@/types'
+import type { AppError } from '@/lib/errors'
 
 // ─── Return type ─────────────────────────────────────────────────────────────
 
@@ -26,7 +28,7 @@ export interface UseMessagesResult {
   messages:    Message[]
   loading:     boolean
   sending:     boolean
-  error:       string | null
+  error:       AppError | null
   draft:       string
   setDraft:    (value: string) => void
   sendMessage: () => Promise<void>
@@ -43,7 +45,7 @@ export function useMessages(
   const [messages, setMessages] = useState<Message[]>([])
   const [loading,  setLoading]  = useState(true)
   const [sending,  setSending]  = useState(false)
-  const [error,    setError]    = useState<string | null>(null)
+  const [error,    setError]    = useState<AppError | null>(null)
   const [draft,    setDraft]    = useState('')
 
   // ── Fetch ───────────────────────────────────────────────────────
@@ -56,7 +58,8 @@ export function useMessages(
       .eq('client_id', clientId)
       .order('created_at', { ascending: true })
     if (err) {
-      setError('Failed to load messages. Please refresh.')
+      console.error('MSG_001', err)
+      setError(APP_ERRORS.MSG_001)
     } else {
       setMessages(data ?? [])
     }
@@ -112,7 +115,8 @@ export function useMessages(
       })
 
     if (err) {
-      setError('Failed to send message. Please try again.')
+      console.error('MSG_002', err)
+      setError(APP_ERRORS.MSG_002)
     } else {
       setDraft('')
     }

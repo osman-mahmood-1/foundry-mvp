@@ -3,8 +3,6 @@
 import { createClient } from '@/lib/supabase-server'
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-
 function generateUID(memberNumber: number): string {
   const s1 = Math.random().toString(36).substring(2, 5).toUpperCase()
   const s2 = Math.random().toString(36).substring(2, 5).toUpperCase()
@@ -12,6 +10,7 @@ function generateUID(memberNumber: number): string {
 }
 
 export async function joinWaitlist(formData: FormData) {
+  const resend = new Resend(process.env.RESEND_API_KEY)
   const name = formData.get('name') as string
   const email = formData.get('email') as string
 

@@ -26,7 +26,11 @@ export async function GET(request: NextRequest) {
       }
     )
 
-    await supabase.auth.exchangeCodeForSession(code)
+    const { error } = await supabase.auth.exchangeCodeForSession(code)
+    if (error) {
+      const errorCode = error.message?.includes('expired') ? 'AUTH_001' : 'AUTH_002'
+      return NextResponse.redirect(new URL(`/login?error=${errorCode}`, request.url))
+    }
   }
 
   return NextResponse.redirect(new URL('/portal', request.url))

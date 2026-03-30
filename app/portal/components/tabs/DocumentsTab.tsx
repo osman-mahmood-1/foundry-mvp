@@ -19,7 +19,7 @@ import type { Client, DocumentCategory, Document as FoundryDocument } from '@/ty
 import { useDocuments } from './useDocuments'
 import {
   Panel, Label, EmptyState, Spinner,
-  Badge, Button, Select, formatBytes, formatDate,
+  Badge, Button, Select, ErrorBanner, formatBytes, formatDate,
 } from '../ui'
 import { light as colours } from '@/styles/tokens/colours'
 import { fonts, fontSize, fontWeight } from '@/styles/tokens/typography'
@@ -173,17 +173,7 @@ export default function DocumentsTab({ client }: Props) {
             </div>
           )}
 
-          {error && (
-            <div style={{
-              fontSize:     fontSize.xs,
-              color:        colours.danger,
-              padding:      '8px 12px',
-              background:   colours.dangerLight,
-              borderRadius: radius.sm,
-            }}>
-              {error}
-            </div>
-          )}
+          {error && <ErrorBanner error={error} />}
 
           <Select
             label="Document type"
