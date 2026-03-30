@@ -32,11 +32,16 @@ export default async function PortalPage() {
   if (!user) redirect('/login')
 
   // ── Client record ─────────────────────────────────────────────
-  const { data: clientData } = await supabase
+  // .limit(1) instead of .single() — prevents a crash if duplicate records
+  // exist (e.g. a double-submit on mobile during onboarding). Always picks
+  // the most recently created record.
+  const { data: clientRows } = await supabase
     .from('clients')
     .select('*')
     .eq('user_id', user.id)
-    .single()
+    .order('created_at', { ascending: false })
+    .limit(1)
+  const clientData = clientRows?.[0] ?? null
 
   // ── Onboarding guard ──────────────────────────────────────────
   if (!clientData?.onboarding_complete) redirect('/onboarding')

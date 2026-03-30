@@ -150,8 +150,9 @@ export default function OnboardingPage() {
         setFirstName(cleaned.charAt(0).toUpperCase() + cleaned.slice(1))
       }
       // Get client ID
-      supabase.from('clients').select('id').eq('user_id', user.id).single()
-        .then(({ data }) => { if (data) setClientId(data.id)
+      supabase.from('clients').select('id').eq('user_id', user.id)
+        .order('created_at', { ascending: false }).limit(1)
+        .then(({ data }) => { if (data?.[0]) setClientId(data[0].id)
         setClientEmail(user.email ?? '') })
     })
   }, [])
