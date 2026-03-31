@@ -28,12 +28,13 @@ import { radius, transition, spacing } from '@/styles/tokens'
 // ─── Props ────────────────────────────────────────────────────────────────────
 
 interface Props {
-  client: Client
+  client:    Client
+  readOnly?: boolean
 }
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
-export default function MessagesTab({ client }: Props) {
+export default function MessagesTab({ client, readOnly = false }: Props) {
   const scrollRef = useRef<HTMLDivElement>(null)
 
   const {
@@ -101,8 +102,8 @@ export default function MessagesTab({ client }: Props) {
       {/* ── Error banner ── */}
       {error && <ErrorBanner error={error} />}
 
-      {/* ── Compose area ── */}
-      <div style={{
+      {/* ── Compose area — hidden in read-only mode (accountant uses right panel) ── */}
+      {!readOnly && <div style={{
         background:   colours.panelBg,
         backdropFilter: 'blur(48px)',
         WebkitBackdropFilter: 'blur(48px)',
@@ -163,18 +164,20 @@ export default function MessagesTab({ client }: Props) {
         >
           {sending ? 'Sending…' : 'Send'}
         </button>
-      </div>
+      </div>}
 
-      {/* Send hint */}
-      <div style={{
-        fontSize:   fontSize.xs,
-        color:      colours.textMuted,
-        fontFamily: fonts.mono,
-        textAlign:  'center' as const,
-        marginTop:  '-8px',
-      }}>
-        Enter to send · Shift+Enter for new line
-      </div>
+      {/* Send hint — hidden in read-only mode */}
+      {!readOnly && (
+        <div style={{
+          fontSize:   fontSize.xs,
+          color:      colours.textMuted,
+          fontFamily: fonts.mono,
+          textAlign:  'center' as const,
+          marginTop:  '-8px',
+        }}>
+          Enter to send · Shift+Enter for new line
+        </div>
+      )}
 
     </div>
   )

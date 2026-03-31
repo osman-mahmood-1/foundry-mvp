@@ -51,12 +51,13 @@ function formatMonthLabel(ym: string): string {
 // ─── Props ────────────────────────────────────────────────────────────────────
 
 interface Props {
-  client: Client
+  client:    Client
+  readOnly?: boolean
 }
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
-export default function IncomeTab({ client }: Props) {
+export default function IncomeTab({ client, readOnly = false }: Props) {
   const [showForm, setShowForm] = useState(false)
 
   const {
@@ -123,8 +124,8 @@ export default function IncomeTab({ client }: Props) {
       {/* ── Error banner ── */}
       {error && <ErrorBanner error={error} />}
 
-      {/* ── Add entry form ── */}
-      {showForm && (
+      {/* ── Add entry form — hidden in read-only mode ── */}
+      {!readOnly && showForm && (
         <Panel>
           <Label>New income entry</Label>
           <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.form.fieldGap }}>
@@ -183,7 +184,7 @@ export default function IncomeTab({ client }: Props) {
           borderBottom:   income.length > 0 ? `1px solid ${colours.borderHairline}` : 'none',
         }}>
           <Label>Income · {client.tax_year}</Label>
-          {!showForm && (
+          {!readOnly && !showForm && (
             <Button size="sm" onClick={() => setShowForm(true)}>
               + Add entry
             </Button>
@@ -196,8 +197,8 @@ export default function IncomeTab({ client }: Props) {
             icon="↑"
             headline="No income logged yet."
             sub="Every payment you receive goes here. Start with your first entry and we'll handle the categorisation."
-            action="Log first entry"
-            onAction={() => setShowForm(true)}
+            action={readOnly ? undefined : 'Log first entry'}
+            onAction={readOnly ? undefined : () => setShowForm(true)}
           />
         )}
 
@@ -242,7 +243,7 @@ export default function IncomeTab({ client }: Props) {
                   key={item.id}
                   item={item}
                   isLast={idx === rows.length - 1}
-                  onDelete={() => deleteIncome(item.id, item.amount_pence)}
+                  onDelete={readOnly ? undefined : () => deleteIncome(item.id, item.amount_pence)}
                 />
               ))}
             </div>
@@ -275,9 +276,9 @@ export default function IncomeTab({ client }: Props) {
 // ─── Income row ──────────────────────────────────────────────────────────────
 
 interface IncomeRowProps {
-  item:     ReturnType<typeof useIncome>['income'][number]
-  isLast:   boolean
-  onDelete: () => void
+  item:      ReturnType<typeof useIncome>['income'][number]
+  isLast:    boolean
+  onDelete?: () => void
 }
 
 function IncomeRow({ item, isLast, onDelete }: IncomeRowProps) {
@@ -353,7 +354,7 @@ function IncomeRow({ item, isLast, onDelete }: IncomeRowProps) {
         }}>
           {formatGBP(item.amount_pence)}
         </div>
-        {hovered && (
+        {hovered && onDelete && (
           <button
             onClick={onDelete}
             title="Remove entry"

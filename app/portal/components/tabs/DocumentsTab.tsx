@@ -59,12 +59,13 @@ function formatMonthLabel(ym: string): string {
 // ─── Props ────────────────────────────────────────────────────────────────────
 
 interface Props {
-  client: Client
+  client:    Client
+  readOnly?: boolean
 }
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
-export default function DocumentsTab({ client }: Props) {
+export default function DocumentsTab({ client, readOnly = false }: Props) {
   const fileInputRef                            = useRef<HTMLInputElement>(null)
   const [selectedFile,     setSelectedFile]     = useState<File | null>(null)
   const [selectedCategory, setSelectedCategory] = useState<DocumentCategory>('other')
@@ -122,8 +123,8 @@ export default function DocumentsTab({ client }: Props) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.tab.gap }}>
 
-      {/* ── Upload panel ── */}
-      <Panel>
+      {/* ── Upload panel — hidden in read-only mode ── */}
+      {!readOnly && <Panel>
         <Label>Upload document · {client.tax_year}</Label>
         <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.form.fieldGap }}>
 
@@ -204,7 +205,7 @@ export default function DocumentsTab({ client }: Props) {
             {uploading ? 'Uploading…' : 'Upload document'}
           </Button>
         </div>
-      </Panel>
+      </Panel>}
 
       {/* ── Document list ── */}
       <Panel padding="0">
@@ -263,7 +264,7 @@ export default function DocumentsTab({ client }: Props) {
                   key={doc.id}
                   doc={doc}
                   isLast={idx === rows.length - 1}
-                  onDelete={() => deleteDocument(doc.id, doc.storage_path)}
+                  onDelete={readOnly ? undefined : () => deleteDocument(doc.id, doc.storage_path)}
                 />
               ))}
             </div>
@@ -296,9 +297,9 @@ export default function DocumentsTab({ client }: Props) {
 // ─── Document row ─────────────────────────────────────────────────────────────
 
 interface DocumentRowProps {
-  doc:      FoundryDocument
-  isLast:   boolean
-  onDelete: () => void
+  doc:       FoundryDocument
+  isLast:    boolean
+  onDelete?: () => void
 }
 
 function DocumentRow({ doc, isLast, onDelete }: DocumentRowProps) {
@@ -375,7 +376,7 @@ function DocumentRow({ doc, isLast, onDelete }: DocumentRowProps) {
         <div style={{ fontSize: fontSize.xs, color: colours.textMuted, fontFamily: fonts.mono }}>
           {formatBytes(doc.size_bytes)}
         </div>
-        {hovered && (
+        {hovered && onDelete && (
           <button
             onClick={onDelete}
             title="Remove document"

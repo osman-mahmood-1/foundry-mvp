@@ -234,7 +234,7 @@ function QuickAction({ icon, label }: { icon: string; label: string }) {
 
 // ── Overview Tab ──────────────────────────────────────────────────────────────
 
-export default function OverviewTab({ clientId }: { clientId: string | null }) {
+export default function OverviewTab({ clientId, readOnly = false }: { clientId: string | null; readOnly?: boolean }) {
   const { stats, recent, taxYear, clientName, loading, error } = useOverview(clientId)
 
   if (loading) return (
@@ -317,17 +317,19 @@ export default function OverviewTab({ clientId }: { clientId: string | null }) {
         />
       </div>
 
-      {/* Quick actions */}
-      <div style={{
-        display:      'flex',
-        gap:          '12px',
-        flexWrap:     'wrap',
-        marginBottom: '24px',
-      }}>
-        <QuickAction icon="+" label="Add income" />
-        <QuickAction icon="+" label="Add expense" />
-        <QuickAction icon="↑" label="Upload document" />
-      </div>
+      {/* Quick actions — hidden in read-only mode (accountant view) */}
+      {!readOnly && (
+        <div style={{
+          display:      'flex',
+          gap:          '12px',
+          flexWrap:     'wrap',
+          marginBottom: '24px',
+        }}>
+          <QuickAction icon="+" label="Add income" />
+          <QuickAction icon="+" label="Add expense" />
+          <QuickAction icon="↑" label="Upload document" />
+        </div>
+      )}
 
       {/* Recent transactions */}
       <div style={{

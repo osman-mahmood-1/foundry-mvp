@@ -79,12 +79,14 @@ function AllowableBadge({ allowable }: { allowable: boolean | null }) {
 // ─── Props ────────────────────────────────────────────────────────────────────
 
 interface Props {
-  client: Client
+  client:          Client
+  readOnly?:       boolean
+  onExpenseSelect?: (expenseId: string) => void
 }
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
-export default function ExpensesTab({ client }: Props) {
+export default function ExpensesTab({ client, readOnly = false, onExpenseSelect }: Props) {
   const [showForm, setShowForm] = useState(false)
 
   const {
@@ -149,8 +151,8 @@ export default function ExpensesTab({ client }: Props) {
       {/* ── Error banner ── */}
       {error && <ErrorBanner error={error} />}
 
-      {/* ── Add entry form ── */}
-      {showForm && (
+      {/* ── Add entry form — hidden in read-only mode ── */}
+      {!readOnly && showForm && (
         <Panel>
           <Label>New expense entry</Label>
           <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.form.fieldGap }}>
@@ -220,7 +222,7 @@ export default function ExpensesTab({ client }: Props) {
           borderBottom:   expenses.length > 0 ? `1px solid ${colours.borderHairline}` : 'none',
         }}>
           <Label>Expenses · {client.tax_year}</Label>
-          {!showForm && (
+          {!readOnly && !showForm && (
             <Button size="sm" onClick={() => setShowForm(true)}>
               + Add entry
             </Button>
@@ -232,8 +234,8 @@ export default function ExpensesTab({ client }: Props) {
             icon="↓"
             headline="No expenses logged yet."
             sub="Every business cost goes here. Your accountant will confirm what's allowable against your tax bill."
-            action="Log first expense"
-            onAction={() => setShowForm(true)}
+            action={readOnly ? undefined : 'Log first expense'}
+            onAction={readOnly ? undefined : () => setShowForm(true)}
           />
         )}
 
@@ -276,7 +278,8 @@ export default function ExpensesTab({ client }: Props) {
                   key={item.id}
                   item={item}
                   isLast={idx === rows.length - 1}
-                  onDelete={() => deleteExpense(item.id, item.amount_pence)}
+                  onDelete={readOnly ? undefined : () => deleteExpense(item.id, item.amount_pence)}
+                  onSelect={onExpenseSelect ? () => onExpenseSelect(item.id) : undefined}
                 />
               ))}
             </div>
@@ -310,12 +313,13 @@ export default function ExpensesTab({ client }: Props) {
 // ─── Expense row ─────────────────────────────────────────────────────────────
 
 interface ExpenseRowProps {
-  item:     import('@/types').Expense
-  isLast:   boolean
-  onDelete: () => void
+  item:      import('@/types').Expense
+  isLast:    boolean
+  onDelete?: () => void
+  onSelect?: () => void
 }
 
-function ExpenseRow({ item, isLast, onDelete }: ExpenseRowProps) {
+function ExpenseRow({ item, isLast, onDelete, onSelect }: ExpenseRowProps) {
   const [hovered, setHovered] = useState(false)
 
   const categoryLabel = EXPENSE_CATEGORIES.find(c => c.value === item.category)?.label
@@ -323,6 +327,7 @@ function ExpenseRow({ item, isLast, onDelete }: ExpenseRowProps) {
 
   return (
     <div
+      onClick={onSelect}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
@@ -333,6 +338,7 @@ function ExpenseRow({ item, isLast, onDelete }: ExpenseRowProps) {
         borderBottom:   isLast ? 'none' : `1px solid ${colours.borderHairline}`,
         background:     hovered ? colours.hoverBg : 'transparent',
         transition:     transition.snap,
+        cursor:         onSelect ? 'pointer' : 'default',
       }}
     >
       {/* Left */}
@@ -390,9 +396,9 @@ function ExpenseRow({ item, isLast, onDelete }: ExpenseRowProps) {
         }}>
           {formatGBP(item.amount_pence)}
         </div>
-        {hovered && (
+        {hovered && onDelete && (
           <button
-            onClick={onDelete}
+            onClick={e => { e.stopPropagation(); onDelete() }}
             title="Remove entry"
             style={{
               width:          '24px',
