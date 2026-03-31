@@ -176,7 +176,7 @@ export default function AdminClientsTable({ clients, totalAccountants }: Props) 
           clients.map(client => (
             <Link
               key={client.id}
-              href={`/admin/clients/${client.id}`}
+              href={`/accountant/clients/${client.id}`}
               style={{
                 display:        'grid',
                 gridTemplateColumns: '2fr 1fr 1.5fr 1fr 1fr',
