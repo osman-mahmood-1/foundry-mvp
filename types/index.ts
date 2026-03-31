@@ -221,6 +221,7 @@ export interface Client {
   accounting_period_label: string      // generated column, read-only
   current_period_start: ISODate | null
   current_period_end: ISODate | null
+  assigned_accountant_id: string | null
   created_at: ISODatetime
   updated_at: ISODatetime
   deleted_at: ISODatetime | null
@@ -235,6 +236,8 @@ export interface Accountant {
   firm_name: string | null
   is_foundry_admin: boolean
   is_active: boolean
+  invited_by: string | null   // references platform_editors(id)
+  deactivated_at: ISODatetime | null
   created_at: ISODatetime
   updated_at: ISODatetime
 }
@@ -537,6 +540,8 @@ export interface AuditLogEntry {
   before_state: Record<string, unknown> | null
   after_state: Record<string, unknown> | null
   ip_address: string | null
+  reversed_by: string | null   // auth.users(id) of the platform editor who reversed this
+  reversed_at: ISODatetime | null
   created_at: ISODatetime
 }
 
@@ -547,6 +552,61 @@ export interface WaitlistEntry {
   name: string
   email: string
   created_at: ISODatetime | null
+}
+
+// ─── Multi-user access types (Phase 1) ───────────────────────────────────────
+
+/** Platform editor (internal Tax Foundry team). Has access to /admin/* */
+export interface PlatformEditor {
+  id: string
+  user_id: string
+  full_name: string
+  email: string
+  invited_by: string | null   // references platform_editors(id); null for bootstrapped first editor
+  created_at: ISODatetime
+  deactivated_at: ISODatetime | null
+}
+
+/** Private working notes written by an accountant about a client. Never visible to the client. */
+export interface AccountantNote {
+  id: string
+  client_id: string
+  accountant_id: string
+  body: string
+  created_at: ISODatetime
+  updated_at: ISODatetime
+}
+
+export type HmrcTreatment =
+  | 'wholly_and_exclusively'
+  | 'partial'
+  | 'capital'
+  | 'not_business'
+
+/** Accountant's formal allowability decision on a single expense. One per expense (UNIQUE). */
+export interface ExpenseReview {
+  id: string
+  expense_id: string
+  client_id: string
+  accountant_id: string
+  allowable: boolean
+  reason: string | null           // plain-English explanation shown to the client
+  hmrc_treatment: HmrcTreatment | null
+  reviewed_at: ISODatetime
+}
+
+export type InviteRole = 'accountant' | 'platform_editor'
+
+/** One-time invite token for accountant and platform editor provisioning. */
+export interface InviteToken {
+  id: string
+  token: string                   // 32-byte hex, single-use
+  role: InviteRole
+  email: string
+  invited_by: string              // references platform_editors(id)
+  used_at: ISODatetime | null
+  expires_at: ISODatetime
+  created_at: ISODatetime
 }
 
 
