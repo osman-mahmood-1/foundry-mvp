@@ -176,6 +176,42 @@ export const APP_ERRORS = {
     internal: false,
   },
 
+  // ── Accountant notes ──────────────────────────────────────────────────────
+
+  NOTE_001: {
+    code:     'NOTE_001',
+    title:    'Notes unavailable',
+    message:  'Working notes are temporarily unavailable.',
+    action:   'Reload the page to restore access.',
+    internal: false,
+  },
+
+  NOTE_002: {
+    code:     'NOTE_002',
+    title:    'Note not saved',
+    message:  'That note wasn\'t saved.',
+    action:   'Please try saving again.',
+    internal: false,
+  },
+
+  // ── Expense reviews ───────────────────────────────────────────────────────
+
+  REVIEW_001: {
+    code:     'REVIEW_001',
+    title:    'Reviews unavailable',
+    message:  'Expense review data is temporarily unavailable.',
+    action:   'Reload the page to restore access.',
+    internal: false,
+  },
+
+  REVIEW_002: {
+    code:     'REVIEW_002',
+    title:    'Review not saved',
+    message:  'That review decision wasn\'t saved.',
+    action:   'Please try saving again.',
+    internal: false,
+  },
+
 } satisfies Record<string, AppError>
 
 export type ErrorCode = keyof typeof APP_ERRORS

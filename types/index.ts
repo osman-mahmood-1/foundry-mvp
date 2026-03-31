@@ -610,6 +610,39 @@ export interface InviteToken {
 }
 
 
+/**
+ * Server-fetched initial data bundle passed from the accountant client record
+ * server component down to SplitPanel and its contextual right panels.
+ *
+ * Fetched server-side with the admin client so panels have data immediately
+ * without needing client-side RLS access to existing tables.
+ * Client-side hooks (useAccountantNotes, useExpenseReviews) handle mutations.
+ */
+export interface SplitPanelInitialData {
+  /** All expenses for this client (current tax year) */
+  expenses:           Expense[]
+  /** Sum of all expense amounts */
+  expenseTotal:       Pence
+  /** Sum of all income amounts */
+  incomeTotal:        Pence
+  /** Income grouped by category for the source split display */
+  incomeSources:      { category: IncomeCategory; totalPence: Pence }[]
+  /** All documents for this client (current tax year) */
+  documents:          Document[]
+  /** 3 most recent income entries — for Messages panel quick links */
+  recentIncome:       { id: string; description: string; amount_pence: Pence; date: ISODate }[]
+  /** 3 most recent expense entries — for Messages panel quick links */
+  recentExpenses:     { id: string; description: string; amount_pence: Pence; date: ISODate }[]
+  /** Days until the nearest upcoming SA deadline, or null if none found */
+  saDaysRemaining:    number | null
+  /** Count of unread messages from the client */
+  unreadMessages:     number
+  /** Count of expenses with no review yet (allowable = null) */
+  pendingReviewCount: number
+  /** Count of documents not yet marked as reviewed */
+  unreviewedDocCount: number
+}
+
 // ─── UI-only types ─────────────────────────────────────────────────────────
 
 /** Which tab is currently active in the portal */

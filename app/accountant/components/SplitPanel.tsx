@@ -9,18 +9,16 @@
  *   Left panel  (60%): client's portal tabs in read-only mode
  *   Right panel (40%): contextual professional tools, driven by activeTab state
  *
- * The left panel renders the existing tab components with readOnly={true}.
- * No add/edit/delete controls are visible. All data comes from the same hooks —
- * no separate data layer. The accountant's JWT determines what RLS permits.
+ * initialData is fetched server-side in the page component and passed down,
+ * giving the right panels immediate data without additional client-side fetches
+ * for client-owned tables that don't yet have accountant RLS.
  *
- * The right panel is a ContextPanel that switches content based on the
- * active tab. Clicking an expense row on the left loads it into the right panel.
- *
- * Mobile: stacked vertically (out of scope for this phase — desktop first).
+ * Mutations (expense reviews, working notes) use dedicated hooks with
+ * accountant-scoped RLS on the new tables.
  */
 
 import { useState }       from 'react'
-import type { Client }    from '@/types'
+import type { Client, SplitPanelInitialData } from '@/types'
 import { light as colours }   from '@/styles/tokens/colours'
 import { fonts, fontSize, fontWeight, letterSpacing } from '@/styles/tokens/typography'
 import { radius, transition } from '@/styles/tokens'
@@ -75,8 +73,14 @@ function LeftTabRenderer({
 
 // ─── Header ───────────────────────────────────────────────────────────────────
 
-function SplitHeader({ client }: { client: Client }) {
-  const daysToDeadline = null // TODO: wire to deadlines table in Phase 5
+function SplitHeader({ client, saDaysRemaining }: { client: Client; saDaysRemaining: number | null }) {
+  const saColour = saDaysRemaining === null
+    ? colours.textMuted
+    : saDaysRemaining <= 14
+      ? colours.danger
+      : saDaysRemaining <= 30
+        ? '#F59E0B'
+        : colours.textMuted
 
   return (
     <div style={{
@@ -128,17 +132,17 @@ function SplitHeader({ client }: { client: Client }) {
         {client.plan ?? 'foundation'}
       </div>
 
-      {daysToDeadline !== null && (
+      {saDaysRemaining !== null && (
         <div style={{
           fontSize:      fontSize.label,
           fontFamily:    fonts.mono,
           letterSpacing: letterSpacing.wide,
-          color:         daysToDeadline <= 14 ? colours.danger : colours.textMuted,
-          background:    daysToDeadline <= 14 ? colours.dangerLight : colours.borderLight,
+          color:         saColour,
+          background:    saDaysRemaining <= 14 ? colours.dangerLight : colours.borderLight,
           padding:       '2px 7px',
           borderRadius:  radius.xs,
         }}>
-          SA: {daysToDeadline}d
+          SA: {saDaysRemaining}d
         </div>
       )}
     </div>
@@ -193,36 +197,38 @@ function TabBar({
 // ─── Main component ───────────────────────────────────────────────────────────
 
 interface Props {
-  client:       Client
-  accountantId: string | null
+  client:           Client
+  accountantId:     string | null
+  accountantUserId: string
+  initialData:      SplitPanelInitialData
 }
 
-export default function SplitPanel({ client, accountantId }: Props) {
-  const [activeTab,        setActiveTab]        = useState<SplitTab>('overview')
+export default function SplitPanel({ client, accountantId, accountantUserId, initialData }: Props) {
+  const [activeTab,         setActiveTab]         = useState<SplitTab>('overview')
   const [selectedExpenseId, setSelectedExpenseId] = useState<string | null>(null)
 
   return (
     <div style={{
       display:       'flex',
       flexDirection: 'column',
-      height:        'calc(100vh - 24px)',   // 24px = 12px top + 12px bottom margin
+      height:        'calc(100vh - 24px)',
       overflow:      'hidden',
     }}>
 
       {/* ── Header ── */}
-      <SplitHeader client={client} />
+      <SplitHeader client={client} saDaysRemaining={initialData.saDaysRemaining} />
 
       {/* ── Body ── */}
       <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
 
         {/* ── Left panel (60%) ── */}
         <div style={{
-          width:     '60%',
-          flexShrink: 0,
-          display:   'flex',
+          width:         '60%',
+          flexShrink:    0,
+          display:       'flex',
           flexDirection: 'column',
-          borderRight: `1px solid ${colours.borderHairline}`,
-          overflow:  'hidden',
+          borderRight:   `1px solid ${colours.borderHairline}`,
+          overflow:      'hidden',
         }}>
           <TabBar activeTab={activeTab} onSelect={tab => {
             setActiveTab(tab)
@@ -258,8 +264,10 @@ export default function SplitPanel({ client, accountantId }: Props) {
             activeTab={activeTab}
             client={client}
             accountantId={accountantId}
+            accountantUserId={accountantUserId}
             selectedExpenseId={selectedExpenseId}
             onExpenseSelect={setSelectedExpenseId}
+            initialData={initialData}
           />
         </div>
 
