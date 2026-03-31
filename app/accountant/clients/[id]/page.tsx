@@ -32,18 +32,7 @@ interface Props {
   params: Promise<{ id: string }>
 }
 
-// ─── Tax year helper ──────────────────────────────────────────────────────────
-
-/** Returns the current UK tax year string, e.g. '2025-26'. */
-function currentTaxYear(): string {
-  const now = new Date()
-  const y   = now.getFullYear()
-  const m   = now.getMonth() + 1 // 1-12
-  const d   = now.getDate()
-  // UK tax year starts April 6
-  const inNewYear = m > 4 || (m === 4 && d >= 6)
-  return inNewYear ? `${y}-${String(y + 1).slice(2)}` : `${y - 1}-${String(y).slice(2)}`
-}
+// ─── SA deadline helper ───────────────────────────────────────────────────────
 
 /** Returns the SA deadline date string for a given tax year, e.g. '2026-01-31'. */
 function saDeadlineForYear(taxYear: string): string {
@@ -100,7 +89,7 @@ export default async function AccountantClientPage({ params }: Props) {
   if (!client) notFound()
 
   // ── SplitPanelInitialData ──────────────────────────────────────────────────
-  const taxYear = currentTaxYear()
+  const taxYear = client.tax_year
 
   const [
     expensesResult,
