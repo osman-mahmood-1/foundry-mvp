@@ -1,26 +1,94 @@
 @import "tailwindcss";
 
+/* ── Font variables (set by next/font in layout.tsx) ──────────────────────── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --font-display: var(--font-inter, 'Inter', sans-serif);
+  --font-mono:    var(--font-jetbrains-mono, 'JetBrains Mono', monospace);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* ── Base reset ────────────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html, body {
+  margin:      0;
+  padding:     0;
+  font-family: var(--font-display);
+  font-size:   14px;
+  line-height: 1.6;
+  -webkit-font-smoothing:  antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ── Spinner keyframe (used by Spinner component) ─────────────────────────── */
+@keyframes spin {
+  from { transform: rotate(0deg);   }
+  to   { transform: rotate(360deg); }
+}
+
+/* ── Pulse keyframe (used by status indicator dots) ──────────────────────── */
+@keyframes pulse {
+  0%, 100% { opacity: 1;   }
+  50%       { opacity: 0.4; }
+}
+
+/* ── Input/select appearance reset ────────────────────────────────────────── */
+input, select, textarea, button {
+  font-family: inherit;
+}
+
+/* ── CTA button — slowly rotating gradient border on hover ───────────────── */
+@property --cta-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes cta-border-spin {
+  to { --cta-angle: 360deg; }
+}
+
+.cta-btn {
+  position: relative;
+  isolation: isolate;
+}
+
+.cta-btn::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 102px; /* pill (100px) + 2px border */
+  background: conic-gradient(
+    from var(--cta-angle),
+    rgba(0,194,255,0.15) 0deg,
+    #00C2FF 80deg,
+    rgba(255,255,255,0.90) 180deg,
+    #00C2FF 280deg,
+    rgba(0,194,255,0.15) 360deg
+  );
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  animation: cta-border-spin 3s linear infinite paused;
+}
+
+.cta-btn:hover::after {
+  opacity: 1;
+  animation-play-state: running;
+}
+
+/* Light theme data-theme vars (consumed by components that need CSS vars) */
+[data-theme="light"] {
+  --color-bg-base:      #F4F6FA;
+  --color-bg-surface:   #FFFFFF;
+  --color-text-primary: #0D1117;
+  --color-accent:       #00C2FF;
+}
+
+[data-theme="dark"] {
+  --color-bg-base:      #0D0F14;
+  --color-bg-surface:   #13161D;
+  --color-text-primary: #EDF2F7;
+  --color-accent:       #00C2FF;
 }

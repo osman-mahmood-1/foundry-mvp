@@ -1,260 +1,271 @@
-const palette = {
-  white:      '#FFFFFF',
-  appleWhite: '#F5F5F7',
-  grey50:     '#FAFAFA',
-  grey100:    '#F5F5F7',
-  grey200:    '#E5E5E7',
-  grey300:    '#D1D1D6',
-  grey400:    '#AEAEB2',
-  grey500:    '#8E8E93',
-  grey600:    '#6E6E73',
-  grey700:    '#3A3A3C',
-  grey800:    '#2C2C2E',
-  grey900:    '#1D1D1F',
-  dark50:     '#0A0A0F',
-  dark100:    '#111116',
-  dark200:    '#16161E',
-  dark300:    '#1C1C28',
-  dark400:    '#252535',
-  dark500:    '#2E2E42',
-  darkText1:  '#F5F5F7',
-  darkText2:  '#98989F',
-  darkText3:  '#48484F',
-  blue:       '#007AFF',
-  blueDark:   '#0A84FF',
-  blueDeep:   '#0062CC',
-  blueLight:  '#3395FF',
-  emerald400: '#34D399',
-  emerald500: '#10B981',
-  emerald600: '#059669',
-  sky400:     '#38BDF8',
-  sky500:     '#0EA5E9',
-  sky600:     '#0284C7',
-  amber400:   '#FCD34D',
-  amber500:   '#F59E0B',
-  amber600:   '#D97706',
-  red400:     '#F87171',
-  red500:     '#EF4444',
-  red600:     '#DC2626',
-  teal400:    '#2DD4BF',
-  teal500:    '#14B8A6',
-} as const
+/**
+ * styles/tokens/colours.ts
+ *
+ * Single source of truth for all colours.
+ * Palette: ice blue / electric cyan on deep slate.
+ *
+ * Rules (from fintech-ui SKILL.md):
+ * - Primary accent is #00C2FF (electric cyan). Never iOS blue.
+ * - No purple anywhere.
+ * - Green is semantic-only: positive deltas, active/online status, credit lines.
+ * - Exactly 4 text levels per theme.
+ */
+
+// ─── Light theme ──────────────────────────────────────────────────────────────
 
 export const light = {
-  // ── Structure ─────────────────────────────────────────────────
-  pageBg:             '#F5F5F7',
+  // ── Page surfaces
+  pageBg:             '#F4F6FA',
   sidebarBg:          '#FFFFFF',
-  panelBg:            'rgba(255,255,255,0.78)',
+  panelBg:            'rgba(255,255,255,0.82)',
   panelBgSolid:       '#FFFFFF',
   inputBg:            '#FFFFFF',
-  hoverBg:            '#FAFAFA',
-  accent:             '#007AFF',
-  accentHover:        '#0066CC',
-  accentLight:        'rgba(0,122,255,0.10)',
-  accentSoft:         'rgba(0,122,255,0.06)',
-  accentBorder:       'rgba(0,122,255,0.30)',
-  accentDark:         '#0055AA',
-  accentText:         '#007AFF',
-  // ── Text ──────────────────────────────────────────────────────
-  textPrimary:        '#1D1D1F',
-  textSecondary:      '#6E6E73',
-  textMuted:          '#AEAEB2',
-  textInverse:        '#FFFFFF',
-  textAccent:         '#007AFF',
-  // ── Borders ───────────────────────────────────────────────────
-  borderHairline:     '#E5E5EA',
+  hoverBg:            'rgba(0,0,0,0.032)',   // ghost — barely perceptible
+
+  // ── Primary accent — electric cyan
+  accent:             '#00C2FF',
+  accentHover:        '#00AADD',
+  accentLight:        'rgba(0,194,255,0.10)',
+  accentSoft:         'rgba(0,194,255,0.06)',
+  accentBorder:       'rgba(0,194,255,0.40)',
+  accentDark:         '#0090C4',
+  accentText:         '#00C2FF',
+
+  // ── Text — 4 levels
+  textPrimary:        '#0D1117',
+  textSecondary:      '#4A5568',
+  textMuted:          '#94A3B8',
+  textInverse:        '#EDF2F7',
+  textAccent:         '#00C2FF',
+
+  // ── Borders
+  borderHairline:     'rgba(0,0,0,0.07)',
   borderLight:        'rgba(0,0,0,0.06)',
   borderMedium:       'rgba(0,0,0,0.10)',
-  borderInput:        '#C7C7CC',
-  // ── Nav ───────────────────────────────────────────────────────
-  navActive:          '#007AFF',
-  navActiveBg:        'rgba(0,122,255,0.08)',
-  navInactive:        '#6E6E73',
-  navGroupLabel:      '#AEAEB2',
-  // ── Sidebar / misc ────────────────────────────────────────────
+  borderInput:        'rgba(0,0,0,0.16)',
+
+  // ── Nav
+  navActive:          '#00C2FF',
+  navActiveBg:        'rgba(0,194,255,0.08)',
+  navInactive:        '#4A5568',
+  navGroupLabel:      '#94A3B8',
+
+  // ── Sidebar / misc
   sidebarShadow:      'rgba(0,0,0,0.06)',
   appleWhite:         '#FFFFFF',
   white:              '#FFFFFF',
-  // ── Glows / feature colours ───────────────────────────────────
-  incomeGlow:         'rgba(16,185,129,0.06)',
-  expenseGlow:        'rgba(14,165,233,0.06)',
-  warningGlow:        'rgba(245,158,11,0.06)',
-  dangerGlow:         'rgba(239,68,68,0.06)',
-  intelligenceGlow:   'rgba(0,122,255,0.06)',
-  expenseText:        '#0EA5E9',
-  incomeText:         '#10B981',
-  // ── Misc tokens ───────────────────────────────────────────────
-  overview:           '#007AFF',
-  healthRing:         '#34C759',
-  intelligence:       '#007AFF',
-  glassBg:            'rgba(255,255,255,0.78)',
-  glassBlur:          'blur(48px)',
-  glassBorder:        'rgba(255,255,255,0.95)',
+
+  // ── Glass
+  glassBg:            'rgba(255,255,255,0.82)',
+  glassBlur:          'blur(18px) saturate(160%)',
+  glassBorder:        'rgba(0,0,0,0.07)',
   glassShadow:        'rgba(0,0,0,0.06)',
-  orbAccent:          'rgba(0,122,255,0.15)',
-  orbSky:             'rgba(14,165,233,0.10)',
-  blue:               '#007AFF',
-  blueLight:          'rgba(0,122,255,0.10)',
-  blueDark:           '#0055AA',
-  blueDeep:           '#003D99',
-  tealBar:            '#14B8A6',
-  // ── Semantic tokens ───────────────────────────────────────────
-  income:             'rgba(16,185,129,1)',
+  orbAccent:          'rgba(0,194,255,0.07)',
+  orbSky:             'rgba(0,100,180,0.05)',
+
+  // ── Backward-compat aliases
+  blue:               '#00C2FF',
+  blueLight:          'rgba(0,194,255,0.10)',
+  blueDark:           '#0090C4',
+  blueDeep:           '#006B99',
+  tealBar:            '#10B981',
+
+  // ── Semantic income / expense
+  income:             '#10B981',
   incomeLight:        'rgba(16,185,129,0.10)',
-  expense:            'rgba(14,165,233,1)',
-  expenseLight:       'rgba(14,165,233,0.10)',
-  warning:            'rgba(245,158,11,1)',
-  warningLight:       'rgba(245,158,11,0.10)',
-  warningDark:        'rgba(217,119,6,1)',
-  danger:             'rgba(239,68,68,1)',
-  dangerLight:        'rgba(239,68,68,0.10)',
-  allowable:          'rgba(16,185,129,1)',
-  allowableLight:     'rgba(16,185,129,0.10)',
-  notAllowable:       'rgba(239,68,68,1)',
-  notAllowableLight:  'rgba(239,68,68,0.10)',
-  pendingReview:      'rgba(245,158,11,1)',
-  pendingReviewLight: 'rgba(245,158,11,0.10)',
-  urgent:             'rgba(239,68,68,1)',
-  urgentLight:        'rgba(239,68,68,0.10)',
-  attention:          'rgba(245,158,11,1)',
-  attentionLight:     'rgba(245,158,11,0.10)',
-  info:               'rgba(0,122,255,1)',
-  infoLight:          'rgba(0,122,255,0.10)',
-  teal:               'rgba(20,184,166,1)',
-  tealLight:          'rgba(20,184,166,0.10)',
+  expense:            '#00C2FF',
+  expenseLight:       'rgba(0,194,255,0.10)',
+
+  // ── States
+  warning:            '#F59E0B',
+  warningLight:       'rgba(245,158,11,0.12)',
+  warningDark:        '#D97706',
+  danger:             '#F43F5E',
+  dangerLight:        'rgba(244,63,94,0.12)',
+
+  // ── Allowability
+  allowable:          '#10B981',
+  allowableLight:     'rgba(16,185,129,0.12)',
+  notAllowable:       '#F43F5E',
+  notAllowableLight:  'rgba(244,63,94,0.12)',
+  pendingReview:      '#F59E0B',
+  pendingReviewLight: 'rgba(245,158,11,0.12)',
+
+  // ── Intelligence severity
+  urgent:             '#F43F5E',
+  urgentLight:        'rgba(244,63,94,0.12)',
+  attention:          '#F59E0B',
+  attentionLight:     'rgba(245,158,11,0.12)',
+  info:               '#00C2FF',
+  infoLight:          'rgba(0,194,255,0.10)',
+
+  // ── Misc
+  teal:               '#10B981',
+  tealLight:          'rgba(16,185,129,0.10)',
+  overview:           '#00C2FF',
+  healthRing:         '#10B981',
+  intelligence:       '#00C2FF',
+  incomeGlow:         'rgba(16,185,129,0.06)',
+  expenseGlow:        'rgba(0,194,255,0.06)',
+  warningGlow:        'rgba(245,158,11,0.06)',
+  dangerGlow:         'rgba(244,63,94,0.06)',
+  intelligenceGlow:   'rgba(0,194,255,0.06)',
+  expenseText:        '#00C2FF',
+  incomeText:         '#10B981',
 } as const
 
+// ─── Dark theme ───────────────────────────────────────────────────────────────
+
 export const dark = {
-  // ── Structure ─────────────────────────────────────────────────
-  pageBg:             '#0A0A0F',
-  sidebarBg:          '#111116',
-  panelBg:            'rgba(22,22,30,0.80)',
-  panelBgSolid:       '#16161E',
-  inputBg:            '#1C1C28',
-  hoverBg:            '#252535',
-  accent:             '#0A84FF',
-  accentHover:        '#3399FF',
-  accentLight:        'rgba(10,132,255,0.15)',
-  accentSoft:         'rgba(10,132,255,0.08)',
-  accentBorder:       'rgba(10,132,255,0.30)',
-  accentDark:         '#0066CC',
-  accentText:         '#0A84FF',
-  // ── Text ──────────────────────────────────────────────────────
-  textPrimary:        '#F5F5F7',
-  textSecondary:      '#98989F',
-  textMuted:          '#636366',
-  textInverse:        '#1D1D1F',
-  textAccent:         '#0A84FF',
-  // ── Borders ───────────────────────────────────────────────────
-  borderHairline:     '#2C2C3A',
-  borderLight:        'rgba(255,255,255,0.04)',
-  borderMedium:       'rgba(255,255,255,0.08)',
-  borderInput:        '#3A3A4A',
-  // ── Nav ───────────────────────────────────────────────────────
-  navActive:          '#F5F5F7',
-  navActiveBg:        '#252535',
-  navInactive:        '#98989F',
-  navGroupLabel:      '#636366',
-  // ── Sidebar / misc ────────────────────────────────────────────
+  // ── Page surfaces
+  pageBg:             '#0D0F14',
+  sidebarBg:          '#08090C',
+  panelBg:            'rgba(19,22,29,0.80)',
+  panelBgSolid:       '#13161D',
+  inputBg:            '#1A1E28',
+  hoverBg:            'rgba(255,255,255,0.028)',
+
+  // ── Primary accent — electric cyan
+  accent:             '#00C2FF',
+  accentHover:        '#00AADD',
+  accentLight:        'rgba(0,194,255,0.15)',
+  accentSoft:         'rgba(0,194,255,0.08)',
+  accentBorder:       'rgba(0,194,255,0.30)',
+  accentDark:         '#0090C4',
+  accentText:         '#00C2FF',
+
+  // ── Text — 4 levels
+  textPrimary:        '#EDF2F7',
+  textSecondary:      '#8896AA',
+  textMuted:          '#4A5568',
+  textInverse:        '#0D1117',
+  textAccent:         '#00C2FF',
+
+  // ── Borders
+  borderHairline:     'rgba(255,255,255,0.07)',
+  borderLight:        'rgba(255,255,255,0.05)',
+  borderMedium:       'rgba(255,255,255,0.09)',
+  borderInput:        'rgba(255,255,255,0.15)',
+
+  // ── Nav
+  navActive:          '#EDF2F7',
+  navActiveBg:        '#1F2330',
+  navInactive:        '#8896AA',
+  navGroupLabel:      '#4A5568',
+
+  // ── Sidebar / misc
   sidebarShadow:      '1px 0 0 rgba(255,255,255,0.04)',
   appleWhite:         '#FFFFFF',
   white:              '#FFFFFF',
-  // ── Glows / feature colours ───────────────────────────────────
-  incomeGlow:         'rgba(16,185,129,0.15)',
-  expenseGlow:        'rgba(14,165,233,0.15)',
-  warningGlow:        'rgba(245,158,11,0.15)',
-  dangerGlow:         'rgba(239,68,68,0.15)',
-  intelligenceGlow:   'rgba(10,132,255,0.20)',
-  expenseText:        '#38BDF8',
-  incomeText:         '#34D399',
-  // ── Misc tokens ───────────────────────────────────────────────
-  overview:           '#0A84FF',
-  healthRing:         '#30D158',
-  intelligence:       '#0A84FF',
-  glassBg:            'rgba(22,22,30,0.80)',
-  glassBlur:          'blur(48px)',
+
+  // ── Glass
+  glassBg:            'rgba(19,22,29,0.80)',
+  glassBlur:          'blur(18px) saturate(160%)',
   glassBorder:        'rgba(255,255,255,0.07)',
   glassShadow:        'rgba(0,0,0,0.40)',
-  orbAccent:          'rgba(10,132,255,0.20)',
-  orbSky:             'rgba(14,165,233,0.15)',
-  blue:               '#0A84FF',
-  blueLight:          'rgba(10,132,255,0.15)',
-  blueDark:           '#0066CC',
-  blueDeep:           '#004499',
-  tealBar:            '#2DD4BF',
-  // ── Semantic tokens ───────────────────────────────────────────
-  income:             'rgba(52,211,153,1)',
+  orbAccent:          'rgba(0,194,255,0.14)',
+  orbSky:             'rgba(0,194,255,0.07)',
+
+  // ── Backward-compat aliases
+  blue:               '#00C2FF',
+  blueLight:          'rgba(0,194,255,0.15)',
+  blueDark:           '#0090C4',
+  blueDeep:           '#006B99',
+  tealBar:            '#34D399',
+
+  // ── Semantic income / expense
+  income:             '#34D399',
   incomeLight:        'rgba(52,211,153,0.15)',
-  expense:            'rgba(56,189,248,1)',
-  expenseLight:       'rgba(56,189,248,0.15)',
-  warning:            'rgba(251,191,36,1)',
-  warningLight:       'rgba(251,191,36,0.15)',
-  warningDark:        'rgba(245,158,11,1)',
-  danger:             'rgba(248,113,113,1)',
+  expense:            '#33CEFF',
+  expenseLight:       'rgba(0,194,255,0.15)',
+
+  // ── States
+  warning:            '#FBBD24',
+  warningLight:       'rgba(251,189,36,0.15)',
+  warningDark:        '#F59E0B',
+  danger:             '#F87171',
   dangerLight:        'rgba(248,113,113,0.15)',
-  allowable:          'rgba(52,211,153,1)',
+
+  // ── Allowability
+  allowable:          '#34D399',
   allowableLight:     'rgba(52,211,153,0.15)',
-  notAllowable:       'rgba(248,113,113,1)',
+  notAllowable:       '#F87171',
   notAllowableLight:  'rgba(248,113,113,0.15)',
-  pendingReview:      'rgba(251,191,36,1)',
-  pendingReviewLight: 'rgba(251,191,36,0.15)',
-  urgent:             'rgba(248,113,113,1)',
+  pendingReview:      '#FBBD24',
+  pendingReviewLight: 'rgba(251,189,36,0.15)',
+
+  // ── Intelligence severity
+  urgent:             '#F87171',
   urgentLight:        'rgba(248,113,113,0.15)',
-  attention:          'rgba(251,191,36,1)',
-  attentionLight:     'rgba(251,191,36,0.15)',
-  info:               'rgba(10,132,255,1)',
-  infoLight:          'rgba(10,132,255,0.15)',
-  teal:               'rgba(45,212,191,1)',
-  tealLight:          'rgba(45,212,191,0.15)',
+  attention:          '#FBBD24',
+  attentionLight:     'rgba(251,189,36,0.15)',
+  info:               '#00C2FF',
+  infoLight:          'rgba(0,194,255,0.15)',
+
+  // ── Misc
+  teal:               '#34D399',
+  tealLight:          'rgba(52,211,153,0.15)',
+  overview:           '#00C2FF',
+  healthRing:         '#30D158',
+  intelligence:       '#00C2FF',
+  incomeGlow:         'rgba(52,211,153,0.15)',
+  expenseGlow:        'rgba(0,194,255,0.15)',
+  warningGlow:        'rgba(245,158,11,0.15)',
+  dangerGlow:         'rgba(244,63,94,0.15)',
+  intelligenceGlow:   'rgba(0,194,255,0.20)',
+  expenseText:        '#33CEFF',
+  incomeText:         '#34D399',
+} as const
+
+// ─── Gradients ────────────────────────────────────────────────────────────────
+
+export const gradients = {
+  accent:       'linear-gradient(135deg, #00C2FF 0%, #0094CC 100%)',
+  accentHover:  'linear-gradient(135deg, #1ACEFF 0%, #00AADD 100%)',
+  accentDark:   'linear-gradient(135deg, #00C2FF 0%, #33CEFF 100%)',
+  accentSoft:   'linear-gradient(135deg, rgba(0,194,255,0.12) 0%, rgba(0,148,204,0.12) 100%)',
+  accentText:   'linear-gradient(135deg, #00C2FF 0%, #33CEFF 100%)',
+  income:       'radial-gradient(ellipse at 20% 50%, rgba(16,185,129,0.22) 0%, transparent 70%)',
+  expense:      'radial-gradient(ellipse at 80% 50%, rgba(0,194,255,0.22) 0%, transparent 70%)',
+  intelligence: 'radial-gradient(ellipse at 50% 0%, rgba(0,194,255,0.28) 0%, rgba(0,148,204,0.18) 50%, transparent 80%)',
+  warning:      'radial-gradient(ellipse at 50% 0%, rgba(245,158,11,0.22) 0%, transparent 70%)',
+  danger:       'radial-gradient(ellipse at 50% 0%, rgba(244,63,94,0.22) 0%, transparent 70%)',
+  overview:     'radial-gradient(ellipse at 50% 0%, rgba(0,194,255,0.18) 0%, rgba(16,185,129,0.10) 60%, transparent 90%)',
+  orbAccent:    'radial-gradient(circle, rgba(0,194,255,0.08) 0%, transparent 70%)',
+  orbSky:       'radial-gradient(circle, rgba(0,194,255,0.05) 0%, transparent 70%)',
+  incomeText:   'linear-gradient(135deg, #10B981 0%, #34D399 100%)',
+  expenseText:  'linear-gradient(135deg, #00C2FF 0%, #33CEFF 100%)',
+  healthRing:   'linear-gradient(135deg, #00C2FF 0%, #10B981 100%)',
+  tealBar:      'linear-gradient(90deg, #10B981, #34D399)',
 } as const
 
 export const semantic = {
-  income:             palette.emerald500,
-  incomeLight:        'rgba(16,185,129,0.10)',
-  expense:            palette.sky500,
-  expenseLight:       'rgba(14,165,233,0.10)',
-  warning:            palette.amber500,
-  warningLight:       'rgba(245,158,11,0.10)',
-  warningDark:        palette.amber600,
-  danger:             palette.red500,
-  dangerLight:        'rgba(239,68,68,0.10)',
-  allowable:          palette.emerald500,
-  allowableLight:     'rgba(16,185,129,0.10)',
-  notAllowable:       palette.red500,
-  notAllowableLight:  'rgba(239,68,68,0.10)',
-  pendingReview:      palette.amber500,
-  pendingReviewLight: 'rgba(245,158,11,0.10)',
-  urgent:             palette.red500,
-  urgentLight:        'rgba(239,68,68,0.10)',
-  attention:          palette.amber500,
-  attentionLight:     'rgba(245,158,11,0.10)',
-  info:               palette.blue,
-  infoLight:          'rgba(0,122,255,0.10)',
-  teal:               palette.teal500,
-  tealLight:          'rgba(20,184,166,0.10)',
-} as const
-
-export const gradients = {
-  accent:       'linear-gradient(135deg, #007AFF 0%, #0EA5E9 100%)',
-  accentDark:   'linear-gradient(135deg, #0A84FF 0%, #38BDF8 100%)',
-  accentHover:  'linear-gradient(135deg, #0062CC 0%, #0284C7 100%)',
-  accentSoft:   'linear-gradient(135deg, rgba(0,122,255,0.12) 0%, rgba(14,165,233,0.12) 100%)',
-  accentText:   'linear-gradient(135deg, #007AFF 0%, #0EA5E9 100%)',
-  income:       'radial-gradient(ellipse at 20% 50%, rgba(16,185,129,0.22) 0%, transparent 70%)',
-  expense:      'radial-gradient(ellipse at 80% 50%, rgba(14,165,233,0.22) 0%, transparent 70%)',
-  intelligence: 'radial-gradient(ellipse at 50% 0%, rgba(0,122,255,0.28) 0%, rgba(14,165,233,0.18) 50%, transparent 80%)',
-  warning:      'radial-gradient(ellipse at 50% 0%, rgba(245,158,11,0.22) 0%, transparent 70%)',
-  danger:       'radial-gradient(ellipse at 50% 0%, rgba(239,68,68,0.22) 0%, transparent 70%)',
-  overview:     'radial-gradient(ellipse at 50% 0%, rgba(0,122,255,0.18) 0%, rgba(20,184,166,0.12) 60%, transparent 90%)',
-  orbAccent:    'radial-gradient(circle, rgba(0,122,255,0.08) 0%, transparent 70%)',
-  orbSky:       'radial-gradient(circle, rgba(14,165,233,0.06) 0%, transparent 70%)',
-  incomeText:   'linear-gradient(135deg, #10B981 0%, #34D399 100%)',
-  expenseText:  'linear-gradient(135deg, #0EA5E9 0%, #38BDF8 100%)',
-  healthRing:   'linear-gradient(135deg, #007AFF 0%, #0EA5E9 50%, #14B8A6 100%)',
-  tealBar:      'linear-gradient(90deg, #14B8A6, #2DD4BF)',
+  income:             '#10B981',
+  incomeLight:        'rgba(16,185,129,0.12)',
+  expense:            '#00C2FF',
+  expenseLight:       'rgba(0,194,255,0.12)',
+  warning:            '#F59E0B',
+  warningLight:       'rgba(245,158,11,0.12)',
+  warningDark:        '#D97706',
+  danger:             '#F43F5E',
+  dangerLight:        'rgba(244,63,94,0.12)',
+  allowable:          '#10B981',
+  allowableLight:     'rgba(16,185,129,0.12)',
+  notAllowable:       '#F43F5E',
+  notAllowableLight:  'rgba(244,63,94,0.12)',
+  pendingReview:      '#F59E0B',
+  pendingReviewLight: 'rgba(245,158,11,0.12)',
+  urgent:             '#F43F5E',
+  urgentLight:        'rgba(244,63,94,0.12)',
+  attention:          '#F59E0B',
+  attentionLight:     'rgba(245,158,11,0.12)',
+  info:               '#00C2FF',
+  infoLight:          'rgba(0,194,255,0.12)',
+  teal:               '#10B981',
+  tealLight:          'rgba(16,185,129,0.12)',
 } as const
 
 export const colours = light
 
-export type ColourMode = 'light' | 'dark'
+export type ColourMode  = 'light' | 'dark'
 export type ColourToken = keyof typeof light
