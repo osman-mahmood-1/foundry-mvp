@@ -3,22 +3,29 @@
 /**
  * app/portal/components/tabs/IncomeTab.tsx
  *
- * Income tab — presentation layer only.
+ * Income tab — split-panel layout.
+ * Left: income list (always visible, scrollable).
+ * Right: EntryPanel slides in for adding entries — user can reference
+ *        existing entries while filling in the form.
  *
- * Rules:
- * - No Supabase imports. No data fetching. All data via useIncome().
- * - All design values from @/styles/tokens — no hardcoded values.
- * - Uses shared UI primitives from ../ui/index.tsx throughout.
+ * UX principles:
+ * - "Add Another" submits and keeps panel open with cursor back on Description
+ * - "Done" submits and closes the panel
+ * - Draft auto-saved to localStorage on every keystroke
+ * - Delete on row hover (icon only, no label)
+ * - Button sizing: intrinsic width, right-aligned — never full-width on desktop
  */
 
 import { useState } from 'react'
 import type { Client, IncomeCategory } from '@/types'
-import { useIncome }  from './useIncome'
+import { useIncome }   from './useIncome'
+import { useDraft }    from '@/lib/useDraft'
 import {
   Panel, Label, StatCard, EmptyState,
   Spinner, Badge, Button, Input, Select,
   ErrorBanner, formatGBP, formatDate,
 } from '../ui'
+import EntryPanel from '../ui/EntryPanel'
 import { light as colours } from '@/styles/tokens/colours'
 import { fonts, fontSize, fontWeight, letterSpacing } from '@/styles/tokens/typography'
 import { radius, transition, spacing } from '@/styles/tokens'
@@ -41,11 +48,27 @@ const INCOME_CATEGORIES: { value: IncomeCategory; label: string }[] = [
   { value: 'other',        label: 'Other income' },
 ]
 
-// ─── Month helper ─────────────────────────────────────────────────────────────
-
 function formatMonthLabel(ym: string): string {
   const [y, m] = ym.split('-').map(Number)
   return new Date(y, m - 1, 1).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })
+}
+
+// ─── Draft state shape ────────────────────────────────────────────────────────
+
+interface IncomeFormState {
+  description: string
+  amount:      string
+  date:        string
+  category:    IncomeCategory
+}
+
+const TODAY = new Date().toISOString().slice(0, 10)
+
+const EMPTY_FORM: IncomeFormState = {
+  description: '',
+  amount:      '',
+  date:        TODAY,
+  category:    'trading',
 }
 
 // ─── Props ────────────────────────────────────────────────────────────────────
@@ -55,43 +78,92 @@ interface Props {
   readOnly?: boolean
 }
 
+// ─── Draft banner ─────────────────────────────────────────────────────────────
+
+function DraftBanner({ onDiscard }: { onDiscard: () => void }) {
+  return (
+    <div style={{
+      display:      'flex',
+      alignItems:   'center',
+      justifyContent: 'space-between',
+      padding:      '8px 12px',
+      background:   colours.warningLight,
+      borderRadius: radius.sm,
+      fontSize:     fontSize.xs,
+      color:        colours.warning,
+      marginBottom: '12px',
+    }}>
+      <span>◉ Draft restored — your previous entry has been reloaded.</span>
+      <button
+        onClick={onDiscard}
+        style={{
+          background:  'transparent',
+          border:      'none',
+          color:       colours.warning,
+          cursor:      'pointer',
+          fontSize:    fontSize.xs,
+          fontFamily:  fonts.sans,
+          padding:     '2px 6px',
+        }}
+      >
+        Discard
+      </button>
+    </div>
+  )
+}
+
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export default function IncomeTab({ client, readOnly = false }: Props) {
-  const [showForm, setShowForm] = useState(false)
+  const [panelOpen, setPanelOpen] = useState(false)
 
   const {
-    income,
-    totalPence,
-    entryCount,
-    availableMonths,
-    loadedMonths,
-    hasMore,
-    loadingMore,
-    loadMonth,
-    loading,
-    saving,
-    error,
-    form,
-    setForm,
-    isFormValid,
-    addIncome,
-    deleteIncome,
-    resetForm,
+    income, totalPence, entryCount,
+    availableMonths, loadedMonths, hasMore, loadingMore, loadMonth,
+    loading, saving, error,
+    form: hookForm, setForm: hookSetForm, isFormValid, addIncome, deleteIncome, resetForm,
   } = useIncome(client.id, client.tax_year, client.user_id)
 
-  // ── Handlers ───────────────────────────────────────────────────
-  async function handleAdd() {
+  // Draft persistence — survives tab switches and refreshes
+  const draftKey = `foundry-draft-income-${client.id}`
+  const { state: draftForm, setState: setDraftForm, clearDraft, hasDraft } = useDraft<IncomeFormState>(
+    draftKey,
+    EMPTY_FORM,
+  )
+
+  // Sync draft into the hook form when panel opens
+  function openPanel() {
+    hookSetForm(() => ({
+      description: draftForm.description,
+      amount:      draftForm.amount,
+      date:        draftForm.date,
+      category:    draftForm.category,
+    }))
+    setPanelOpen(true)
+  }
+
+  function handleFieldChange(field: keyof IncomeFormState, value: string) {
+    const updated = { ...draftForm, [field]: value }
+    setDraftForm(updated)
+    hookSetForm(f => ({ ...f, [field]: value }))
+  }
+
+  async function handleSave(keepOpen: boolean) {
     await addIncome()
-    setShowForm(false)
+    clearDraft()
+    hookSetForm(() => EMPTY_FORM)
+    setDraftForm(EMPTY_FORM)
+    if (!keepOpen) setPanelOpen(false)
   }
 
-  function handleCancel() {
+  function handleClose() {
+    // Persist current form state as draft before closing
+    // (already saved on every keystroke via draftForm)
     resetForm()
-    setShowForm(false)
+    setPanelOpen(false)
   }
 
-  // ── Month grouping ──────────────────────────────────────────────
+  // Month grouping
   const groups: Record<string, typeof income> = {}
   for (const item of income) {
     const m = item.date.slice(0, 7)
@@ -99,41 +171,147 @@ export default function IncomeTab({ client, readOnly = false }: Props) {
     groups[m].push(item)
   }
   const sortedGroupKeys = Object.keys(groups).sort((a, b) => b.localeCompare(a))
-
-  // Next month to load
   const nextMonth = availableMonths.find(m => !loadedMonths.includes(m))
 
   if (loading) return <Spinner />
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.tab.gap }}>
+    <div style={{ display: 'flex', gap: spacing.tab.gap, minHeight: 0 }}>
 
-      {/* ── Summary stat ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: spacing.tab.gap }}>
-        <StatCard
-          label="Total income"
-          value={totalPence > 0 ? formatGBP(totalPence) : '—'}
-          sub={entryCount > 0
-            ? `${entryCount} entr${entryCount === 1 ? 'y' : 'ies'} · ${client.tax_year}`
-            : `No income logged yet · ${client.tax_year}`
-          }
-          colour={colours.income}
-        />
+      {/* ── Left: income list (always visible) ── */}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: spacing.tab.gap, minWidth: 0 }}>
+
+        {/* Summary stat */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: spacing.tab.gap }}>
+          <StatCard
+            label="Total income"
+            value={totalPence > 0 ? formatGBP(totalPence) : '—'}
+            sub={entryCount > 0
+              ? `${entryCount} entr${entryCount === 1 ? 'y' : 'ies'} · ${client.tax_year}`
+              : `No income logged yet · ${client.tax_year}`
+            }
+            colour={colours.income}
+          />
+        </div>
+
+        {error && <ErrorBanner error={error} />}
+
+        {/* Income list */}
+        <Panel padding="0">
+          <div style={{
+            display:        'flex',
+            alignItems:     'center',
+            justifyContent: 'space-between',
+            padding:        `${spacing.panel.paddingTight} ${spacing.panel.padding}`,
+            borderBottom:   income.length > 0 ? `1px solid ${colours.borderHairline}` : 'none',
+          }}>
+            <Label>Income · {client.tax_year}</Label>
+            {!readOnly && !panelOpen && (
+              <Button size="sm" onClick={openPanel}>
+                + Add entry
+              </Button>
+            )}
+          </div>
+
+          {income.length === 0 && entryCount === 0 && (
+            <EmptyState
+              icon="↑"
+              headline="No income logged yet."
+              sub="Every payment you receive goes here. Start with your first entry and we'll handle the categorisation."
+              action={readOnly ? undefined : 'Log first entry'}
+              onAction={readOnly ? undefined : openPanel}
+            />
+          )}
+
+          {sortedGroupKeys.map(month => {
+            const rows     = groups[month]
+            const subtotal = rows.reduce((s, r) => s + r.amount_pence, 0)
+            return (
+              <div key={month}>
+                <div style={{
+                  display:        'flex',
+                  alignItems:     'center',
+                  justifyContent: 'space-between',
+                  padding:        `8px ${spacing.panel.padding}`,
+                  background:     colours.hoverBg,
+                  borderBottom:   `1px solid ${colours.borderHairline}`,
+                }}>
+                  <span style={{
+                    fontSize:      fontSize.xs,
+                    fontWeight:    fontWeight.medium,
+                    color:         colours.textSecondary,
+                    letterSpacing: '0.04em',
+                  }}>
+                    {formatMonthLabel(month)}
+                    <span style={{ opacity: 0.5, margin: '0 6px' }}>·</span>
+                    {rows.length} entr{rows.length === 1 ? 'y' : 'ies'}
+                  </span>
+                  <span style={{
+                    fontFamily:    fonts.mono,
+                    fontSize:      fontSize.xs,
+                    fontWeight:    fontWeight.semibold,
+                    color:         colours.income,
+                    letterSpacing: letterSpacing.tight,
+                  }}>
+                    {formatGBP(subtotal)}
+                  </span>
+                </div>
+                {rows.map((item, idx) => (
+                  <IncomeRow
+                    key={item.id}
+                    item={item}
+                    isLast={idx === rows.length - 1}
+                    onDelete={readOnly ? undefined : () => deleteIncome(item.id, item.amount_pence)}
+                  />
+                ))}
+              </div>
+            )
+          })}
+
+          {hasMore && nextMonth && (
+            <div style={{
+              borderTop:      `1px solid ${colours.borderHairline}`,
+              padding:        '14px',
+              display:        'flex',
+              justifyContent: 'center',
+            }}>
+              <button
+                onClick={loadMonth}
+                disabled={loadingMore}
+                style={{
+                  background:  'transparent',
+                  border:      'none',
+                  color:       colours.textMuted,
+                  fontSize:    fontSize.sm,
+                  cursor:      loadingMore ? 'default' : 'pointer',
+                  fontFamily:  fonts.sans,
+                  padding:     '4px 8px',
+                  transition:  transition.snap,
+                  opacity:     loadingMore ? 0.5 : 1,
+                }}
+              >
+                {loadingMore ? 'Loading…' : `+ Load ${formatMonthLabel(nextMonth)}`}
+              </button>
+            </div>
+          )}
+        </Panel>
       </div>
 
-      {/* ── Error banner ── */}
-      {error && <ErrorBanner error={error} />}
+      {/* ── Right: entry panel ── */}
+      {!readOnly && (
+        <EntryPanel
+          open={panelOpen}
+          title="New income entry"
+          subtitle={client.tax_year}
+          onClose={handleClose}
+        >
+          {hasDraft && <DraftBanner onDiscard={() => { clearDraft(); hookSetForm(() => EMPTY_FORM) }} />}
 
-      {/* ── Add entry form — hidden in read-only mode ── */}
-      {!readOnly && showForm && (
-        <Panel>
-          <Label>New income entry</Label>
           <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.form.fieldGap }}>
-
             <Input
               label="Description"
-              value={form.description}
-              onChange={v => setForm(f => ({ ...f, description: v }))}
+              value={draftForm.description}
+              onChange={v => handleFieldChange('description', v)}
               placeholder="e.g. Invoice #023 — Acme Ltd"
               autoFocus
             />
@@ -142,133 +320,51 @@ export default function IncomeTab({ client, readOnly = false }: Props) {
               <Input
                 label="Amount (£)"
                 type="number"
-                value={form.amount}
-                onChange={v => setForm(f => ({ ...f, amount: v }))}
+                value={draftForm.amount}
+                onChange={v => handleFieldChange('amount', v)}
                 placeholder="0.00"
               />
               <Input
                 label="Date"
                 type="date"
-                value={form.date}
-                onChange={v => setForm(f => ({ ...f, date: v }))}
+                value={draftForm.date}
+                onChange={v => handleFieldChange('date', v)}
               />
             </div>
 
             <Select
               label="Category"
-              value={form.category}
-              onChange={v => setForm(f => ({ ...f, category: v as IncomeCategory }))}
+              value={draftForm.category}
+              onChange={v => handleFieldChange('category', v)}
               options={INCOME_CATEGORIES}
             />
 
-            <div style={{ display: 'flex', gap: '10px', marginTop: '4px' }}>
-              <Button onClick={handleAdd} disabled={saving || !isFormValid}>
-                {saving ? 'Saving…' : 'Save entry'}
+            {/* Action buttons — right-aligned, intrinsic width */}
+            <div style={{
+              display:        'flex',
+              gap:            '8px',
+              justifyContent: 'flex-end',
+              marginTop:      '4px',
+            }}>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => handleSave(true)}
+                disabled={saving || !isFormValid}
+              >
+                {saving ? 'Saving…' : 'Add another'}
               </Button>
-              <Button variant="secondary" onClick={handleCancel} disabled={saving}>
-                Cancel
+              <Button
+                size="sm"
+                onClick={() => handleSave(false)}
+                disabled={saving || !isFormValid}
+              >
+                {saving ? 'Saving…' : 'Done'}
               </Button>
             </div>
           </div>
-        </Panel>
+        </EntryPanel>
       )}
-
-      {/* ── Income list ── */}
-      <Panel padding="0">
-        {/* List header */}
-        <div style={{
-          display:        'flex',
-          alignItems:     'center',
-          justifyContent: 'space-between',
-          padding:        `${spacing.panel.paddingTight} ${spacing.panel.padding}`,
-          borderBottom:   income.length > 0 ? `1px solid ${colours.borderHairline}` : 'none',
-        }}>
-          <Label>Income · {client.tax_year}</Label>
-          {!readOnly && !showForm && (
-            <Button size="sm" onClick={() => setShowForm(true)}>
-              + Add entry
-            </Button>
-          )}
-        </div>
-
-        {/* Empty state */}
-        {income.length === 0 && entryCount === 0 && (
-          <EmptyState
-            icon="↑"
-            headline="No income logged yet."
-            sub="Every payment you receive goes here. Start with your first entry and we'll handle the categorisation."
-            action={readOnly ? undefined : 'Log first entry'}
-            onAction={readOnly ? undefined : () => setShowForm(true)}
-          />
-        )}
-
-        {/* Month groups */}
-        {sortedGroupKeys.map(month => {
-          const rows      = groups[month]
-          const subtotal  = rows.reduce((s, r) => s + r.amount_pence, 0)
-          return (
-            <div key={month}>
-              {/* Month header */}
-              <div style={{
-                display:        'flex',
-                alignItems:     'center',
-                justifyContent: 'space-between',
-                padding:        `8px ${spacing.panel.padding}`,
-                background:     colours.hoverBg,
-                borderBottom:   `1px solid ${colours.borderHairline}`,
-              }}>
-                <span style={{
-                  fontSize:      fontSize.xs,
-                  fontWeight:    fontWeight.medium,
-                  color:         colours.textSecondary,
-                  letterSpacing: '0.04em',
-                }}>
-                  {formatMonthLabel(month)}
-                  <span style={{ opacity: 0.5, margin: '0 6px' }}>·</span>
-                  {rows.length} entr{rows.length === 1 ? 'y' : 'ies'}
-                </span>
-                <span style={{
-                  fontFamily:    fonts.mono,
-                  fontSize:      fontSize.xs,
-                  fontWeight:    fontWeight.semibold,
-                  color:         colours.income,
-                  letterSpacing: letterSpacing.tight,
-                }}>
-                  {formatGBP(subtotal)}
-                </span>
-              </div>
-              {/* Rows */}
-              {rows.map((item, idx) => (
-                <IncomeRow
-                  key={item.id}
-                  item={item}
-                  isLast={idx === rows.length - 1}
-                  onDelete={readOnly ? undefined : () => deleteIncome(item.id, item.amount_pence)}
-                />
-              ))}
-            </div>
-          )
-        })}
-
-        {/* Load more month */}
-        {hasMore && nextMonth && (
-          <div style={{
-            borderTop:      `1px solid ${colours.borderHairline}`,
-            padding:        '14px',
-            display:        'flex',
-            justifyContent: 'center',
-          }}>
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={loadMonth}
-              disabled={loadingMore}
-            >
-              {loadingMore ? 'Loading…' : `Load ${formatMonthLabel(nextMonth)}`}
-            </Button>
-          </div>
-        )}
-      </Panel>
     </div>
   )
 }
@@ -301,7 +397,6 @@ function IncomeRow({ item, isLast, onDelete }: IncomeRowProps) {
         transition:     transition.snap,
       }}
     >
-      {/* Left — icon + description */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1, minWidth: 0 }}>
         <div style={{
           width:          '32px',
@@ -343,7 +438,6 @@ function IncomeRow({ item, isLast, onDelete }: IncomeRowProps) {
         </div>
       </div>
 
-      {/* Right — amount + delete */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
         <div style={{
           fontFamily:    fonts.mono,
@@ -354,6 +448,7 @@ function IncomeRow({ item, isLast, onDelete }: IncomeRowProps) {
         }}>
           {formatGBP(item.amount_pence)}
         </div>
+        {/* Delete button — hover only, icon only, no label */}
         {hovered && onDelete && (
           <button
             onClick={onDelete}

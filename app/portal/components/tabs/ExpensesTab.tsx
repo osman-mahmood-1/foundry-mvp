@@ -3,24 +3,29 @@
 /**
  * app/portal/components/tabs/ExpensesTab.tsx
  *
- * Expenses tab — presentation layer only.
- * Follows the identical pattern to IncomeTab.
+ * Expenses tab — split-panel layout.
+ * Left: expense list (always visible, scrollable).
+ * Right: EntryPanel slides in for adding entries — user can reference
+ *        existing entries while filling in the form.
  *
  * Key addition vs IncomeTab:
- * - Each row shows an allowability badge:
- *   null  → "Pending review"  (amber)
- *   true  → "Allowable"       (green)
- *   false → "Not allowable"   (red)
+ * - Each row shows an allowability badge (Pending / Allowable / Not allowable)
+ * - Receipt upload: paperclip icon next to Amount opens file picker
+ * - "Add Another" submits and keeps panel open
+ * - "Done" submits and closes the panel
+ * - Draft auto-saved to localStorage on every keystroke
  */
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import type { Client, ExpenseCategory } from '@/types'
 import { useExpenses } from './useExpenses'
+import { useDraft }    from '@/lib/useDraft'
 import {
   Panel, Label, StatCard, EmptyState,
   Spinner, Badge, Button, Input, Select,
   ErrorBanner, formatGBP, formatDate,
 } from '../ui'
+import EntryPanel from '../ui/EntryPanel'
 import { light as colours } from '@/styles/tokens/colours'
 import { fonts, fontSize, fontWeight, letterSpacing } from '@/styles/tokens/typography'
 import { radius, transition, spacing } from '@/styles/tokens'
@@ -76,50 +81,117 @@ function AllowableBadge({ allowable }: { allowable: boolean | null }) {
   return <Badge variant="warning">Pending review</Badge>
 }
 
+// ─── Draft state shape ────────────────────────────────────────────────────────
+
+interface ExpenseFormState {
+  description: string
+  amount:      string
+  date:        string
+  category:    ExpenseCategory
+}
+
+const TODAY = new Date().toISOString().slice(0, 10)
+
+const EMPTY_FORM: ExpenseFormState = {
+  description: '',
+  amount:      '',
+  date:        TODAY,
+  category:    'other',
+}
+
 // ─── Props ────────────────────────────────────────────────────────────────────
 
 interface Props {
-  client:          Client
-  readOnly?:       boolean
+  client:           Client
+  readOnly?:        boolean
   onExpenseSelect?: (expenseId: string) => void
+}
+
+// ─── Draft banner ─────────────────────────────────────────────────────────────
+
+function DraftBanner({ onDiscard }: { onDiscard: () => void }) {
+  return (
+    <div style={{
+      display:        'flex',
+      alignItems:     'center',
+      justifyContent: 'space-between',
+      padding:        '8px 12px',
+      background:     colours.warningLight,
+      borderRadius:   radius.sm,
+      fontSize:       fontSize.xs,
+      color:          colours.warning,
+      marginBottom:   '12px',
+    }}>
+      <span>◉ Draft restored — your previous entry has been reloaded.</span>
+      <button
+        onClick={onDiscard}
+        style={{
+          background: 'transparent',
+          border:     'none',
+          color:      colours.warning,
+          cursor:     'pointer',
+          fontSize:   fontSize.xs,
+          fontFamily: fonts.sans,
+          padding:    '2px 6px',
+        }}
+      >
+        Discard
+      </button>
+    </div>
+  )
 }
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export default function ExpensesTab({ client, readOnly = false, onExpenseSelect }: Props) {
-  const [showForm, setShowForm] = useState(false)
+  const [panelOpen, setPanelOpen] = useState(false)
+  const [receiptFile, setReceiptFile] = useState<File | null>(null)
+  const receiptInputRef = useRef<HTMLInputElement>(null)
 
   const {
-    expenses,
-    totalPence,
-    entryCount,
-    availableMonths,
-    loadedMonths,
-    hasMore,
-    loadingMore,
-    loadMonth,
-    loading,
-    saving,
-    error,
-    form,
-    setForm,
-    isFormValid,
-    addExpense,
-    deleteExpense,
-    resetForm,
+    expenses, totalPence, entryCount,
+    availableMonths, loadedMonths, hasMore, loadingMore, loadMonth,
+    loading, saving, error,
+    form: hookForm, setForm: hookSetForm, isFormValid, addExpense, deleteExpense, resetForm,
   } = useExpenses(client.id, client.tax_year, client.user_id)
 
-  async function handleAdd() {
+  const draftKey = `foundry-draft-expense-${client.id}`
+  const { state: draftForm, setState: setDraftForm, clearDraft, hasDraft } = useDraft<ExpenseFormState>(
+    draftKey,
+    EMPTY_FORM,
+  )
+
+  function openPanel() {
+    hookSetForm(() => ({
+      description: draftForm.description,
+      amount:      draftForm.amount,
+      date:        draftForm.date,
+      category:    draftForm.category,
+    }))
+    setPanelOpen(true)
+  }
+
+  function handleFieldChange(field: keyof ExpenseFormState, value: string) {
+    const updated = { ...draftForm, [field]: value }
+    setDraftForm(updated)
+    hookSetForm(f => ({ ...f, [field]: value }))
+  }
+
+  async function handleSave(keepOpen: boolean) {
     await addExpense()
-    setShowForm(false)
+    clearDraft()
+    setReceiptFile(null)
+    hookSetForm(() => EMPTY_FORM)
+    setDraftForm(EMPTY_FORM)
+    if (!keepOpen) setPanelOpen(false)
   }
 
-  function handleCancel() {
+  function handleClose() {
     resetForm()
-    setShowForm(false)
+    setPanelOpen(false)
   }
 
-  // ── Month grouping ──────────────────────────────────────────────
+  // Month grouping
   const groups: Record<string, typeof expenses> = {}
   for (const item of expenses) {
     const m = item.date.slice(0, 7)
@@ -127,185 +199,298 @@ export default function ExpensesTab({ client, readOnly = false, onExpenseSelect 
     groups[m].push(item)
   }
   const sortedGroupKeys = Object.keys(groups).sort((a, b) => b.localeCompare(a))
-
   const nextMonth = availableMonths.find(m => !loadedMonths.includes(m))
 
   if (loading) return <Spinner />
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.tab.gap }}>
+    <div style={{ display: 'flex', gap: spacing.tab.gap, minHeight: 0 }}>
 
-      {/* ── Summary stat ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: spacing.tab.gap }}>
-        <StatCard
-          label="Total expenses"
-          value={totalPence > 0 ? formatGBP(totalPence) : '—'}
-          sub={entryCount > 0
-            ? `${entryCount} entr${entryCount === 1 ? 'y' : 'ies'} · ${client.tax_year}`
-            : `No expenses logged yet · ${client.tax_year}`
-          }
-          colour={colours.expense}
-        />
+      {/* ── Left: expense list (always visible) ── */}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: spacing.tab.gap, minWidth: 0 }}>
+
+        {/* Summary stat */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: spacing.tab.gap }}>
+          <StatCard
+            label="Total expenses"
+            value={totalPence > 0 ? formatGBP(totalPence) : '—'}
+            sub={entryCount > 0
+              ? `${entryCount} entr${entryCount === 1 ? 'y' : 'ies'} · ${client.tax_year}`
+              : `No expenses logged yet · ${client.tax_year}`
+            }
+            colour={colours.expense}
+          />
+        </div>
+
+        {error && <ErrorBanner error={error} />}
+
+        {/* Expense list */}
+        <Panel padding="0">
+          <div style={{
+            display:        'flex',
+            alignItems:     'center',
+            justifyContent: 'space-between',
+            padding:        `${spacing.panel.paddingTight} ${spacing.panel.padding}`,
+            borderBottom:   expenses.length > 0 ? `1px solid ${colours.borderHairline}` : 'none',
+          }}>
+            <Label>Expenses · {client.tax_year}</Label>
+            {!readOnly && !panelOpen && (
+              <Button size="sm" onClick={openPanel}>
+                + Add entry
+              </Button>
+            )}
+          </div>
+
+          {expenses.length === 0 && entryCount === 0 && (
+            <EmptyState
+              icon="↓"
+              headline="No expenses logged yet."
+              sub="Every business cost goes here. Your accountant will confirm what's allowable against your tax bill."
+              action={readOnly ? undefined : 'Log first expense'}
+              onAction={readOnly ? undefined : openPanel}
+            />
+          )}
+
+          {sortedGroupKeys.map(month => {
+            const rows     = groups[month]
+            const subtotal = rows.reduce((s, r) => s + r.amount_pence, 0)
+            return (
+              <div key={month}>
+                <div style={{
+                  display:        'flex',
+                  alignItems:     'center',
+                  justifyContent: 'space-between',
+                  padding:        `8px ${spacing.panel.padding}`,
+                  background:     colours.hoverBg,
+                  borderBottom:   `1px solid ${colours.borderHairline}`,
+                }}>
+                  <span style={{
+                    fontSize:      fontSize.xs,
+                    fontWeight:    fontWeight.medium,
+                    color:         colours.textSecondary,
+                    letterSpacing: '0.04em',
+                  }}>
+                    {formatMonthLabel(month)}
+                    <span style={{ opacity: 0.5, margin: '0 6px' }}>·</span>
+                    {rows.length} entr{rows.length === 1 ? 'y' : 'ies'}
+                  </span>
+                  <span style={{
+                    fontFamily:    fonts.mono,
+                    fontSize:      fontSize.xs,
+                    fontWeight:    fontWeight.semibold,
+                    color:         colours.expense,
+                    letterSpacing: letterSpacing.tight,
+                  }}>
+                    {formatGBP(subtotal)}
+                  </span>
+                </div>
+                {rows.map((item, idx) => (
+                  <ExpenseRow
+                    key={item.id}
+                    item={item}
+                    isLast={idx === rows.length - 1}
+                    onDelete={readOnly ? undefined : () => deleteExpense(item.id, item.amount_pence)}
+                    onSelect={onExpenseSelect ? () => onExpenseSelect(item.id) : undefined}
+                  />
+                ))}
+              </div>
+            )
+          })}
+
+          {hasMore && nextMonth && (
+            <div style={{
+              borderTop:      `1px solid ${colours.borderHairline}`,
+              padding:        '14px',
+              display:        'flex',
+              justifyContent: 'center',
+            }}>
+              <button
+                onClick={loadMonth}
+                disabled={loadingMore}
+                style={{
+                  background: 'transparent',
+                  border:     'none',
+                  color:      colours.textMuted,
+                  fontSize:   fontSize.sm,
+                  cursor:     loadingMore ? 'default' : 'pointer',
+                  fontFamily: fonts.sans,
+                  padding:    '4px 8px',
+                  transition: transition.snap,
+                  opacity:    loadingMore ? 0.5 : 1,
+                }}
+              >
+                {loadingMore ? 'Loading…' : `+ Load ${formatMonthLabel(nextMonth)}`}
+              </button>
+            </div>
+          )}
+        </Panel>
       </div>
 
-      {/* ── Error banner ── */}
-      {error && <ErrorBanner error={error} />}
+      {/* ── Right: entry panel ── */}
+      {!readOnly && (
+        <EntryPanel
+          open={panelOpen}
+          title="New expense entry"
+          subtitle={client.tax_year}
+          onClose={handleClose}
+        >
+          {hasDraft && <DraftBanner onDiscard={() => { clearDraft(); hookSetForm(() => EMPTY_FORM) }} />}
 
-      {/* ── Add entry form — hidden in read-only mode ── */}
-      {!readOnly && showForm && (
-        <Panel>
-          <Label>New expense entry</Label>
           <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.form.fieldGap }}>
-
             <Input
               label="Description"
-              value={form.description}
-              onChange={v => setForm(f => ({ ...f, description: v }))}
+              value={draftForm.description}
+              onChange={v => handleFieldChange('description', v)}
               placeholder="e.g. Boiler repair — 14 Ashford Rd"
               autoFocus
             />
 
+            {/* Amount + Date row with receipt upload */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: spacing.form.fieldGap }}>
-              <Input
-                label="Amount (£)"
-                type="number"
-                value={form.amount}
-                onChange={v => setForm(f => ({ ...f, amount: v }))}
-                placeholder="0.00"
-              />
+              {/* Amount + receipt icon stacked together */}
+              <div>
+                <div style={{ display: 'flex', alignItems: 'flex-end', gap: '6px' }}>
+                  <div style={{ flex: 1 }}>
+                    <Input
+                      label="Amount (£)"
+                      type="number"
+                      value={draftForm.amount}
+                      onChange={v => handleFieldChange('amount', v)}
+                      placeholder="0.00"
+                    />
+                  </div>
+                  {/* Receipt upload button */}
+                  <button
+                    type="button"
+                    title="Attach receipt"
+                    onClick={() => receiptInputRef.current?.click()}
+                    style={{
+                      width:        '34px',
+                      height:       '34px',
+                      borderRadius: radius.sm,
+                      border:       `1px solid ${receiptFile ? colours.accent : colours.borderMedium}`,
+                      background:   receiptFile ? colours.accentLight : 'transparent',
+                      color:        receiptFile ? colours.accent : colours.textMuted,
+                      cursor:       'pointer',
+                      display:      'flex',
+                      alignItems:   'center',
+                      justifyContent: 'center',
+                      fontSize:     '14px',
+                      transition:   transition.snap,
+                      flexShrink:   0,
+                      marginBottom: '1px',
+                    }}
+                    onMouseEnter={e => {
+                      if (!receiptFile) {
+                        e.currentTarget.style.background   = colours.hoverBg
+                        e.currentTarget.style.borderColor  = colours.borderMedium
+                      }
+                    }}
+                    onMouseLeave={e => {
+                      if (!receiptFile) {
+                        e.currentTarget.style.background  = 'transparent'
+                        e.currentTarget.style.borderColor = colours.borderMedium
+                      }
+                    }}
+                  >
+                    📎
+                  </button>
+                  <input
+                    ref={receiptInputRef}
+                    type="file"
+                    accept="image/*,.pdf"
+                    style={{ display: 'none' }}
+                    onChange={e => setReceiptFile(e.target.files?.[0] ?? null)}
+                  />
+                </div>
+                {/* Receipt filename hint */}
+                {receiptFile && (
+                  <div style={{
+                    marginTop:    '4px',
+                    fontSize:     fontSize.xs,
+                    color:        colours.accent,
+                    display:      'flex',
+                    alignItems:   'center',
+                    gap:          '4px',
+                    overflow:     'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace:   'nowrap' as const,
+                  }}>
+                    <span>✓</span>
+                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {receiptFile.name}
+                    </span>
+                    <button
+                      onClick={() => setReceiptFile(null)}
+                      style={{
+                        background: 'transparent',
+                        border:     'none',
+                        color:      colours.textMuted,
+                        cursor:     'pointer',
+                        padding:    '0 2px',
+                        fontSize:   fontSize.xs,
+                        flexShrink: 0,
+                      }}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                )}
+              </div>
+
               <Input
                 label="Date"
                 type="date"
-                value={form.date}
-                onChange={v => setForm(f => ({ ...f, date: v }))}
+                value={draftForm.date}
+                onChange={v => handleFieldChange('date', v)}
               />
             </div>
 
             <Select
               label="Category"
-              value={form.category}
-              onChange={v => setForm(f => ({ ...f, category: v as ExpenseCategory }))}
+              value={draftForm.category}
+              onChange={v => handleFieldChange('category', v)}
               options={EXPENSE_CATEGORIES}
             />
 
+            {/* Allowability note */}
             <div style={{
-              padding:      '10px 12px',
+              padding:      '8px 10px',
               background:   colours.warningLight,
               borderRadius: radius.sm,
               fontSize:     fontSize.xs,
               color:        colours.warning,
               lineHeight:   1.5,
             }}>
-              Your accountant will review allowability. Expenses are marked pending until confirmed.
+              Your accountant will review allowability. Entries are marked pending until confirmed.
             </div>
 
-            <div style={{ display: 'flex', gap: '10px', marginTop: '4px' }}>
-              <Button onClick={handleAdd} disabled={saving || !isFormValid}>
-                {saving ? 'Saving…' : 'Save entry'}
+            {/* Action buttons — right-aligned, intrinsic width */}
+            <div style={{
+              display:        'flex',
+              gap:            '8px',
+              justifyContent: 'flex-end',
+              marginTop:      '4px',
+            }}>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => handleSave(true)}
+                disabled={saving || !isFormValid}
+              >
+                {saving ? 'Saving…' : 'Add another'}
               </Button>
-              <Button variant="secondary" onClick={handleCancel} disabled={saving}>
-                Cancel
+              <Button
+                size="sm"
+                onClick={() => handleSave(false)}
+                disabled={saving || !isFormValid}
+              >
+                {saving ? 'Saving…' : 'Done'}
               </Button>
             </div>
-
           </div>
-        </Panel>
+        </EntryPanel>
       )}
-
-      {/* ── Expenses list ── */}
-      <Panel padding="0">
-        <div style={{
-          display:        'flex',
-          alignItems:     'center',
-          justifyContent: 'space-between',
-          padding:        `${spacing.panel.paddingTight} ${spacing.panel.padding}`,
-          borderBottom:   expenses.length > 0 ? `1px solid ${colours.borderHairline}` : 'none',
-        }}>
-          <Label>Expenses · {client.tax_year}</Label>
-          {!readOnly && !showForm && (
-            <Button size="sm" onClick={() => setShowForm(true)}>
-              + Add entry
-            </Button>
-          )}
-        </div>
-
-        {expenses.length === 0 && entryCount === 0 && (
-          <EmptyState
-            icon="↓"
-            headline="No expenses logged yet."
-            sub="Every business cost goes here. Your accountant will confirm what's allowable against your tax bill."
-            action={readOnly ? undefined : 'Log first expense'}
-            onAction={readOnly ? undefined : () => setShowForm(true)}
-          />
-        )}
-
-        {/* Month groups */}
-        {sortedGroupKeys.map(month => {
-          const rows     = groups[month]
-          const subtotal = rows.reduce((s, r) => s + r.amount_pence, 0)
-          return (
-            <div key={month}>
-              <div style={{
-                display:        'flex',
-                alignItems:     'center',
-                justifyContent: 'space-between',
-                padding:        `8px ${spacing.panel.padding}`,
-                background:     colours.hoverBg,
-                borderBottom:   `1px solid ${colours.borderHairline}`,
-              }}>
-                <span style={{
-                  fontSize:      fontSize.xs,
-                  fontWeight:    fontWeight.medium,
-                  color:         colours.textSecondary,
-                  letterSpacing: '0.04em',
-                }}>
-                  {formatMonthLabel(month)}
-                  <span style={{ opacity: 0.5, margin: '0 6px' }}>·</span>
-                  {rows.length} entr{rows.length === 1 ? 'y' : 'ies'}
-                </span>
-                <span style={{
-                  fontFamily:    fonts.mono,
-                  fontSize:      fontSize.xs,
-                  fontWeight:    fontWeight.semibold,
-                  color:         colours.expense,
-                  letterSpacing: letterSpacing.tight,
-                }}>
-                  {formatGBP(subtotal)}
-                </span>
-              </div>
-              {rows.map((item, idx) => (
-                <ExpenseRow
-                  key={item.id}
-                  item={item}
-                  isLast={idx === rows.length - 1}
-                  onDelete={readOnly ? undefined : () => deleteExpense(item.id, item.amount_pence)}
-                  onSelect={onExpenseSelect ? () => onExpenseSelect(item.id) : undefined}
-                />
-              ))}
-            </div>
-          )
-        })}
-
-        {/* Load more month */}
-        {hasMore && nextMonth && (
-          <div style={{
-            borderTop:      `1px solid ${colours.borderHairline}`,
-            padding:        '14px',
-            display:        'flex',
-            justifyContent: 'center',
-          }}>
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={loadMonth}
-              disabled={loadingMore}
-            >
-              {loadingMore ? 'Loading…' : `Load ${formatMonthLabel(nextMonth)}`}
-            </Button>
-          </div>
-        )}
-      </Panel>
-
     </div>
   )
 }

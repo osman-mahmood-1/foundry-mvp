@@ -8,9 +8,6 @@
  * - Removing a tab → remove one entry here
  * - Coming soon   → set comingSoon: true (greyed, non-clickable)
  * - Group order   → Overview → Money → Invoices → Workspace → Filing
- *
- * Settings lives in the sidebar footer (not here).
- * Calendar is hidden from nav but kept in PortalTab for deep-linking.
  */
 
 import type { NavItem } from '@/types'
@@ -39,27 +36,24 @@ export const NAV_ITEMS: NavItem[] = [
     group: 'money',
   },
   {
-    id:         'transactions',
-    label:      'Transactions',
-    icon:       '⇅',
-    group:      'money',
-    comingSoon: true,
+    id:    'transactions',
+    label: 'Transactions',
+    icon:  '⇅',
+    group: 'money',
   },
 
   // ─── Invoices ────────────────────────────────────────────────────
   {
-    id:         'invoices',
-    label:      'Invoices',
-    icon:       '□',
-    group:      'invoices',
-    comingSoon: true,
+    id:    'invoices',
+    label: 'Invoices',
+    icon:  '□',
+    group: 'invoices',
   },
   {
-    id:         'clients',
-    label:      'Clients',
-    icon:       '◎',
-    group:      'invoices',
-    comingSoon: true,
+    id:    'clients',
+    label: 'Clients',
+    icon:  '◎',
+    group: 'invoices',
   },
 
   // ─── Workspace ───────────────────────────────────────────────────
@@ -84,18 +78,16 @@ export const NAV_ITEMS: NavItem[] = [
 
   // ─── Filing ──────────────────────────────────────────────────────
   {
-    id:         'submission',
-    label:      'Submission Centre',
-    icon:       '⬡',
-    group:      'filing',
-    comingSoon: true,
+    id:    'submission',
+    label: 'Submission Centre',
+    icon:  '⬡',
+    group: 'filing',
   },
   {
-    id:         'prior-returns',
-    label:      'Prior Returns',
-    icon:       '△',
-    group:      'filing',
-    comingSoon: true,
+    id:    'prior-returns',
+    label: 'Prior Returns',
+    icon:  '△',
+    group: 'filing',
   },
 ]
 
