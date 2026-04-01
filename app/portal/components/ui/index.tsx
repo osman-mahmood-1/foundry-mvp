@@ -490,10 +490,10 @@ const BUTTON_VARIANTS: Record<ButtonVariant, React.CSSProperties> = {
     background:  'linear-gradient(135deg, #00C2FF 0%, #0094CC 100%)',
     color:       '#0D1117',
     border:      'none',
-    boxShadow:   '0 2px 8px rgba(0,194,255,0.30)',
+    boxShadow:   '0 2px 8px rgba(0,194,255,0.28)',
   },
   secondary: {
-    background:  'rgba(255,255,255,0.07)',
+    background:  colours.hoverBg,
     color:       colours.textSecondary,
     border:      `1px solid ${colours.borderMedium}`,
   },
@@ -539,6 +539,7 @@ export function Button({
       type={type}
       onClick={onClick}
       disabled={disabled}
+      className={variant === 'primary' ? 'cta-btn' : undefined}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{

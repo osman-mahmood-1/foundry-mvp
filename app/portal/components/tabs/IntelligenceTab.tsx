@@ -4,19 +4,22 @@
  * app/portal/components/tabs/IntelligenceTab.tsx
  *
  * Foundry Intelligence — AI-powered financial insights, alerts, and recommendations.
- * Uses existing income/expense data to derive actionable insights.
+ *
+ * Task 9 changes:
+ * - Remove borderLeft from InsightCards, replace with small blurred orb inside each card
+ * - Fix hardcoded iOS blue (rgba(0,122,255,...)) → electric cyan (rgba(0,194,255,...))
+ * - Header card uses 2-orb treatment matching Overview style
  */
 
-import { useState } from 'react'
 import type { Client } from '@/types'
 import { useIncome }   from './useIncome'
 import { useExpenses } from './useExpenses'
-import { Panel, Spinner, formatGBP } from '../ui'
+import { Spinner, formatGBP } from '../ui'
 import { light as colours } from '@/styles/tokens/colours'
 import { fonts, fontSize, fontWeight, letterSpacing } from '@/styles/tokens/typography'
 import { radius, glassStatic, spacing } from '@/styles/tokens'
 
-// ─── Insight card ─────────────────────────────────────────────────────────────
+// ─── Insight types ────────────────────────────────────────────────────────────
 
 type Severity = 'urgent' | 'attention' | 'info'
 
@@ -29,39 +32,81 @@ interface Insight {
   action?:  string
 }
 
-const SEVERITY_STYLE: Record<Severity, { border: string; bg: string; icon: string; colour: string }> = {
-  urgent:    { border: colours.danger,  bg: colours.dangerLight,  icon: '⚠', colour: colours.danger },
-  attention: { border: colours.warning, bg: colours.warningLight, icon: '◉', colour: colours.warning },
-  info:      { border: colours.info,    bg: colours.infoLight,    icon: '✦', colour: colours.info },
+// Orb colours per severity (small, absolutely positioned, heavily blurred)
+const SEVERITY_ORB: Record<Severity, string> = {
+  urgent:    'rgba(239,68,68,0.22)',     // red
+  attention: 'rgba(245,158,11,0.22)',    // amber
+  info:      'rgba(0,194,255,0.18)',     // electric cyan — NOT iOS blue
 }
 
+const SEVERITY_ICON: Record<Severity, string> = {
+  urgent:    '⚠',
+  attention: '◉',
+  info:      '✦',
+}
+
+const SEVERITY_COLOUR: Record<Severity, string> = {
+  urgent:    colours.danger,
+  attention: colours.warning,
+  info:      colours.info,
+}
+
+const SEVERITY_BG: Record<Severity, string> = {
+  urgent:    colours.dangerLight,
+  attention: colours.warningLight,
+  info:      colours.infoLight,
+}
+
+// ─── Insight card — orb+glass, no left border ─────────────────────────────────
+
 function InsightCard({ insight }: { insight: Insight }) {
-  const s = SEVERITY_STYLE[insight.severity]
+  const orb    = SEVERITY_ORB[insight.severity]
+  const icon   = SEVERITY_ICON[insight.severity]
+  const colour = SEVERITY_COLOUR[insight.severity]
+  const bg     = SEVERITY_BG[insight.severity]
 
   return (
     <div style={{
       ...glassStatic.panel,
-      borderLeft:    `3px solid ${s.border}`,
-      padding:       '16px 20px',
-      display:       'flex',
-      gap:           '14px',
-      alignItems:    'flex-start',
+      position:  'relative',
+      overflow:  'hidden',
+      padding:   '16px 20px',
+      display:   'flex',
+      gap:       '14px',
+      alignItems: 'flex-start',
     }}>
+      {/* Small blurred severity orb — top-right inside card */}
+      <div style={{
+        position:      'absolute',
+        top:           '-30px',
+        right:         '-30px',
+        width:         '120px',
+        height:        '120px',
+        borderRadius:  '50%',
+        background:    `radial-gradient(circle, ${orb} 0%, transparent 70%)`,
+        filter:        'blur(40px)',
+        pointerEvents: 'none',
+      }} />
+
+      {/* Icon circle */}
       <div style={{
         width:          '32px',
         height:         '32px',
         borderRadius:   radius.sm,
-        background:     s.bg,
+        background:     bg,
         display:        'flex',
         alignItems:     'center',
         justifyContent: 'center',
         fontSize:       '14px',
-        color:          s.colour,
+        color:          colour,
         flexShrink:     0,
+        position:       'relative',
+        zIndex:         1,
       }}>
-        {s.icon}
+        {icon}
       </div>
-      <div style={{ flex: 1 }}>
+
+      <div style={{ flex: 1, position: 'relative', zIndex: 1 }}>
         <div style={{
           fontSize:     fontSize.base,
           fontWeight:   fontWeight.medium,
@@ -82,7 +127,7 @@ function InsightCard({ insight }: { insight: Insight }) {
             marginTop:     '8px',
             fontSize:      fontSize.xs,
             fontFamily:    fonts.mono,
-            color:         s.colour,
+            color:         colour,
             letterSpacing: letterSpacing.wide,
           }}>
             Potential impact: {insight.impact}
@@ -96,7 +141,7 @@ function InsightCard({ insight }: { insight: Insight }) {
 // ─── Main component ───────────────────────────────────────────────────────────
 
 export default function IntelligenceTab({ client }: { client: Client }) {
-  const { income, loading: li } = useIncome(client.id, client.tax_year, client.user_id)
+  const { income,   loading: li } = useIncome(client.id, client.tax_year, client.user_id)
   const { expenses, loading: le } = useExpenses(client.id, client.tax_year, client.user_id)
 
   if (li || le) return <Spinner />
@@ -106,7 +151,6 @@ export default function IntelligenceTab({ client }: { client: Client }) {
   const netProfit     = totalIncome - totalExpenses
   const pendingReview = expenses.filter(e => e.allowable === null).length
 
-  // Generate dynamic insights from real data
   const insights: Insight[] = []
 
   if (pendingReview > 0) {
@@ -120,8 +164,7 @@ export default function IntelligenceTab({ client }: { client: Client }) {
   }
 
   if (totalIncome > 0 && netProfit > 0) {
-    const effectiveTaxRate = netProfit > 5027500 ? 0.45 : netProfit > 5027500 ? 0.40 : 0.20
-    const estimatedTax     = Math.max(0, (netProfit - 1257500) * effectiveTaxRate)
+    const estimatedTax = Math.max(0, (netProfit - 1257500) * 0.20)
     insights.push({
       id:       'tax-estimate',
       severity: 'info',
@@ -151,7 +194,6 @@ export default function IntelligenceTab({ client }: { client: Client }) {
     })
   }
 
-  // Always show a health insight
   const healthScore = Math.min(100, Math.round(
     (income.length > 0 ? 25 : 0) +
     (expenses.length > 0 ? 25 : 0) +
@@ -171,15 +213,41 @@ export default function IntelligenceTab({ client }: { client: Client }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.tab.gap }}>
 
-      {/* ── Header card ── */}
+      {/* ── Header card — 2-orb treatment ── */}
       <div style={{
         ...glassStatic.panel,
-        padding:         spacing.panel.padding,
-        background:      `radial-gradient(ellipse at 50% 0%, rgba(0,122,255,0.12) 0%, rgba(14,165,233,0.06) 50%, transparent 80%), ${glassStatic.panel.background}`,
-        display:         'flex',
-        alignItems:      'center',
-        gap:             '20px',
+        position:    'relative',
+        overflow:    'hidden',
+        padding:     spacing.panel.padding,
+        display:     'flex',
+        alignItems:  'center',
+        gap:         '20px',
       }}>
+        {/* Cyan orb top-right */}
+        <div style={{
+          position:      'absolute',
+          top:           '-60px',
+          right:         '-40px',
+          width:         '280px',
+          height:        '280px',
+          borderRadius:  '50%',
+          background:    'radial-gradient(circle, rgba(0,194,255,0.14) 0%, transparent 65%)',
+          filter:        'blur(60px)',
+          pointerEvents: 'none',
+        }} />
+        {/* Green orb top-left */}
+        <div style={{
+          position:      'absolute',
+          top:           '-40px',
+          left:          '-20px',
+          width:         '200px',
+          height:        '200px',
+          borderRadius:  '50%',
+          background:    'radial-gradient(circle, rgba(16,185,129,0.10) 0%, transparent 65%)',
+          filter:        'blur(50px)',
+          pointerEvents: 'none',
+        }} />
+
         <div style={{
           width:          '52px',
           height:         '52px',
@@ -191,47 +259,30 @@ export default function IntelligenceTab({ client }: { client: Client }) {
           fontSize:       '22px',
           color:          colours.info,
           flexShrink:     0,
+          position:       'relative',
+          zIndex:         1,
         }}>
           ✦
         </div>
-        <div>
-          <div style={{
-            fontFamily:   fonts.sans,
-            fontSize:     '18px',
-            fontWeight:   fontWeight.medium,
-            color:        colours.textPrimary,
-            marginBottom: '4px',
-          }}>
+        <div style={{ position: 'relative', zIndex: 1 }}>
+          <div style={{ fontFamily: fonts.sans, fontSize: '18px', fontWeight: fontWeight.medium, color: colours.textPrimary, marginBottom: '4px' }}>
             Foundry Intelligence
           </div>
-          <div style={{
-            fontSize:   fontSize.sm,
-            color:      colours.textSecondary,
-            lineHeight: 1.5,
-          }}>
+          <div style={{ fontSize: fontSize.sm, color: colours.textSecondary, lineHeight: 1.5 }}>
             AI-powered insights derived from your financial records. Updated as you add entries.
           </div>
         </div>
-        <div style={{
-          marginLeft:    'auto',
-          textAlign:     'right' as const,
-          flexShrink:    0,
-        }}>
+        <div style={{ marginLeft: 'auto', textAlign: 'right' as const, flexShrink: 0, position: 'relative', zIndex: 1 }}>
           <div style={{
-            fontFamily:    fonts.mono,
-            fontSize:      '32px',
-            fontWeight:    fontWeight.medium,
-            color:         healthScore >= 75 ? colours.income : colours.warning,
-            lineHeight:    1,
+            fontFamily:  fonts.mono,
+            fontSize:    '32px',
+            fontWeight:  fontWeight.medium,
+            color:       healthScore >= 75 ? colours.income : colours.warning,
+            lineHeight:  1,
           }}>
             {healthScore}
           </div>
-          <div style={{
-            fontSize:      fontSize.xs,
-            color:         colours.textMuted,
-            fontFamily:    fonts.mono,
-            letterSpacing: letterSpacing.wide,
-          }}>
+          <div style={{ fontSize: fontSize.xs, color: colours.textMuted, fontFamily: fonts.mono, letterSpacing: letterSpacing.wide }}>
             HEALTH SCORE
           </div>
         </div>

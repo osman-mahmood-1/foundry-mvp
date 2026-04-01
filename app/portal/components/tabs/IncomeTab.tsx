@@ -5,14 +5,14 @@
  *
  * Income tab — split-panel layout.
  * Left: income list (always visible, scrollable).
- * Right: EntryPanel slides in for adding entries — user can reference
- *        existing entries while filling in the form.
+ * Right: EntryPanel slides in for adding/editing entries.
  *
  * UX principles:
+ * - Click a row → open detail panel (edit/delete)
  * - "Add Another" submits and keeps panel open with cursor back on Description
  * - "Done" submits and closes the panel
  * - Draft auto-saved to localStorage on every keystroke
- * - Delete on row hover (icon only, no label)
+ * - Delete on row hover (icon only) OR in detail panel (danger button)
  * - Button sizing: intrinsic width, right-aligned — never full-width on desktop
  */
 
@@ -60,6 +60,7 @@ interface IncomeFormState {
   amount:      string
   date:        string
   category:    IncomeCategory
+  notes:       string
 }
 
 const TODAY = new Date().toISOString().slice(0, 10)
@@ -69,6 +70,18 @@ const EMPTY_FORM: IncomeFormState = {
   amount:      '',
   date:        TODAY,
   category:    'trading',
+  notes:       '',
+}
+
+// ─── Field group container (Task 3) ──────────────────────────────────────────
+
+const fieldGroup: React.CSSProperties = {
+  background:   'rgba(0,0,0,0.03)',
+  borderRadius: radius.md,
+  padding:      '14px',
+  display:      'flex',
+  flexDirection: 'column',
+  gap:          spacing.form.fieldGap,
 }
 
 // ─── Props ────────────────────────────────────────────────────────────────────
@@ -83,15 +96,15 @@ interface Props {
 function DraftBanner({ onDiscard }: { onDiscard: () => void }) {
   return (
     <div style={{
-      display:      'flex',
-      alignItems:   'center',
+      display:        'flex',
+      alignItems:     'center',
       justifyContent: 'space-between',
-      padding:      '8px 12px',
-      background:   colours.warningLight,
-      borderRadius: radius.sm,
-      fontSize:     fontSize.xs,
-      color:        colours.warning,
-      marginBottom: '12px',
+      padding:        '8px 12px',
+      background:     colours.warningLight,
+      borderRadius:   radius.sm,
+      fontSize:       fontSize.xs,
+      color:          colours.warning,
+      marginBottom:   '12px',
     }}>
       <span>◉ Draft restored — your previous entry has been reloaded.</span>
       <button
@@ -114,8 +127,13 @@ function DraftBanner({ onDiscard }: { onDiscard: () => void }) {
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
+type IncomeItem = ReturnType<typeof useIncome>['income'][number]
+
 export default function IncomeTab({ client, readOnly = false }: Props) {
   const [panelOpen, setPanelOpen] = useState(false)
+  const [editItem, setEditItem]   = useState<IncomeItem | null>(null)
+  const [editNotes, setEditNotes] = useState('')
+  const [editForm, setEditForm]   = useState<IncomeFormState>(EMPTY_FORM)
 
   const {
     income, totalPence, entryCount,
@@ -124,15 +142,17 @@ export default function IncomeTab({ client, readOnly = false }: Props) {
     form: hookForm, setForm: hookSetForm, isFormValid, addIncome, deleteIncome, resetForm,
   } = useIncome(client.id, client.tax_year, client.user_id)
 
-  // Draft persistence — survives tab switches and refreshes
+  // Draft persistence — new entries only
   const draftKey = `foundry-draft-income-${client.id}`
   const { state: draftForm, setState: setDraftForm, clearDraft, hasDraft } = useDraft<IncomeFormState>(
     draftKey,
     EMPTY_FORM,
   )
 
-  // Sync draft into the hook form when panel opens
-  function openPanel() {
+  // ── New entry ──
+
+  function openNewPanel() {
+    setEditItem(null)
     hookSetForm(() => ({
       description: draftForm.description,
       amount:      draftForm.amount,
@@ -145,7 +165,7 @@ export default function IncomeTab({ client, readOnly = false }: Props) {
   function handleFieldChange(field: keyof IncomeFormState, value: string) {
     const updated = { ...draftForm, [field]: value }
     setDraftForm(updated)
-    hookSetForm(f => ({ ...f, [field]: value }))
+    hookSetForm(f => ({ ...f, [field]: value as IncomeCategory }))
   }
 
   async function handleSave(keepOpen: boolean) {
@@ -156,10 +176,48 @@ export default function IncomeTab({ client, readOnly = false }: Props) {
     if (!keepOpen) setPanelOpen(false)
   }
 
-  function handleClose() {
-    // Persist current form state as draft before closing
-    // (already saved on every keystroke via draftForm)
+  // ── Edit existing ──
+
+  function openEditPanel(item: IncomeItem) {
+    setEditItem(item)
+    setEditNotes('')
+    setEditForm({
+      description: item.description,
+      amount:      (item.amount_pence / 100).toFixed(2),
+      date:        item.date,
+      category:    item.category as IncomeCategory,
+      notes:       '',
+    })
+    setPanelOpen(true)
+  }
+
+  async function handleEditSave() {
+    if (!editItem) return
+    // Delete old, add updated (upsert-style for demo)
+    await deleteIncome(editItem.id, editItem.amount_pence)
+    hookSetForm(() => ({
+      description: editForm.description,
+      amount:      editForm.amount,
+      date:        editForm.date,
+      category:    editForm.category,
+    }))
+    await addIncome()
     resetForm()
+    hookSetForm(() => EMPTY_FORM)
+    setEditItem(null)
+    setPanelOpen(false)
+  }
+
+  async function handleEditDelete() {
+    if (!editItem) return
+    await deleteIncome(editItem.id, editItem.amount_pence)
+    setEditItem(null)
+    setPanelOpen(false)
+  }
+
+  function handleClose() {
+    resetForm()
+    setEditItem(null)
     setPanelOpen(false)
   }
 
@@ -174,6 +232,9 @@ export default function IncomeTab({ client, readOnly = false }: Props) {
   const nextMonth = availableMonths.find(m => !loadedMonths.includes(m))
 
   if (loading) return <Spinner />
+
+  const isNewFormValid = isFormValid && !editItem
+  const isEditFormValid = editForm.description.trim() && editForm.amount && editForm.date
 
   return (
     <div style={{ display: 'flex', gap: spacing.tab.gap, minHeight: 0 }}>
@@ -207,7 +268,7 @@ export default function IncomeTab({ client, readOnly = false }: Props) {
           }}>
             <Label>Income · {client.tax_year}</Label>
             {!readOnly && !panelOpen && (
-              <Button size="sm" onClick={openPanel}>
+              <Button size="sm" onClick={openNewPanel}>
                 + Add entry
               </Button>
             )}
@@ -219,7 +280,7 @@ export default function IncomeTab({ client, readOnly = false }: Props) {
               headline="No income logged yet."
               sub="Every payment you receive goes here. Start with your first entry and we'll handle the categorisation."
               action={readOnly ? undefined : 'Log first entry'}
-              onAction={readOnly ? undefined : openPanel}
+              onAction={readOnly ? undefined : openNewPanel}
             />
           )}
 
@@ -261,6 +322,8 @@ export default function IncomeTab({ client, readOnly = false }: Props) {
                     key={item.id}
                     item={item}
                     isLast={idx === rows.length - 1}
+                    selected={editItem?.id === item.id}
+                    onSelect={readOnly ? undefined : () => openEditPanel(item)}
                     onDelete={readOnly ? undefined : () => deleteIncome(item.id, item.amount_pence)}
                   />
                 ))}
@@ -297,72 +360,168 @@ export default function IncomeTab({ client, readOnly = false }: Props) {
         </Panel>
       </div>
 
-      {/* ── Right: entry panel ── */}
+      {/* ── Right: entry / detail panel ── */}
       {!readOnly && (
         <EntryPanel
           open={panelOpen}
-          title="New income entry"
-          subtitle={client.tax_year}
+          title={editItem ? 'Income entry' : 'New income entry'}
+          subtitle={editItem ? formatDate(editItem.date) : client.tax_year}
           onClose={handleClose}
         >
-          {hasDraft && <DraftBanner onDiscard={() => { clearDraft(); hookSetForm(() => EMPTY_FORM) }} />}
+          {editItem ? (
+            /* ── Edit / view mode ── */
+            <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.form.fieldGap }}>
+              <div style={fieldGroup}>
+                <Input
+                  label="Description"
+                  value={editForm.description}
+                  onChange={v => setEditForm(f => ({ ...f, description: v }))}
+                  placeholder="e.g. Invoice #023 — Acme Ltd"
+                  autoFocus
+                />
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: spacing.form.fieldGap }}>
+                  <Input
+                    label="Amount (£)"
+                    type="number"
+                    value={editForm.amount}
+                    onChange={v => setEditForm(f => ({ ...f, amount: v }))}
+                    placeholder="0.00"
+                  />
+                  <Input
+                    label="Date"
+                    type="date"
+                    value={editForm.date}
+                    onChange={v => setEditForm(f => ({ ...f, date: v }))}
+                  />
+                </div>
+                <Select
+                  label="Category"
+                  value={editForm.category}
+                  onChange={v => setEditForm(f => ({ ...f, category: v as IncomeCategory }))}
+                  options={INCOME_CATEGORIES}
+                />
+              </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.form.fieldGap }}>
-            <Input
-              label="Description"
-              value={draftForm.description}
-              onChange={v => handleFieldChange('description', v)}
-              placeholder="e.g. Invoice #023 — Acme Ltd"
-              autoFocus
-            />
+              {/* Notes */}
+              <div style={fieldGroup}>
+                <div>
+                  <div style={{
+                    fontSize:     fontSize.xs,
+                    fontWeight:   fontWeight.medium,
+                    color:        colours.textSecondary,
+                    fontFamily:   fonts.sans,
+                    marginBottom: '6px',
+                    textTransform: 'uppercase' as const,
+                    letterSpacing: '0.05em',
+                  }}>
+                    Notes
+                  </div>
+                  <textarea
+                    value={editNotes}
+                    onChange={e => setEditNotes(e.target.value)}
+                    placeholder="Optional notes for your records…"
+                    rows={3}
+                    style={{
+                      width:        '100%',
+                      padding:      '8px 10px',
+                      background:   colours.inputBg,
+                      border:       `1px solid ${colours.borderMedium}`,
+                      borderRadius: radius.sm,
+                      fontSize:     fontSize.sm,
+                      fontFamily:   fonts.sans,
+                      color:        colours.textPrimary,
+                      resize:       'vertical' as const,
+                      outline:      'none',
+                      lineHeight:   1.5,
+                      boxSizing:    'border-box' as const,
+                    }}
+                  />
+                </div>
+              </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: spacing.form.fieldGap }}>
-              <Input
-                label="Amount (£)"
-                type="number"
-                value={draftForm.amount}
-                onChange={v => handleFieldChange('amount', v)}
-                placeholder="0.00"
-              />
-              <Input
-                label="Date"
-                type="date"
-                value={draftForm.date}
-                onChange={v => handleFieldChange('date', v)}
-              />
+              {/* Actions */}
+              <div style={{ display: 'flex', gap: '8px', justifyContent: 'space-between', marginTop: '4px' }}>
+                <button
+                  onClick={handleEditDelete}
+                  style={{
+                    background:   colours.dangerLight,
+                    border:       `1px solid ${colours.danger}33`,
+                    borderRadius: radius.sm,
+                    color:        colours.danger,
+                    fontSize:     fontSize.sm,
+                    fontFamily:   fonts.sans,
+                    fontWeight:   fontWeight.medium,
+                    padding:      '7px 14px',
+                    cursor:       'pointer',
+                    transition:   transition.snap,
+                  }}
+                >
+                  Delete
+                </button>
+                <Button
+                  size="sm"
+                  onClick={handleEditSave}
+                  disabled={saving || !isEditFormValid}
+                >
+                  {saving ? 'Saving…' : 'Save changes'}
+                </Button>
+              </div>
             </div>
+          ) : (
+            /* ── New entry mode ── */
+            <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.form.fieldGap }}>
+              {hasDraft && <DraftBanner onDiscard={() => { clearDraft(); hookSetForm(() => EMPTY_FORM) }} />}
 
-            <Select
-              label="Category"
-              value={draftForm.category}
-              onChange={v => handleFieldChange('category', v)}
-              options={INCOME_CATEGORIES}
-            />
+              <div style={fieldGroup}>
+                <Input
+                  label="Description"
+                  value={draftForm.description}
+                  onChange={v => handleFieldChange('description', v)}
+                  placeholder="e.g. Invoice #023 — Acme Ltd"
+                  autoFocus
+                />
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: spacing.form.fieldGap }}>
+                  <Input
+                    label="Amount (£)"
+                    type="number"
+                    value={draftForm.amount}
+                    onChange={v => handleFieldChange('amount', v)}
+                    placeholder="0.00"
+                  />
+                  <Input
+                    label="Date"
+                    type="date"
+                    value={draftForm.date}
+                    onChange={v => handleFieldChange('date', v)}
+                  />
+                </div>
+                <Select
+                  label="Category"
+                  value={draftForm.category}
+                  onChange={v => handleFieldChange('category', v)}
+                  options={INCOME_CATEGORIES}
+                />
+              </div>
 
-            {/* Action buttons — right-aligned, intrinsic width */}
-            <div style={{
-              display:        'flex',
-              gap:            '8px',
-              justifyContent: 'flex-end',
-              marginTop:      '4px',
-            }}>
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => handleSave(true)}
-                disabled={saving || !isFormValid}
-              >
-                {saving ? 'Saving…' : 'Add another'}
-              </Button>
-              <Button
-                size="sm"
-                onClick={() => handleSave(false)}
-                disabled={saving || !isFormValid}
-              >
-                {saving ? 'Saving…' : 'Done'}
-              </Button>
+              <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', marginTop: '4px' }}>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => handleSave(true)}
+                  disabled={saving || !isNewFormValid}
+                >
+                  {saving ? 'Saving…' : 'Add another'}
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={() => handleSave(false)}
+                  disabled={saving || !isNewFormValid}
+                >
+                  {saving ? 'Saving…' : 'Done'}
+                </Button>
+              </div>
             </div>
-          </div>
+          )}
         </EntryPanel>
       )}
     </div>
@@ -374,10 +533,12 @@ export default function IncomeTab({ client, readOnly = false }: Props) {
 interface IncomeRowProps {
   item:      ReturnType<typeof useIncome>['income'][number]
   isLast:    boolean
+  selected?: boolean
+  onSelect?: () => void
   onDelete?: () => void
 }
 
-function IncomeRow({ item, isLast, onDelete }: IncomeRowProps) {
+function IncomeRow({ item, isLast, selected, onSelect, onDelete }: IncomeRowProps) {
   const [hovered, setHovered] = useState(false)
 
   const categoryLabel = INCOME_CATEGORIES.find(c => c.value === item.category)?.label
@@ -385,6 +546,7 @@ function IncomeRow({ item, isLast, onDelete }: IncomeRowProps) {
 
   return (
     <div
+      onClick={onSelect}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
@@ -393,8 +555,10 @@ function IncomeRow({ item, isLast, onDelete }: IncomeRowProps) {
         justifyContent: 'space-between',
         padding:        spacing.table.rowPadding,
         borderBottom:   isLast ? 'none' : `1px solid ${colours.borderHairline}`,
-        background:     hovered ? colours.hoverBg : 'transparent',
+        background:     selected ? colours.accentLight : hovered ? colours.hoverBg : 'transparent',
         transition:     transition.snap,
+        cursor:         onSelect ? 'pointer' : 'default',
+        borderLeft:     selected ? `2px solid ${colours.accent}` : '2px solid transparent',
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1, minWidth: 0 }}>
@@ -448,10 +612,9 @@ function IncomeRow({ item, isLast, onDelete }: IncomeRowProps) {
         }}>
           {formatGBP(item.amount_pence)}
         </div>
-        {/* Delete button — hover only, icon only, no label */}
-        {hovered && onDelete && (
+        {hovered && onDelete && !onSelect && (
           <button
-            onClick={onDelete}
+            onClick={e => { e.stopPropagation(); onDelete() }}
             title="Remove entry"
             style={{
               width:          '24px',
