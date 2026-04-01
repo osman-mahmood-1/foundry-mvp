@@ -159,7 +159,8 @@ export default function PortalShell({ client }: Props) {
       email={client.email}
       footerItems={footerItems}
       navGroups={NAV_GROUPS_CONFIG}
-      collapsible={false}
+      collapsible={true}
+      storageKey="foundry-portal-sidebar"
       showOrbs
       sidebarStyle="floating"
       activeId={activeTab}

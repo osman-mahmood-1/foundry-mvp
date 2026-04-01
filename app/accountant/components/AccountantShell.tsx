@@ -91,6 +91,8 @@ export default function AccountantShell({ accountant, children }: Props) {
       email={accountant.email}
       footerItems={footerItems}
       navGroups={ACCOUNTANT_NAV}
+      collapsible={true}
+      storageKey="foundry-accountant-sidebar"
       showOrbs
       sidebarStyle="floating"
     >

@@ -342,7 +342,7 @@ function NavGroupSection({
   }
 
   return (
-    <div style={{ marginBottom: '4px' }}>
+    <div style={{ marginBottom: '2px' }}>
       {/* Group label — only shown when expanded */}
       {!collapsed && group.label && (
         group.collapsible ? (
@@ -375,15 +375,15 @@ function NavGroupSection({
             </span>
           </button>
         ) : (
-          <div style={{ marginTop: '6px' }}>
-            <div style={{ height: '1px', background: colours.borderHairline, margin: '0 4px 10px' }} />
+          <div style={{ marginTop: '4px' }}>
+            <div style={{ height: '1px', background: colours.borderHairline, margin: '0 4px 7px' }} />
             <div style={{
               fontSize:      fontSize.xs,
               color:         colours.navGroupLabel,
               fontFamily:    fonts.sans,
               fontWeight:    fontWeight.medium,
               letterSpacing: '0.01em',
-              padding:       '0 10px 5px',
+              padding:       '0 10px 4px',
             }}>
               {group.label}
             </div>
