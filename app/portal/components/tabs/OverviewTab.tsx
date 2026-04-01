@@ -5,6 +5,7 @@ import { ErrorBanner } from '../ui'
 import { light as colours } from '@/styles/tokens/colours'
 import { fonts, fontSize, fontWeight } from '@/styles/tokens/typography'
 import { radius } from '@/styles/tokens'
+import { glassStatic } from '@/styles/tokens/effects'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -21,44 +22,25 @@ function catLabel(cat: string): string {
   return cat.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
 }
 
-// ── Stat Card ─────────────────────────────────────────────────────────────────
+// ── Stat Card — skill-spec glass with NO inline orbs ─────────────────────────
 
-function StatCard({ label, value, sub, accent, glow, icon }: {
+function StatCard({ label, value, sub, accent, icon }: {
   label: string; value: string; sub?: string
-  accent: string; glow: string; icon: string
+  accent: string; icon: string
 }) {
   return (
     <div style={{
-      background:           colours.panelBg,
-      backdropFilter:       'blur(48px)',
-      WebkitBackdropFilter: 'blur(48px)',
-      border:               `1px solid ${colours.borderLight}`,
-      borderRadius:         radius.lg,
-      padding:              '20px',
-      position:             'relative',
-      overflow:             'hidden',
-      flex:                 '1 1 200px',
-      minWidth:             '180px',
+      ...glassStatic.panel,
+      padding:   '20px',
+      flex:      '1 1 200px',
+      minWidth:  '180px',
     }}>
-      {/* Glow orb */}
-      <div style={{
-        position:      'absolute',
-        top:           -20,
-        right:         -20,
-        width:         80,
-        height:        80,
-        borderRadius:  '50%',
-        background:    glow,
-        filter:        'blur(24px)',
-        pointerEvents: 'none',
-      }} />
-
       {/* Icon */}
       <div style={{
         width:           36,
         height:          36,
         borderRadius:    radius.md,
-        background:      glow,
+        background:      `${accent}18`,
         display:         'flex',
         alignItems:      'center',
         justifyContent:  'center',
@@ -70,13 +52,13 @@ function StatCard({ label, value, sub, accent, glow, icon }: {
 
       {/* Label */}
       <div style={{
-        fontSize:       fontSize.xs,
-        color:          colours.textMuted,
-        fontWeight:     fontWeight.medium,
-        fontFamily:     fonts.sans,
-        marginBottom:   '4px',
-        textTransform:  'uppercase',
-        letterSpacing:  '0.06em',
+        fontSize:      fontSize.xs,
+        color:         colours.textMuted,
+        fontWeight:    fontWeight.medium,
+        fontFamily:    fonts.sans,
+        marginBottom:  '4px',
+        textTransform: 'uppercase' as const,
+        letterSpacing: '0.06em',
       }}>
         {label}
       </div>
@@ -87,17 +69,17 @@ function StatCard({ label, value, sub, accent, glow, icon }: {
         fontWeight: fontWeight.semibold,
         color:      accent,
         fontFamily: fonts.sans,
-        lineHeight:  1.1,
+        lineHeight: 1.1,
       }}>
         {value}
       </div>
 
       {sub && (
         <div style={{
-          fontSize:   fontSize.xs,
-          color:      colours.textMuted,
+          fontSize:  fontSize.xs,
+          color:     colours.textMuted,
           fontFamily: fonts.sans,
-          marginTop:  '4px',
+          marginTop: '4px',
         }}>
           {sub}
         </div>
@@ -139,7 +121,7 @@ function TxRow({ description, category, date, amount, type, status }: {
           fontWeight:   fontWeight.medium,
           color:        isDraft ? colours.textMuted : colours.textPrimary,
           fontFamily:   fonts.sans,
-          whiteSpace:   'nowrap',
+          whiteSpace:   'nowrap' as const,
           overflow:     'hidden',
           textOverflow: 'ellipsis',
         }}>
@@ -195,35 +177,32 @@ function TxRow({ description, category, date, amount, type, status }: {
 
 // ── Quick Action ──────────────────────────────────────────────────────────────
 
-function QuickAction({ icon, label }: { icon: string; label: string }) {
+function QuickAction({
+  icon, label, onClick,
+}: {
+  icon: string; label: string; onClick: () => void
+}) {
+  const [hovered, setHovered] = React.useState(false)
   return (
     <button
+      onClick={onClick}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
       style={{
-        display:    'flex',
-        alignItems: 'center',
-        gap:        '8px',
-        padding:    '8px 16px',
-        background: colours.hoverBg,
-        border:     `1px solid ${colours.borderLight}`,
+        display:      'flex',
+        alignItems:   'center',
+        gap:          '8px',
+        padding:      '8px 16px',
+        background:   hovered ? colours.accentLight  : colours.hoverBg,
+        border:       `1px solid ${hovered ? colours.accentBorder : colours.borderMedium}`,
         borderRadius: radius.md,
-        cursor:     'pointer',
-        fontSize:   fontSize.sm,
-        fontFamily: fonts.sans,
-        fontWeight: fontWeight.medium,
-        color:      colours.textSecondary,
-        transition: 'all 0.15s ease',
-      }}
-      onMouseEnter={e => {
-        const t = e.currentTarget
-        t.style.background   = colours.accentLight
-        t.style.borderColor  = colours.accentBorder
-        t.style.color        = colours.accent
-      }}
-      onMouseLeave={e => {
-        const t = e.currentTarget
-        t.style.background   = colours.hoverBg
-        t.style.borderColor  = colours.borderLight
-        t.style.color        = colours.textSecondary
+        cursor:       'pointer',
+        fontSize:     fontSize.sm,
+        fontFamily:   fonts.sans,
+        fontWeight:   fontWeight.medium,
+        color:        hovered ? colours.accent : colours.textSecondary,
+        transition:   'all 0.15s ease',
+        flexShrink:   0,
       }}
     >
       <span>{icon}</span>
@@ -234,7 +213,13 @@ function QuickAction({ icon, label }: { icon: string; label: string }) {
 
 // ── Overview Tab ──────────────────────────────────────────────────────────────
 
-export default function OverviewTab({ clientId, readOnly = false }: { clientId: string | null; readOnly?: boolean }) {
+interface Props {
+  clientId:      string | null
+  readOnly?:     boolean
+  onTabChange?:  (tab: string) => void
+}
+
+export default function OverviewTab({ clientId, readOnly = false, onTabChange }: Props) {
   const { stats, recent, taxYear, clientName, loading, error } = useOverview(clientId)
 
   if (loading) return (
@@ -260,160 +245,186 @@ export default function OverviewTab({ clientId, readOnly = false }: { clientId: 
   const profit = stats.incomePence - stats.expensesPence
 
   return (
-    <div style={{ padding: '24px 24px 40px', maxWidth: '900px' }}>
+    /* Outer container — full width, relative for orb positioning */
+    <div style={{ position: 'relative', padding: '24px 24px 40px', overflow: 'hidden', minHeight: '100%' }}>
 
-      {/* Header */}
-      <div style={{ marginBottom: '24px' }}>
-        <h1 style={{
-          fontSize:   fontSize.xl,
-          fontWeight: fontWeight.semibold,
-          color:      colours.textPrimary,
-          fontFamily: fonts.sans,
-          margin:     0,
-          lineHeight: 1.2,
-        }}>
-          {clientName ? `Good to see you, ${clientName.split(' ')[0]}` : 'Overview'}
-        </h1>
-        <p style={{
-          fontSize:   fontSize.sm,
-          color:      colours.textMuted,
-          fontFamily: fonts.sans,
-          margin:     '4px 0 0',
-        }}>
-          Tax year {taxYear} · {new Date().toLocaleDateString('en-GB', {
-            weekday: 'long', day: 'numeric', month: 'long',
-          })}
-        </p>
-      </div>
-
-      {/* Stat cards */}
+      {/* ── Two large background orbs ── */}
       <div style={{
-        display:      'flex',
-        flexWrap:     'wrap',
-        gap:          '16px',
-        marginBottom: '24px',
-      }}>
-        <StatCard
-          label="Income" value={fmt(stats.incomePence)}
-          sub={`${taxYear} tax year`}
-          accent={colours.income} glow={colours.incomeGlow} icon="📈"
-        />
-        <StatCard
-          label="Expenses" value={fmt(stats.expensesPence)}
-          sub="Confirmed + draft"
-          accent={colours.expense} glow={colours.expenseGlow} icon="📉"
-        />
-        <StatCard
-          label="Est. Tax" value={fmt(stats.estTaxPence)}
-          sub="Rough estimate only"
-          accent={colours.warning} glow={colours.warningGlow} icon="🧾"
-        />
-        <StatCard
-          label="Net Profit" value={fmt(Math.abs(profit))}
-          sub={profit >= 0 ? 'Profit' : 'Loss so far'}
-          accent={profit >= 0 ? colours.allowable : colours.danger}
-          glow={profit >= 0 ? colours.incomeGlow : colours.dangerLight}
-          icon={profit >= 0 ? '✅' : '⚠️'}
-        />
-      </div>
-
-      {/* Quick actions — hidden in read-only mode (accountant view) */}
-      {!readOnly && (
-        <div style={{
-          display:      'flex',
-          gap:          '12px',
-          flexWrap:     'wrap',
-          marginBottom: '24px',
-        }}>
-          <QuickAction icon="+" label="Add income" />
-          <QuickAction icon="+" label="Add expense" />
-          <QuickAction icon="↑" label="Upload document" />
-        </div>
-      )}
-
-      {/* Recent transactions */}
+        position:      'absolute',
+        top:           '-80px',
+        right:         '-60px',
+        width:         '560px',
+        height:        '560px',
+        borderRadius:  '50%',
+        background:    'radial-gradient(circle, rgba(0,194,255,0.14) 0%, transparent 65%)',
+        filter:        'blur(80px)',
+        pointerEvents: 'none',
+        zIndex:        0,
+      }} />
       <div style={{
-        background:           colours.panelBg,
-        backdropFilter:       'blur(48px)',
-        WebkitBackdropFilter: 'blur(48px)',
-        border:               `1px solid ${colours.borderLight}`,
-        borderRadius:         radius.lg,
-        padding:              '20px',
-      }}>
-        <div style={{
-          display:        'flex',
-          alignItems:     'center',
-          justifyContent: 'space-between',
-          marginBottom:   '16px',
-        }}>
-          <h2 style={{
-            fontSize:   fontSize.base,
+        position:      'absolute',
+        top:           '-40px',
+        left:          '-40px',
+        width:         '400px',
+        height:        '400px',
+        borderRadius:  '50%',
+        background:    'radial-gradient(circle, rgba(16,185,129,0.10) 0%, transparent 65%)',
+        filter:        'blur(100px)',
+        pointerEvents: 'none',
+        zIndex:        0,
+      }} />
+
+      {/* Content sits above orbs */}
+      <div style={{ position: 'relative', zIndex: 1 }}>
+
+        {/* Header */}
+        <div style={{ marginBottom: '24px' }}>
+          <h1 style={{
+            fontSize:   fontSize.xl,
             fontWeight: fontWeight.semibold,
             color:      colours.textPrimary,
             fontFamily: fonts.sans,
             margin:     0,
+            lineHeight: 1.2,
           }}>
-            Recent transactions
-          </h2>
-          <span style={{ fontSize: fontSize.xs, color: colours.textMuted, fontFamily: fonts.sans }}>
-            {recent.length > 0 ? `${recent.length} shown` : ''}
-          </span>
+            {clientName ? `Good to see you, ${clientName.split(' ')[0]}` : 'Overview'}
+          </h1>
+          <p style={{
+            fontSize:   fontSize.sm,
+            color:      colours.textMuted,
+            fontFamily: fonts.sans,
+            margin:     '4px 0 0',
+          }}>
+            Tax year {taxYear} · {new Date().toLocaleDateString('en-GB', {
+              weekday: 'long', day: 'numeric', month: 'long',
+            })}
+          </p>
         </div>
 
-        {recent.length === 0 ? (
-          <div style={{ padding: '32px 0', textAlign: 'center' }}>
-            <div style={{ fontSize: '32px', marginBottom: '12px' }}>📂</div>
-            <div style={{ fontSize: fontSize.sm, color: colours.textMuted, fontFamily: fonts.sans }}>
-              No transactions yet for this tax year
+        {/* Stat cards */}
+        <div style={{
+          display:      'flex',
+          flexWrap:     'wrap' as const,
+          gap:          '16px',
+          marginBottom: '24px',
+        }}>
+          <StatCard
+            label="Income" value={fmt(stats.incomePence)}
+            sub={`${taxYear} tax year`}
+            accent={colours.income} icon="↑"
+          />
+          <StatCard
+            label="Expenses" value={fmt(stats.expensesPence)}
+            sub="Confirmed + draft"
+            accent={colours.expense} icon="↓"
+          />
+          <StatCard
+            label="Est. Tax" value={fmt(stats.estTaxPence)}
+            sub="Rough estimate only"
+            accent={colours.warning} icon="◈"
+          />
+          <StatCard
+            label="Net Profit" value={fmt(Math.abs(profit))}
+            sub={profit >= 0 ? 'Profit' : 'Loss so far'}
+            accent={profit >= 0 ? colours.allowable : colours.danger}
+            icon={profit >= 0 ? '▲' : '▼'}
+          />
+        </div>
+
+        {/* Quick actions */}
+        {!readOnly && (
+          <div style={{
+            display:      'flex',
+            gap:          '10px',
+            flexWrap:     'wrap' as const,
+            marginBottom: '24px',
+          }}>
+            <QuickAction icon="+" label="Add income"       onClick={() => onTabChange?.('income')} />
+            <QuickAction icon="+" label="Add expense"      onClick={() => onTabChange?.('expenses')} />
+            <QuickAction icon="↑" label="Upload document"  onClick={() => onTabChange?.('documents')} />
+          </div>
+        )}
+
+        {/* Recent transactions */}
+        <div style={{
+          ...glassStatic.panel,
+          padding: '20px',
+        }}>
+          <div style={{
+            display:        'flex',
+            alignItems:     'center',
+            justifyContent: 'space-between',
+            marginBottom:   '16px',
+          }}>
+            <h2 style={{
+              fontSize:   fontSize.base,
+              fontWeight: fontWeight.semibold,
+              color:      colours.textPrimary,
+              fontFamily: fonts.sans,
+              margin:     0,
+            }}>
+              Recent transactions
+            </h2>
+            <span style={{ fontSize: fontSize.xs, color: colours.textMuted, fontFamily: fonts.sans }}>
+              {recent.length > 0 ? `${recent.length} shown` : ''}
+            </span>
+          </div>
+
+          {recent.length === 0 ? (
+            <div style={{ padding: '32px 0', textAlign: 'center' as const }}>
+              <div style={{ fontSize: '28px', marginBottom: '12px', opacity: 0.3 }}>◈</div>
+              <div style={{ fontSize: fontSize.sm, color: colours.textMuted, fontFamily: fonts.sans }}>
+                No transactions yet for this tax year
+              </div>
+              <div style={{ fontSize: fontSize.xs, color: colours.textMuted, fontFamily: fonts.sans, marginTop: '4px', opacity: 0.7 }}>
+                Add income or expenses to see them here
+              </div>
             </div>
-            <div style={{ fontSize: fontSize.xs, color: colours.textMuted, fontFamily: fonts.sans, marginTop: '4px', opacity: 0.7 }}>
-              Add income or expenses to see them here
+          ) : (
+            recent.map(tx => (
+              <TxRow
+                key={tx.id}
+                description={tx.description}
+                category={tx.category}
+                date={tx.date}
+                amount={tx.amountPence}
+                type={tx.type}
+                status={tx.status}
+              />
+            ))
+          )}
+        </div>
+
+        {/* Action nudge */}
+        {(stats.docsNeedingReview > 0 || stats.openTasks > 0) && (
+          <div style={{
+            marginTop:    '16px',
+            padding:      '16px',
+            background:   colours.accentSoft,
+            border:       `1px solid ${colours.accentBorder}`,
+            borderRadius: radius.lg,
+            display:      'flex',
+            alignItems:   'center',
+            gap:          '12px',
+          }}>
+            <span style={{ fontSize: '16px', opacity: 0.7 }}>✦</span>
+            <div style={{ fontFamily: fonts.sans }}>
+              <div style={{
+                fontSize:   fontSize.sm,
+                fontWeight: fontWeight.medium,
+                color:      colours.accent,
+              }}>
+                {stats.openTasks > 0 && `${stats.openTasks} task${stats.openTasks > 1 ? 's' : ''} to complete`}
+                {stats.openTasks > 0 && stats.docsNeedingReview > 0 && ' · '}
+                {stats.docsNeedingReview > 0 && `${stats.docsNeedingReview} document${stats.docsNeedingReview > 1 ? 's' : ''} to review`}
+              </div>
+              <div style={{ fontSize: fontSize.xs, color: colours.textMuted, marginTop: '2px' }}>
+                Stay on top of your submission checklist
+              </div>
             </div>
           </div>
-        ) : (
-          recent.map(tx => (
-            <TxRow
-              key={tx.id}
-              description={tx.description}
-              category={tx.category}
-              date={tx.date}
-              amount={tx.amountPence}
-              type={tx.type}
-              status={tx.status}
-            />
-          ))
         )}
       </div>
-
-      {/* Action nudge */}
-      {(stats.docsNeedingReview > 0 || stats.openTasks > 0) && (
-        <div style={{
-          marginTop:    '16px',
-          padding:      '16px',
-          background:   colours.accentSoft,
-          border:       `1px solid ${colours.accentBorder}`,
-          borderRadius: radius.lg,
-          display:      'flex',
-          alignItems:   'center',
-          gap:          '12px',
-        }}>
-          <span style={{ fontSize: '20px' }}>💡</span>
-          <div style={{ fontFamily: fonts.sans }}>
-            <div style={{
-              fontSize:   fontSize.sm,
-              fontWeight: fontWeight.medium,
-              color:      colours.accent,
-            }}>
-              {stats.openTasks > 0 && `${stats.openTasks} task${stats.openTasks > 1 ? 's' : ''} to complete`}
-              {stats.openTasks > 0 && stats.docsNeedingReview > 0 && ' · '}
-              {stats.docsNeedingReview > 0 && `${stats.docsNeedingReview} document${stats.docsNeedingReview > 1 ? 's' : ''} to review`}
-            </div>
-            <div style={{ fontSize: fontSize.xs, color: colours.textMuted, marginTop: '2px' }}>
-              Stay on top of your submission checklist
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   )
 }

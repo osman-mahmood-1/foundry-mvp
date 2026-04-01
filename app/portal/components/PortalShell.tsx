@@ -46,9 +46,9 @@ const NAV_GROUPS_CONFIG: ShellNavGroup[] = buildNavGroups()
 
 // ─── Tab renderer ─────────────────────────────────────────────────────────────
 
-function TabRenderer({ activeTab, client }: { activeTab: PortalTab; client: Client }) {
+function TabRenderer({ activeTab, client, onTabChange }: { activeTab: PortalTab; client: Client; onTabChange: (tab: string) => void }) {
   switch (activeTab) {
-    case 'overview':      return <OverviewTab     clientId={client.id} />
+    case 'overview':      return <OverviewTab     clientId={client.id} onTabChange={onTabChange} />
     case 'income':        return <IncomeTab        client={client} />
     case 'expenses':      return <ExpensesTab      client={client} />
     case 'documents':     return <DocumentsTab     client={client} />
@@ -195,7 +195,7 @@ export default function PortalShell({ client }: Props) {
         {/* Tab content */}
         <div key={activeTab} style={{ flex: 1, animation: 'fadeUp 0.35s ease' }}>
           <TabErrorBoundary key={activeTab}>
-            <TabRenderer activeTab={activeTab} client={client} />
+            <TabRenderer activeTab={activeTab} client={client} onTabChange={id => setActiveTab(id as PortalTab)} />
           </TabErrorBoundary>
         </div>
       </div>
