@@ -88,7 +88,7 @@ function PortalTopBar({ client }: { client: Client }) {
         {initial}
       </div>
       <div style={{
-        fontFamily: fonts.serif,
+        fontFamily: fonts.sans,
         fontSize:   '16px',
         fontWeight: fontWeight.medium,
         color:      colours.textPrimary,
@@ -178,7 +178,7 @@ export default function PortalShell({ client }: Props) {
             {greeting}
           </div>
           <h1 style={{
-            fontFamily: fonts.serif,
+            fontFamily: fonts.sans,
             fontSize:   '24px',
             fontWeight: fontWeight.medium,
             color:      colours.textPrimary,

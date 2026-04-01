@@ -196,7 +196,7 @@ export default function IntelligenceTab({ client }: { client: Client }) {
         </div>
         <div>
           <div style={{
-            fontFamily:   fonts.serif,
+            fontFamily:   fonts.sans,
             fontSize:     '18px',
             fontWeight:   fontWeight.medium,
             color:        colours.textPrimary,

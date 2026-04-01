@@ -69,7 +69,7 @@ function StatCard({
         {label}
       </div>
       <div style={{
-        fontFamily:  fonts.serif,
+        fontFamily:  fonts.sans,
         fontSize:    '24px',
         fontWeight:  fontWeight.medium,
         color:       accent ?? colours.textPrimary,
@@ -95,7 +95,7 @@ export default function AdminClientsTable({ clients, totalAccountants }: Props) 
       {/* ── Page header ── */}
       <div style={{ marginBottom: '24px' }}>
         <h1 style={{
-          fontFamily: fonts.serif,
+          fontFamily: fonts.sans,
           fontSize:   '24px',
           fontWeight: fontWeight.medium,
           color:      colours.textPrimary,

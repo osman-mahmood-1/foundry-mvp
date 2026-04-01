@@ -135,7 +135,7 @@ export default function SubmissionTab({ client }: { client: Client }) {
       <Panel style={{ textAlign: 'center' as const, padding: '64px 32px' }}>
         <div style={{ fontSize: '40px', marginBottom: '16px' }}>✓</div>
         <div style={{
-          fontFamily:   fonts.serif,
+          fontFamily:   fonts.sans,
           fontSize:     '22px',
           fontWeight:   fontWeight.medium,
           color:        colours.income,
@@ -177,7 +177,7 @@ export default function SubmissionTab({ client }: { client: Client }) {
         {step === 1 && (
           <div>
             <div style={{
-              fontFamily:   fonts.serif,
+              fontFamily:   fonts.sans,
               fontSize:     '18px',
               fontWeight:   fontWeight.medium,
               color:        colours.textPrimary,
@@ -206,7 +206,7 @@ export default function SubmissionTab({ client }: { client: Client }) {
         {/* Step 2: Expenses */}
         {step === 2 && (
           <div>
-            <div style={{ fontFamily: fonts.serif, fontSize: '18px', fontWeight: fontWeight.medium, color: colours.textPrimary, marginBottom: '8px' }}>
+            <div style={{ fontFamily: fonts.sans, fontSize: '18px', fontWeight: fontWeight.medium, color: colours.textPrimary, marginBottom: '8px' }}>
               Allowable expenses
             </div>
             <div style={{ fontSize: fontSize.sm, color: colours.textSecondary, marginBottom: '24px', lineHeight: 1.6 }}>
@@ -225,7 +225,7 @@ export default function SubmissionTab({ client }: { client: Client }) {
         {/* Step 3: Adjustments */}
         {step === 3 && (
           <div>
-            <div style={{ fontFamily: fonts.serif, fontSize: '18px', fontWeight: fontWeight.medium, color: colours.textPrimary, marginBottom: '8px' }}>
+            <div style={{ fontFamily: fonts.sans, fontSize: '18px', fontWeight: fontWeight.medium, color: colours.textPrimary, marginBottom: '8px' }}>
               Adjustments & calculation
             </div>
             <div style={{ fontSize: fontSize.sm, color: colours.textSecondary, marginBottom: '24px', lineHeight: 1.6 }}>
@@ -245,7 +245,7 @@ export default function SubmissionTab({ client }: { client: Client }) {
         {/* Step 4: Submit */}
         {step === 4 && (
           <div>
-            <div style={{ fontFamily: fonts.serif, fontSize: '18px', fontWeight: fontWeight.medium, color: colours.textPrimary, marginBottom: '8px' }}>
+            <div style={{ fontFamily: fonts.sans, fontSize: '18px', fontWeight: fontWeight.medium, color: colours.textPrimary, marginBottom: '8px' }}>
               Review & submit
             </div>
             <div style={{ fontSize: fontSize.sm, color: colours.textSecondary, marginBottom: '24px', lineHeight: 1.6 }}>

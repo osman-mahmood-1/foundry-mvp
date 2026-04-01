@@ -158,7 +158,7 @@ function ClientCard({ item }: { item: ClientWithUrgency }) {
         {/* Name + subtitle */}
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{
-            fontFamily:   fonts.serif,
+            fontFamily:   fonts.sans,
             fontSize:     fontSize.base,
             fontWeight:   fontWeight.medium,
             color:        colours.textPrimary,
@@ -334,7 +334,7 @@ export default async function AccountantPage() {
           Your clients
         </div>
         <h1 style={{
-          fontFamily: fonts.serif,
+          fontFamily: fonts.sans,
           fontSize:   '26px',
           fontWeight: fontWeight.medium,
           color:      colours.textPrimary,
@@ -374,7 +374,7 @@ function EmptyState() {
     }}>
       <div style={{ fontSize: '28px', marginBottom: '16px', opacity: 0.2 }}>◎</div>
       <div style={{
-        fontFamily:   fonts.serif,
+        fontFamily:   fonts.sans,
         fontSize:     '20px',
         fontWeight:   fontWeight.medium,
         color:        colours.textPrimary,

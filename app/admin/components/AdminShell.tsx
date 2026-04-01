@@ -55,7 +55,7 @@ function AdminTopBar() {
   return (
     <div>
       <div style={{
-        fontFamily:   fonts.serif,
+        fontFamily:   fonts.sans,
         fontSize:     '15px',
         fontWeight:   fontWeight.medium,
         color:        colours.textPrimary,

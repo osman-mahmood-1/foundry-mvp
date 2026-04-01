@@ -124,7 +124,7 @@ export default function OverviewPanel({ client, accountantId, initialData }: Pro
         ) : (
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
             <span style={{
-              fontFamily: fonts.serif,
+              fontFamily: fonts.sans,
               fontSize:   '28px',
               fontWeight: fontWeight.medium,
               color:      saColour,

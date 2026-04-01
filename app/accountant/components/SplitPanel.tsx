@@ -111,7 +111,7 @@ function SplitHeader({ client, saDaysRemaining }: { client: Client; saDaysRemain
       <span style={{ color: colours.borderHairline }}>|</span>
 
       <div style={{
-        fontFamily:  fonts.serif,
+        fontFamily:  fonts.sans,
         fontSize:    fontSize.base,
         fontWeight:  fontWeight.medium,
         color:       colours.textPrimary,

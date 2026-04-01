@@ -173,13 +173,13 @@ export default function DocumentsPanel({ client, initialData }: Props) {
         <SectionHeader title="Status" />
         <div style={{ display: 'flex', gap: '20px' }}>
           <div>
-            <div style={{ fontFamily: fonts.serif, fontSize: '22px', fontWeight: fontWeight.medium, color: colours.income }}>
+            <div style={{ fontFamily: fonts.sans, fontSize: '22px', fontWeight: fontWeight.medium, color: colours.income }}>
               {reviewed.length}
             </div>
             <div style={{ fontSize: fontSize.xs, color: colours.textMuted }}>Reviewed</div>
           </div>
           <div>
-            <div style={{ fontFamily: fonts.serif, fontSize: '22px', fontWeight: fontWeight.medium, color: '#F59E0B' }}>
+            <div style={{ fontFamily: fonts.sans, fontSize: '22px', fontWeight: fontWeight.medium, color: '#F59E0B' }}>
               {unreviewed.length}
             </div>
             <div style={{ fontSize: fontSize.xs, color: colours.textMuted }}>Pending</div>

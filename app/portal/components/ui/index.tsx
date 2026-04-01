@@ -173,7 +173,7 @@ export class TabErrorBoundary extends Component<
       }}>
         <div style={{ fontSize: '22px', opacity: 0.2 }}>◈</div>
         <div style={{
-          fontFamily: fonts.serif,
+          fontFamily: fonts.sans,
           fontSize:   '18px',
           fontWeight: fontWeight.medium,
           color:      colours.textPrimary,
@@ -333,7 +333,7 @@ export function EmptyState({ icon, headline, sub, action, onAction }: EmptyState
         {icon}
       </div>
       <div style={{
-        fontFamily:    fonts.serif,
+        fontFamily:    fonts.sans,
         fontSize:      '18px',
         fontWeight:    fontWeight.medium,
         color:         colours.textPrimary,
@@ -453,13 +453,16 @@ export function Badge({ children, variant = 'neutral' }: BadgeProps) {
   return (
     <span style={{
       fontSize:      fontSize.xs,
+      fontWeight:    fontWeight.medium,
       padding:       '2px 8px',
       background,
       color,
-      borderRadius:  radius.pill,
-      fontFamily:    fonts.mono,
+      borderRadius:  radius.xs,
+      fontFamily:    fonts.sans,
       display:       'inline-block',
       whiteSpace:    'nowrap' as const,
+      textTransform: 'uppercase' as const,
+      letterSpacing: '0.06em',
     }}>
       {children}
     </span>
@@ -484,12 +487,13 @@ interface ButtonProps {
 
 const BUTTON_VARIANTS: Record<ButtonVariant, React.CSSProperties> = {
   primary: {
-    background:  colours.accent,
-    color:       colours.textInverse,
+    background:  'linear-gradient(135deg, #00C2FF 0%, #0094CC 100%)',
+    color:       '#0D1117',
     border:      'none',
+    boxShadow:   '0 2px 8px rgba(0,194,255,0.30)',
   },
   secondary: {
-    background:  'transparent',
+    background:  'rgba(255,255,255,0.07)',
     color:       colours.textSecondary,
     border:      `1px solid ${colours.borderMedium}`,
   },
@@ -524,14 +528,23 @@ export function Button({
   fullWidth = false,
   type      = 'button',
 }: ButtonProps) {
+  const [hovered, setHovered] = useState(false)
+
+  const hoverOverride: React.CSSProperties = hovered && !disabled && variant === 'primary'
+    ? { background: 'linear-gradient(135deg, #1ACEFF 0%, #00AADD 100%)', boxShadow: '0 4px 16px rgba(0,194,255,0.40)' }
+    : {}
+
   return (
     <button
       type={type}
       onClick={onClick}
       disabled={disabled}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
       style={{
         ...BUTTON_VARIANTS[variant],
         ...BUTTON_SIZES[size],
+        ...hoverOverride,
         borderRadius:  radius.pill,
         fontWeight:    fontWeight.medium,
         fontFamily:    fonts.sans,
@@ -601,8 +614,9 @@ export function Input({
         onKeyDown={e => e.key === 'Enter' && onEnter?.()}
         style={{
           width:        '100%',
-          padding:      '10px 12px',
-          border:       `1px solid ${colours.borderMedium}`,
+          height:       '40px',
+          padding:      '0 12px',
+          border:       `1px solid ${colours.borderInput}`,
           borderRadius: radius.md,
           fontSize:     fontSize.base,
           color:        colours.textPrimary,
@@ -613,8 +627,14 @@ export function Input({
           transition:   transition.snap,
           opacity:      disabled ? 0.6 : 1,
         }}
-        onFocus={e  => { e.target.style.borderColor = colours.accent }}
-        onBlur={e   => { e.target.style.borderColor = colours.borderMedium }}
+        onFocus={e  => {
+          e.target.style.borderColor = colours.accentBorder
+          e.target.style.boxShadow   = '0 0 0 3px rgba(0,194,255,0.12)'
+        }}
+        onBlur={e   => {
+          e.target.style.borderColor = colours.borderMedium
+          e.target.style.boxShadow   = 'none'
+        }}
       />
     </div>
   )
@@ -660,8 +680,9 @@ export function Select({ value, onChange, options, label, disabled = false }: Se
         onChange={e => onChange(e.target.value)}
         style={{
           width:        '100%',
-          padding:      '10px 12px',
-          border:       `1px solid ${colours.borderMedium}`,
+          height:       '40px',
+          padding:      '0 12px',
+          border:       `1px solid ${colours.borderInput}`,
           borderRadius: radius.md,
           fontSize:     fontSize.base,
           color:        colours.textPrimary,

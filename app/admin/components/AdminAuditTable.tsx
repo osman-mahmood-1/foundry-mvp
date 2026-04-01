@@ -46,7 +46,7 @@ export default function AdminAuditTable({ entries }: Props) {
       {/* Page header */}
       <div style={{ marginBottom: '24px' }}>
         <h1 style={{
-          fontFamily: fonts.serif,
+          fontFamily: fonts.sans,
           fontSize:   '24px',
           fontWeight: fontWeight.medium,
           color:      colours.textPrimary,

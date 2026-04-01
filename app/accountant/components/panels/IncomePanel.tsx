@@ -57,7 +57,7 @@ export default function IncomePanel({ client, initialData }: Props) {
       <div style={{ ...glassStatic.panel, padding: spacing.panel.paddingTight }}>
         <SectionHeader title="Income Summary" />
         <div style={{
-          fontFamily:   fonts.serif,
+          fontFamily:   fonts.sans,
           fontSize:     '28px',
           fontWeight:   fontWeight.medium,
           color:        colours.income,

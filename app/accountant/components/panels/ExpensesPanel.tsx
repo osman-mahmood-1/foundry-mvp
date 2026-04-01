@@ -306,7 +306,7 @@ export default function ExpensesPanel({
           ].map(s => (
             <div key={s.label} style={{ flex: 1, textAlign: 'center' as const }}>
               <div style={{
-                fontFamily:  fonts.serif,
+                fontFamily:  fonts.sans,
                 fontSize:    '22px',
                 fontWeight:  fontWeight.medium,
                 color:       s.colour,
