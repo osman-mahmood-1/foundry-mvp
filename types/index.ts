@@ -659,6 +659,7 @@ export type PortalTab =
   | 'submission'
   | 'prior-returns'
   | 'calendar'
+  | 'settings'
 
 /** Nav item definition for the sidebar */
 export interface NavItem {

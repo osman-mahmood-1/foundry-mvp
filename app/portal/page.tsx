@@ -17,11 +17,11 @@
  * personalised data.
  */
 
-import { redirect }        from 'next/navigation'
-import { createClient }    from '@/lib/supabase-server'
-import { ThemeProvider }   from '@/styles/ThemeContext'
-import PortalShell         from './components/PortalShell'
-import type { Client }     from '@/types'
+import { redirect }           from 'next/navigation'
+import { createClient }       from '@/lib/supabase-server'
+import PortalThemeProvider    from './components/PortalThemeProvider'
+import PortalShell            from './components/PortalShell'
+import type { Client }        from '@/types'
 
 export const dynamic = 'force-dynamic'
 
@@ -48,8 +48,8 @@ export default async function PortalPage() {
   if (!clientData?.onboarding_complete) redirect('/onboarding')
 
   return (
-    <ThemeProvider theme="light">
+    <PortalThemeProvider>
       <PortalShell client={clientData as Client} />
-    </ThemeProvider>
+    </PortalThemeProvider>
   )
 }

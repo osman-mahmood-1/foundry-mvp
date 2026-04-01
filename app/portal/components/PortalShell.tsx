@@ -20,6 +20,7 @@ import IntelligenceTab  from './tabs/IntelligenceTab'
 import SubmissionTab    from './tabs/SubmissionTab'
 import PriorReturnsTab  from './tabs/PriorReturnsTab'
 import ClientsTab       from './tabs/ClientsTab'
+import SettingsTab      from './tabs/SettingsTab'
 import { TabErrorBoundary } from './ui'
 
 // ─── Nav config (convert from lib/nav format to ShellNavGroup[]) ─────────────
@@ -58,6 +59,7 @@ function TabRenderer({ activeTab, client }: { activeTab: PortalTab; client: Clie
     case 'submission':    return <SubmissionTab     client={client} />
     case 'prior-returns': return <PriorReturnsTab   client={client} />
     case 'clients':       return <ClientsTab        client={client} />
+    case 'settings':      return <SettingsTab        client={client} />
     default:              return null
   }
 }
@@ -126,7 +128,7 @@ export default function PortalShell({ client }: Props) {
     {
       label:   'Settings',
       icon:    '⚙',
-      onClick: () => { setActiveTab('submission') },
+      onClick: () => { setActiveTab('settings') },
     },
     {
       label:        'Sign out',
