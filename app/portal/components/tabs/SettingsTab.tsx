@@ -16,6 +16,7 @@
  */
 
 import { useState, useRef, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import type { Client, ClientType } from '@/types'
 import { useColours } from '@/styles/ThemeContext'
 import { useThemePreference } from '../PortalThemeProvider'
@@ -126,7 +127,6 @@ function InfoTooltip({ id }: { id: keyof typeof TOOLTIPS }) {
     if (btnRef.current) {
       const r = btnRef.current.getBoundingClientRect()
       const tipW = 280
-      // Position below the button, centred on it but clamped to viewport
       let left = r.left + r.width / 2 - tipW / 2
       left = Math.max(8, Math.min(left, window.innerWidth - tipW - 8))
       setPos({ top: r.bottom + 8, left })
@@ -135,6 +135,53 @@ function InfoTooltip({ id }: { id: keyof typeof TOOLTIPS }) {
   }
 
   const tip = TOOLTIPS[id]
+
+  const tooltip = open && pos ? (
+    <div ref={tipRef} style={{
+      position:       'fixed',
+      top:            pos.top,
+      left:           pos.left,
+      width:          '280px',
+      background:     colours.panelBgSolid,
+      backdropFilter: 'blur(32px)',
+      WebkitBackdropFilter: 'blur(32px)',
+      border:         `1px solid ${colours.borderHairline}`,
+      borderRadius:   radius.lg,
+      boxShadow:      '0 8px 32px rgba(0,0,0,0.36)',
+      padding:        '14px 16px',
+      zIndex:         99999,
+      animation:      'fadeDown 0.15s ease',
+    }}>
+      <div style={{
+        position:   'absolute',
+        top:        '-5px',
+        left:       '50%',
+        transform:  'translateX(-50%) rotate(45deg)',
+        width:      '8px',
+        height:     '8px',
+        background: colours.panelBgSolid,
+        borderTop:  `1px solid ${colours.borderHairline}`,
+        borderLeft: `1px solid ${colours.borderHairline}`,
+      }} />
+      <div style={{
+        fontSize:     fontSize.xs,
+        fontWeight:   fontWeight.semibold,
+        color:        colours.accent,
+        fontFamily:   fonts.sans,
+        marginBottom: '6px',
+      }}>
+        {tip.title}
+      </div>
+      <div style={{
+        fontSize:   fontSize.xs,
+        color:      colours.textSecondary,
+        fontFamily: fonts.sans,
+        lineHeight: 1.55,
+      }}>
+        {tip.body}
+      </div>
+    </div>
+  ) : null
 
   return (
     <span style={{ display: 'inline-flex', alignItems: 'center' }}>
@@ -175,54 +222,10 @@ function InfoTooltip({ id }: { id: keyof typeof TOOLTIPS }) {
       >
         ?
       </button>
-
-      {open && pos && (
-        <div ref={tipRef} style={{
-          position:       'fixed',
-          top:            pos.top,
-          left:           pos.left,
-          width:          '280px',
-          background:     colours.panelBgSolid,
-          backdropFilter: 'blur(32px)',
-          WebkitBackdropFilter: 'blur(32px)',
-          border:         `1px solid ${colours.borderHairline}`,
-          borderRadius:   radius.lg,
-          boxShadow:      '0 8px 32px rgba(0,0,0,0.24)',
-          padding:        '14px 16px',
-          zIndex:         9999,
-          animation:      'fadeDown 0.15s ease',
-        }}>
-          {/* Arrow pointing up */}
-          <div style={{
-            position:   'absolute',
-            top:        '-5px',
-            left:       '50%',
-            transform:  'translateX(-50%) rotate(45deg)',
-            width:      '8px',
-            height:     '8px',
-            background: colours.panelBgSolid,
-            borderTop:  `1px solid ${colours.borderHairline}`,
-            borderLeft: `1px solid ${colours.borderHairline}`,
-          }} />
-          <div style={{
-            fontSize:     fontSize.xs,
-            fontWeight:   fontWeight.semibold,
-            color:        colours.accent,
-            fontFamily:   fonts.sans,
-            marginBottom: '6px',
-          }}>
-            {tip.title}
-          </div>
-          <div style={{
-            fontSize:   fontSize.xs,
-            color:      colours.textSecondary,
-            fontFamily: fonts.sans,
-            lineHeight: 1.55,
-          }}>
-            {tip.body}
-          </div>
-        </div>
-      )}
+      {typeof document !== 'undefined' && tooltip
+        ? createPortal(tooltip, document.body)
+        : null
+      }
     </span>
   )
 }
@@ -319,7 +322,7 @@ function LockedField({ label, value, lockId }: {
         </span>
       </button>
 
-      {open && pos && (
+      {typeof document !== 'undefined' && open && pos && createPortal(
         <div ref={popRef} style={{
           position:        'fixed',
           top:             pos.top,
@@ -329,10 +332,11 @@ function LockedField({ label, value, lockId }: {
           background:      colours.accentSoft,
           border:          `1px solid ${colours.accentBorder}`,
           borderRadius:    radius.md,
-          zIndex:          9999,
+          zIndex:          99999,
           transformOrigin: 'top center',
           animation:       'expandDown 0.18s cubic-bezier(0.22,1,0.36,1) both',
           overflow:        'hidden',
+          boxShadow:       '0 6px 24px rgba(0,0,0,0.20)',
         }}>
           <div style={{
             fontSize:     fontSize.xs,
@@ -351,7 +355,8 @@ function LockedField({ label, value, lockId }: {
           }}>
             {reason.body}
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
     </div>
   )
@@ -508,7 +513,7 @@ function SectionHeader({
               Edit
             </Button>
           </span>
-          {showBlockMsg && msgPos && (
+          {typeof document !== 'undefined' && showBlockMsg && msgPos && createPortal(
             <div style={{
               position:     'fixed',
               top:          msgPos.top,
@@ -521,12 +526,13 @@ function SectionHeader({
               border:       `1px solid ${colours.borderHairline}`,
               borderRadius: radius.md,
               padding:      '6px 10px',
-              zIndex:       9999,
+              zIndex:       99999,
               boxShadow:    '0 4px 12px rgba(0,0,0,0.16)',
               animation:    'fadeDown 0.15s ease',
             }}>
               Save or cancel your changes above first
-            </div>
+            </div>,
+            document.body,
           )}
         </>
       )}
