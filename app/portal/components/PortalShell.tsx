@@ -83,7 +83,7 @@ function PortalTopBar({ client }: { client: Client }) {
         alignItems:     'center',
         justifyContent: 'center',
         fontSize:       fontSize.base,
-        color:          '#FFFFFF',
+        color:          colours.white,
         fontWeight:     fontWeight.semibold,
         marginBottom:   '12px',
       }}>

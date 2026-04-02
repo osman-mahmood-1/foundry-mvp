@@ -183,7 +183,7 @@ export default function DocumentsPanel({ client, initialData }: Props) {
             <div style={{ fontSize: fontSize.xs, color: colours.textMuted }}>Reviewed</div>
           </div>
           <div>
-            <div style={{ fontFamily: fonts.sans, fontSize: '22px', fontWeight: fontWeight.medium, color: '#F59E0B' }}>
+            <div style={{ fontFamily: fonts.sans, fontSize: '22px', fontWeight: fontWeight.medium, color: colours.warning }}>
               {unreviewed.length}
             </div>
             <div style={{ fontSize: fontSize.xs, color: colours.textMuted }}>Pending</div>

@@ -172,7 +172,7 @@ function HmrcCalendar({ taxYear }: { taxYear: string }) {
         width:         '160px',
         height:        '160px',
         borderRadius:  '50%',
-        background:    'radial-gradient(circle, rgba(0,194,255,0.10) 0%, transparent 70%)',
+        background:    'radial-gradient(circle, rgba(59,130,246,0.10) 0%, transparent 70%)',
         filter:        'blur(40px)',
         pointerEvents: 'none',
       }} />

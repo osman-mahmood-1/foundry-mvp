@@ -2,324 +2,347 @@
  * styles/tokens/colours.ts
  *
  * Single source of truth for all colours.
- * Palette: warm gold / orange on deep warm-dark (dark) or parchment (light).
- *
- * Authority: lotech-dashboard-v9.html mockup — no other source.
+ * Palette: sapphire / teal / copper on deep navy-black (dark) or warm white (light).
  *
  * Rules:
- * - Primary accent is gold (#f5a623). Secondary is orange (#f97316).
- * - Three text levels per theme: textPrimary, textSecondary, textMuted.
- * - Sidebar background is always transparent.
- * - Active nav item: gold-to-orange gradient bg, black text (dark) / white text (light).
+ * - Primary interactive accent is sapphire (#3b82f6 dark / #1d4ed8 light).
+ * - CTA (one per screen) is copper gradient (#e8922a → #d4731a).
+ * - Active nav item is the same copper gradient.
+ * - Sidebar and topbar backgrounds are always transparent with no backdrop-filter.
+ * - Four text levels per theme: textPrimary, textSecondary, textMuted, (textInverse).
  */
 
 // ─── Dark theme ───────────────────────────────────────────────────────────────
-// Source: [data-theme="dark"] in mockup
 
 export const dark = {
   // ── Page surfaces
-  pageBg:          '#0a0806',              // --outer-bg
-  bg5:             '#252018',              // --bg5 (inactive bar/chart elements)
+  pageBg:          'radial-gradient(ellipse 110% 90% at 100% 0%, #0c1826 0%, #050810 55%, #000000 100%)',
+  bg5:             '#0f1a2e',              // inactive bar/chart elements
   sidebarBg:       'transparent',          // sidebar is always transparent
 
   // ── Inner container (glass panel that wraps the main content area)
-  panelBg:         'rgba(13,10,7,0.72)',   // --inner-bg
-  panelBgSolid:    'rgba(11,9,6,0.99)',    // --panel-bg (slide-in panel)
-  innerBorderTop:  'rgba(255,255,255,0.16)', // top highlight on inner container
+  panelBg:         'rgba(8,12,22,0.65)',   // inner container glass
+  panelBgSolid:    'rgba(4,6,12,0.99)',    // slide-in panel / modal solid bg
+  innerBorderTop:  'rgba(255,255,255,0.14)', // top highlight on inner container
 
-  // ── Cards (slightly less opaque so layers show through)
-  cardBg:          'rgba(20,16,11,0.60)',  // --card-bg
-  cardBorder:      'rgba(255,255,255,0.09)', // --card-border
-  cardBorderTop:   'rgba(255,255,255,0.12)', // card top highlight
+  // ── Cards
+  cardBg:          'rgba(0,0,0,0.75)',
+  cardBorder:      'rgba(255,255,255,0.06)',
+  cardBorderTop:   'rgba(255,255,255,0.07)',
 
   // ── Input / form fields
-  inputBg:         'rgba(255,255,255,0.06)',  // --input-bg
-  inputBorder:     'rgba(255,255,255,0.12)',  // --input-border
+  inputBg:         'rgba(255,255,255,0.06)',
+  inputBorder:     'rgba(255,255,255,0.12)',
+  inputFocusBg:    'rgba(59,130,246,0.10)',
+  inputFocusBorder:'rgba(59,130,246,0.30)',
+  inputFocusGlow:  '0 0 0 3px rgba(59,130,246,0.18)',
 
-  // ── Text — 3 levels (--text, --text2, --text3)
-  textPrimary:     '#f2ece3',   // --text
-  textSecondary:   '#9a9080',   // --text2
-  textMuted:       '#4a4438',   // --text3
-  textInverse:     '#0a0806',   // text on bright backgrounds
+  // ── Text — 4 levels
+  textPrimary:     '#ffffff',
+  textSecondary:   'rgba(255,255,255,0.70)',
+  textMuted:       'rgba(255,255,255,0.35)',
+  textInverse:     '#000000',
 
-  // ── Accent palette
-  accent:          '#f5a623',   // --gold (primary)
-  accentHover:     '#fbbf24',   // --gold2 (hover state)
-  accentDark:      '#d4820f',   // darker gold for text on light
-  accentLight:     'rgba(245,166,35,0.14)',
-  accentSoft:      'rgba(245,166,35,0.08)',
-  accentBorder:    'rgba(245,166,35,0.40)',
-  accentText:      '#f5a623',
-  orange:          '#f97316',   // --orange
-  purple:          '#8b5cf6',   // --purple
-  purple2:         '#a78bfa',   // --purple2
-  green:           '#22c55e',   // --green
-  blue:            '#3b82f6',   // --blue
-  blueLight:       'rgba(59,130,246,0.15)',
+  // ── Primary interactive — sapphire
+  accent:          '#3b82f6',
+  accentHover:     '#60a5fa',
+  accentDark:      '#2563eb',
+  accentLight:     'rgba(59,130,246,0.14)',
+  accentSoft:      'rgba(59,130,246,0.08)',
+  accentBorder:    'rgba(59,130,246,0.30)',
+  accentText:      '#3b82f6',
+
+  // ── CTA — copper (one primary action per screen)
+  cta:             'linear-gradient(135deg, #e8922a, #d4731a)',
+  ctaGlow:         'rgba(232,146,42,0.40)',
+  ctaText:         '#000000',
+
+  // ── Copper / teal / extra palette
+  orange:          '#e8922a',   // copper — CTA colour alias
+  teal:            '#14b8a6',   // teal 500
+  tealLight:       'rgba(20,184,166,0.14)',
+  tealBar:         '#2dd4bf',   // teal 400
+  purple:          '#a78bfa',
+  purple2:         '#c4b5fd',
+  green:           '#22d3a5',   // positive teal-green
+  blue:            '#3b82f6',   // sapphire alias
+  blueLight:       'rgba(59,130,246,0.14)',
   blueDark:        '#2563eb',
   blueDeep:        '#1d4ed8',
 
   // ── Borders
-  borderHairline:  'rgba(255,255,255,0.08)',  // --border
+  borderHairline:  'rgba(255,255,255,0.08)',
   borderLight:     'rgba(255,255,255,0.05)',
-  borderMedium:    'rgba(255,255,255,0.14)',  // --border2
-  borderInput:     'rgba(255,255,255,0.12)',  // --input-border (alias)
+  borderMedium:    'rgba(255,255,255,0.14)',
+  borderInput:     'rgba(255,255,255,0.12)',
+
+  // ── Table
+  tableHover:      'rgba(59,130,246,0.06)',
 
   // ── Nav
-  hoverBg:         'rgba(255,255,255,0.05)',  // --nav-hover
-  navActive:       '#000000',                  // active item text (on gold gradient)
-  navActiveBg:     'linear-gradient(135deg, #f5a623, #f97316)', // gold gradient
-  navActiveShadow: '0 4px 20px rgba(245,166,35,0.35)',
-  navInactive:     '#9a9080',   // --text2
-  navGroupLabel:   '#4a4438',   // --text3
+  hoverBg:         'rgba(255,255,255,0.05)',
+  navActive:       '#000000',                                   // text on copper gradient
+  navActiveBg:     'linear-gradient(135deg, #e8922a, #d4731a)', // copper gradient
+  navActiveShadow: '0 4px 20px rgba(232,146,42,0.40)',
+  navInactive:     'rgba(255,255,255,0.38)',
+  navGroupLabel:   'rgba(255,255,255,0.18)',
 
-  // ── Topbar action items (search, icon buttons)
-  topbarItemBg:     'rgba(255,255,255,0.06)',   // --topbar-item-bg
-  topbarItemBorder: 'rgba(255,255,255,0.10)',   // --topbar-item-border
+  // ── Topbar action items
+  topbarItemBg:     'rgba(255,255,255,0.06)',
+  topbarItemBorder: 'rgba(255,255,255,0.10)',
 
-  // ── Secondary / ghost button (btn-simple in mockup)
-  simpleBg:        'rgba(255,255,255,0.06)',    // --simple-bg
-  simpleBorder:    'rgba(255,255,255,0.11)',    // --simple-border
+  // ── Secondary / ghost button
+  simpleBg:        'rgba(255,255,255,0.06)',
+  simpleBorder:    'rgba(255,255,255,0.09)',
 
   // ── Scrollbar
-  scrollThumb:     '#1c1915',   // --scroll
+  scrollThumb:     '#0f1a2e',
 
   // ── Shadows
-  shadow:          '0 8px 32px rgba(0,0,0,0.4)',
-  innerShadow:     '0 2px 0 rgba(255,255,255,0.04) inset, 0 0 0 1px rgba(255,255,255,0.07), 0 32px 80px rgba(0,0,0,0.65)',
-  cardShadow:      '0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06)',
+  shadow:          '0 8px 32px rgba(0,0,0,0.50)',
+  innerShadow:     'inset 0 1px 0 rgba(255,255,255,0.07), 0 0 0 1px rgba(255,255,255,0.06), 0 28px 72px rgba(0,0,0,0.80)',
+  cardShadow:      'inset 0 1px 0 rgba(255,255,255,0.07)',
 
-  // ── Glass
-  glassBg:         'rgba(13,10,7,0.72)',
-  glassBlur:       'blur(40px) saturate(150%) brightness(1.06)',
-  glassBorder:     'rgba(255,255,255,0.11)',
-  glassShadow:     '0 2px 0 rgba(255,255,255,0.04) inset, 0 0 0 1px rgba(255,255,255,0.07), 0 32px 80px rgba(0,0,0,0.65)',
+  // ── Glass (mirrors glass utility — kept for direct token access)
+  glassBg:         'rgba(8,12,22,0.65)',
+  glassBlur:       'blur(40px) saturate(140%) brightness(1.03)',
+  glassBorder:     'rgba(255,255,255,0.08)',
+  glassShadow:     'inset 0 1px 0 rgba(255,255,255,0.07), 0 0 0 1px rgba(255,255,255,0.06), 0 28px 72px rgba(0,0,0,0.80)',
 
   // ── Semantic — income / expense
-  income:          '#22c55e',
-  incomeLight:     'rgba(34,197,94,0.14)',
-  incomeText:      '#22c55e',
-  incomeGlow:      'rgba(34,197,94,0.14)',
-  expense:         '#f97316',
-  expenseLight:    'rgba(249,115,22,0.14)',
-  expenseText:     '#f97316',
-  expenseGlow:     'rgba(249,115,22,0.14)',
+  income:          '#22d3a5',
+  incomeLight:     'rgba(34,211,165,0.14)',
+  incomeText:      '#22d3a5',
+  incomeGlow:      'rgba(34,211,165,0.14)',
+  expense:         '#f87171',
+  expenseLight:    'rgba(248,113,113,0.14)',
+  expenseText:     '#f87171',
+  expenseGlow:     'rgba(248,113,113,0.14)',
 
   // ── States
-  warning:         '#f5a623',
-  warningLight:    'rgba(245,166,35,0.14)',
-  warningDark:     '#d4820f',
-  warningGlow:     'rgba(245,166,35,0.14)',
-  danger:          '#ef4444',
-  dangerLight:     'rgba(239,68,68,0.14)',
-  dangerGlow:      'rgba(239,68,68,0.14)',
+  warning:         '#fbbf24',
+  warningLight:    'rgba(251,191,36,0.14)',
+  warningDark:     '#f59e0b',
+  warningGlow:     'rgba(251,191,36,0.14)',
+  danger:          '#f87171',
+  dangerLight:     'rgba(248,113,113,0.14)',
+  dangerGlow:      'rgba(248,113,113,0.14)',
 
   // ── Allowability
-  allowable:          '#22c55e',
-  allowableLight:     'rgba(34,197,94,0.14)',
-  notAllowable:       '#ef4444',
-  notAllowableLight:  'rgba(239,68,68,0.14)',
-  pendingReview:      '#f5a623',
-  pendingReviewLight: 'rgba(245,166,35,0.14)',
+  allowable:          '#22d3a5',
+  allowableLight:     'rgba(34,211,165,0.14)',
+  notAllowable:       '#f87171',
+  notAllowableLight:  'rgba(248,113,113,0.14)',
+  pendingReview:      '#fbbf24',
+  pendingReviewLight: 'rgba(251,191,36,0.14)',
 
   // ── Intelligence severity
-  urgent:           '#ef4444',
-  urgentLight:      'rgba(239,68,68,0.14)',
-  attention:        '#f5a623',
-  attentionLight:   'rgba(245,166,35,0.14)',
-  info:             '#3b82f6',
-  infoLight:        'rgba(59,130,246,0.14)',
+  urgent:           '#f87171',
+  urgentLight:      'rgba(248,113,113,0.14)',
+  attention:        '#fbbf24',
+  attentionLight:   'rgba(251,191,36,0.14)',
+  info:             '#60a5fa',
+  infoLight:        'rgba(96,165,250,0.12)',
 
   // ── Misc / backward-compat aliases
-  teal:             '#22c55e',
-  tealLight:        'rgba(34,197,94,0.14)',
-  tealBar:          '#22c55e',
-  overview:         '#f5a623',
-  healthRing:       '#22c55e',
-  intelligence:     '#8b5cf6',
-  intelligenceGlow: 'rgba(139,92,246,0.14)',
+  overview:         '#3b82f6',
+  healthRing:       '#22d3a5',
+  intelligence:     '#a78bfa',
+  intelligenceGlow: 'rgba(167,139,250,0.14)',
   appleWhite:       '#ffffff',
   white:            '#ffffff',
-  panelBorder:      'rgba(255,255,255,0.11)',
-  orbAccent:        'rgba(249,115,22,0.48)',
-  orbSky:           'rgba(245,166,35,0.26)',
+  panelBorder:      'rgba(255,255,255,0.08)',
+  orbAccent:        'rgba(59,130,246,0.38)',
+  orbSky:           'rgba(45,212,191,0.12)',
   sidebarShadow:    'none',
 } as const
 
 // ─── Light theme ──────────────────────────────────────────────────────────────
-// Source: [data-theme="light"] in mockup
 
 export const light = {
   // ── Page surfaces
-  pageBg:          '#ddd8ce',               // --outer-bg
-  bg5:             '#ccc4b6',               // --bg5
-  sidebarBg:       'transparent',           // always transparent
+  pageBg:          'radial-gradient(ellipse 110% 90% at 100% 0%, #fdf5ec 0%, #faf7f3 50%, #ffffff 100%)',
+  bg5:             '#e8edf5',
+  sidebarBg:       'transparent',
 
   // ── Inner container
-  panelBg:         'rgba(248,243,235,0.78)', // --inner-bg
-  panelBgSolid:    'rgba(248,244,236,0.99)', // --panel-bg (slide-in panel)
-  innerBorderTop:  'rgba(255,255,255,0.80)', // top highlight
+  panelBg:         'rgba(255,255,255,0.72)',
+  panelBgSolid:    'rgba(255,254,252,0.99)',
+  innerBorderTop:  'rgba(255,255,255,0.98)',
 
   // ── Cards
-  cardBg:          'rgba(255,252,246,0.65)', // --card-bg
-  cardBorder:      'rgba(0,0,0,0.07)',        // --card-border
-  cardBorderTop:   'rgba(255,255,255,0.70)',  // card top highlight
+  cardBg:          'rgba(255,255,255,0.78)',
+  cardBorder:      'rgba(15,23,42,0.07)',
+  cardBorderTop:   'rgba(255,255,255,0.95)',
 
   // ── Input / form fields
-  inputBg:         'rgba(0,0,0,0.05)',       // --input-bg
-  inputBorder:     'rgba(0,0,0,0.12)',        // --input-border
+  inputBg:         'rgba(15,22,38,0.04)',
+  inputBorder:     'rgba(15,23,42,0.14)',
+  inputFocusBg:    'rgba(29,78,216,0.06)',
+  inputFocusBorder:'rgba(29,78,216,0.22)',
+  inputFocusGlow:  '0 0 0 3px rgba(29,78,216,0.12)',
 
-  // ── Text — 3 levels
-  textPrimary:     '#1a1612',   // --text
-  textSecondary:   '#6b6050',   // --text2
-  textMuted:       '#a09080',   // --text3
-  textInverse:     '#ddd8ce',
+  // ── Text — 4 levels
+  textPrimary:     '#0a0f1a',
+  textSecondary:   '#1e2d3d',
+  textMuted:       '#4a5f78',
+  textInverse:     '#ffffff',
 
-  // ── Accent palette (same values across themes)
-  accent:          '#f5a623',
-  accentHover:     '#fbbf24',
-  accentDark:      '#d4820f',
-  accentLight:     'rgba(245,166,35,0.12)',
-  accentSoft:      'rgba(245,166,35,0.06)',
-  accentBorder:    'rgba(245,166,35,0.40)',
-  accentText:      '#f5a623',
-  orange:          '#f97316',
-  purple:          '#8b5cf6',
-  purple2:         '#a78bfa',
-  green:           '#22c55e',
-  blue:            '#3b82f6',
-  blueLight:       'rgba(59,130,246,0.12)',
-  blueDark:        '#2563eb',
-  blueDeep:        '#1d4ed8',
+  // ── Primary interactive — deep sapphire for legibility on white
+  accent:          '#1d4ed8',
+  accentHover:     '#2563eb',
+  accentDark:      '#1e40af',
+  accentLight:     'rgba(29,78,216,0.08)',
+  accentSoft:      'rgba(29,78,216,0.05)',
+  accentBorder:    'rgba(29,78,216,0.18)',
+  accentText:      '#1d4ed8',
+
+  // ── CTA — copper
+  cta:             'linear-gradient(135deg, #e8922a, #d4731a)',
+  ctaGlow:         'rgba(232,146,42,0.28)',
+  ctaText:         '#ffffff',
+
+  // ── Copper / teal / extra palette
+  orange:          '#e8922a',
+  teal:            '#0d9488',
+  tealLight:       'rgba(13,148,136,0.12)',
+  tealBar:         '#14b8a6',
+  purple:          '#7c3aed',
+  purple2:         '#8b5cf6',
+  green:           '#0a8060',
+  blue:            '#1d4ed8',
+  blueLight:       'rgba(29,78,216,0.08)',
+  blueDark:        '#1e40af',
+  blueDeep:        '#1e3a8a',
 
   // ── Borders
-  borderHairline:  'rgba(0,0,0,0.08)',    // --border
-  borderLight:     'rgba(0,0,0,0.06)',
-  borderMedium:    'rgba(0,0,0,0.14)',    // --border2
-  borderInput:     'rgba(0,0,0,0.12)',    // alias
+  borderHairline:  'rgba(15,23,42,0.08)',
+  borderLight:     'rgba(15,23,42,0.06)',
+  borderMedium:    'rgba(15,23,42,0.14)',
+  borderInput:     'rgba(15,23,42,0.14)',
+
+  // ── Table
+  tableHover:      'rgba(29,78,216,0.04)',
 
   // ── Nav
-  hoverBg:         'rgba(0,0,0,0.04)',    // --nav-hover
-  navActive:       '#ffffff',              // active text on gold gradient (light theme: white)
-  navActiveBg:     'linear-gradient(135deg, #f5a623, #f97316)',
-  navActiveShadow: '0 4px 20px rgba(245,166,35,0.35)',
-  navInactive:     '#6b6050',   // --text2
-  navGroupLabel:   '#a09080',   // --text3
+  hoverBg:         'rgba(15,23,42,0.04)',
+  navActive:       '#ffffff',
+  navActiveBg:     'linear-gradient(135deg, #e8922a, #d4731a)',
+  navActiveShadow: '0 4px 20px rgba(232,146,42,0.28)',
+  navInactive:     '#4a5f78',
+  navGroupLabel:   '#8899aa',
 
-  // ── Topbar action items
-  topbarItemBg:     'rgba(255,255,255,0.55)',  // --topbar-item-bg
-  topbarItemBorder: 'rgba(0,0,0,0.10)',         // --topbar-item-border
+  // ── Topbar action items — solid bg (no backdrop-filter in light to avoid seam)
+  topbarItemBg:     'rgba(255,255,255,0.85)',
+  topbarItemBorder: 'rgba(15,23,42,0.10)',
 
   // ── Secondary / ghost button
-  simpleBg:        'rgba(0,0,0,0.05)',    // --simple-bg
-  simpleBorder:    'rgba(0,0,0,0.13)',    // --simple-border
+  simpleBg:        'rgba(255,255,255,0.80)',
+  simpleBorder:    'rgba(15,23,42,0.09)',
 
   // ── Scrollbar
-  scrollThumb:     '#d9d1c5',   // --scroll
+  scrollThumb:     '#c5cfe0',
 
   // ── Shadows
-  shadow:          '0 4px 18px rgba(160,120,60,0.10)',
-  innerShadow:     '0 1px 0 rgba(255,255,255,0.5) inset, 0 0 0 1px rgba(0,0,0,0.06), 0 20px 60px rgba(100,70,20,0.20)',
-  cardShadow:      '0 4px 18px rgba(160,120,60,0.10), inset 0 1px 0 rgba(255,255,255,0.80)',
+  shadow:          '0 4px 18px rgba(15,23,42,0.10)',
+  innerShadow:     'inset 0 1px 0 rgba(255,255,255,0.95), 0 0 0 1px rgba(15,23,42,0.07)',
+  cardShadow:      '0 2px 16px rgba(15,23,42,0.08), inset 0 1px 0 rgba(255,255,255,0.95)',
 
   // ── Glass
-  glassBg:         'rgba(248,243,235,0.78)',
-  glassBlur:       'blur(40px) saturate(150%) brightness(1.06)',
-  glassBorder:     'rgba(0,0,0,0.09)',
-  glassShadow:     '0 1px 0 rgba(255,255,255,0.5) inset, 0 0 0 1px rgba(0,0,0,0.06), 0 20px 60px rgba(100,70,20,0.20)',
+  glassBg:         'rgba(255,255,255,0.72)',
+  glassBlur:       'blur(40px) saturate(140%) brightness(1.03)',
+  glassBorder:     'rgba(15,23,42,0.08)',
+  glassShadow:     'inset 0 1px 0 rgba(255,255,255,0.95), 0 0 0 1px rgba(15,23,42,0.07)',
 
-  // ── Semantic
-  income:          '#22c55e',
-  incomeLight:     'rgba(34,197,94,0.12)',
-  incomeText:      '#22c55e',
-  incomeGlow:      'rgba(34,197,94,0.10)',
-  expense:         '#f97316',
-  expenseLight:    'rgba(249,115,22,0.12)',
-  expenseText:     '#f97316',
-  expenseGlow:     'rgba(249,115,22,0.10)',
+  // ── Semantic — income / expense
+  income:          '#0a8060',
+  incomeLight:     'rgba(10,128,96,0.10)',
+  incomeText:      '#0a8060',
+  incomeGlow:      'rgba(10,128,96,0.10)',
+  expense:         '#c0392b',
+  expenseLight:    'rgba(192,57,43,0.09)',
+  expenseText:     '#c0392b',
+  expenseGlow:     'rgba(192,57,43,0.09)',
 
   // ── States
-  warning:         '#f5a623',
-  warningLight:    'rgba(245,166,35,0.12)',
-  warningDark:     '#d4820f',
-  warningGlow:     'rgba(245,166,35,0.10)',
-  danger:          '#ef4444',
-  dangerLight:     'rgba(239,68,68,0.12)',
-  dangerGlow:      'rgba(239,68,68,0.10)',
+  warning:         '#a0720e',
+  warningLight:    'rgba(160,114,14,0.10)',
+  warningDark:     '#7c5509',
+  warningGlow:     'rgba(160,114,14,0.10)',
+  danger:          '#c0392b',
+  dangerLight:     'rgba(192,57,43,0.09)',
+  dangerGlow:      'rgba(192,57,43,0.09)',
 
   // ── Allowability
-  allowable:          '#22c55e',
-  allowableLight:     'rgba(34,197,94,0.12)',
-  notAllowable:       '#ef4444',
-  notAllowableLight:  'rgba(239,68,68,0.12)',
-  pendingReview:      '#f5a623',
-  pendingReviewLight: 'rgba(245,166,35,0.12)',
+  allowable:          '#0a8060',
+  allowableLight:     'rgba(10,128,96,0.10)',
+  notAllowable:       '#c0392b',
+  notAllowableLight:  'rgba(192,57,43,0.09)',
+  pendingReview:      '#a0720e',
+  pendingReviewLight: 'rgba(160,114,14,0.10)',
 
   // ── Intelligence severity
-  urgent:           '#ef4444',
-  urgentLight:      'rgba(239,68,68,0.12)',
-  attention:        '#f5a623',
-  attentionLight:   'rgba(245,166,35,0.12)',
-  info:             '#3b82f6',
-  infoLight:        'rgba(59,130,246,0.12)',
+  urgent:           '#c0392b',
+  urgentLight:      'rgba(192,57,43,0.09)',
+  attention:        '#a0720e',
+  attentionLight:   'rgba(160,114,14,0.10)',
+  info:             '#1d4ed8',
+  infoLight:        'rgba(29,78,216,0.08)',
 
   // ── Misc / backward-compat aliases
-  teal:             '#22c55e',
-  tealLight:        'rgba(34,197,94,0.12)',
-  tealBar:          '#22c55e',
-  overview:         '#f5a623',
-  healthRing:       '#22c55e',
-  intelligence:     '#8b5cf6',
-  intelligenceGlow: 'rgba(139,92,246,0.10)',
+  overview:         '#1d4ed8',
+  healthRing:       '#0a8060',
+  intelligence:     '#7c3aed',
+  intelligenceGlow: 'rgba(124,58,237,0.10)',
   appleWhite:       '#ffffff',
   white:            '#ffffff',
-  panelBorder:      'rgba(0,0,0,0.09)',
-  orbAccent:        'rgba(249,115,22,0.28)',
-  orbSky:           'rgba(245,166,35,0.14)',
+  panelBorder:      'rgba(15,23,42,0.08)',
+  orbAccent:        'rgba(37,99,235,0.32)',
+  orbSky:           'rgba(37,99,235,0.08)',
   sidebarShadow:    'none',
 } as const
 
 // ─── Gradients ────────────────────────────────────────────────────────────────
 
 export const gradients = {
-  accent:       'linear-gradient(135deg, #f5a623 0%, #f97316 100%)',
-  accentHover:  'linear-gradient(135deg, #fbbf24 0%, #f97316 100%)',
-  income:       'radial-gradient(ellipse at 20% 50%, rgba(34,197,94,0.22) 0%, transparent 70%)',
-  expense:      'radial-gradient(ellipse at 80% 50%, rgba(249,115,22,0.22) 0%, transparent 70%)',
-  intelligence: 'radial-gradient(ellipse at 50% 0%, rgba(139,92,246,0.28) 0%, rgba(109,40,217,0.18) 50%, transparent 80%)',
-  warning:      'radial-gradient(ellipse at 50% 0%, rgba(245,166,35,0.22) 0%, transparent 70%)',
-  danger:       'radial-gradient(ellipse at 50% 0%, rgba(239,68,68,0.22) 0%, transparent 70%)',
-  overview:     'radial-gradient(ellipse at 50% 0%, rgba(245,166,35,0.18) 0%, rgba(34,197,94,0.10) 60%, transparent 90%)',
-  orbAmbient:   'radial-gradient(circle, rgba(249,115,22,0.48) 0%, rgba(245,166,35,0.26) 30%, rgba(245,166,35,0.09) 55%, transparent 72%)',
-  incomeText:   'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
-  expenseText:  'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
-  healthRing:   'linear-gradient(135deg, #f5a623 0%, #22c55e 100%)',
+  accent:       'linear-gradient(135deg, #e8922a 0%, #d4731a 100%)',     // copper CTA
+  accentHover:  'linear-gradient(135deg, #f0a040 0%, #e8922a 100%)',
+  income:       'radial-gradient(ellipse at 20% 50%, rgba(34,211,165,0.22) 0%, transparent 70%)',
+  expense:      'radial-gradient(ellipse at 80% 50%, rgba(248,113,113,0.22) 0%, transparent 70%)',
+  intelligence: 'radial-gradient(ellipse at 50% 0%, rgba(167,139,250,0.28) 0%, rgba(124,58,237,0.18) 50%, transparent 80%)',
+  warning:      'radial-gradient(ellipse at 50% 0%, rgba(251,191,36,0.22) 0%, transparent 70%)',
+  danger:       'radial-gradient(ellipse at 50% 0%, rgba(248,113,113,0.22) 0%, transparent 70%)',
+  overview:     'radial-gradient(ellipse at 50% 0%, rgba(59,130,246,0.18) 0%, rgba(34,211,165,0.10) 60%, transparent 90%)',
+  orbAmbient:   'radial-gradient(circle, rgba(59,130,246,0.38) 0%, rgba(45,212,191,0.12) 30%, rgba(45,212,191,0.04) 55%, transparent 72%)',
+  incomeText:   'linear-gradient(135deg, #22d3a5 0%, #0d9488 100%)',
+  expenseText:  'linear-gradient(135deg, #f87171 0%, #ef4444 100%)',
+  healthRing:   'linear-gradient(135deg, #3b82f6 0%, #22d3a5 100%)',
 } as const
 
 export const semantic = {
-  income:             '#22c55e',
-  incomeLight:        'rgba(34,197,94,0.12)',
-  expense:            '#f97316',
-  expenseLight:       'rgba(249,115,22,0.12)',
-  warning:            '#f5a623',
-  warningLight:       'rgba(245,166,35,0.12)',
-  warningDark:        '#d4820f',
-  danger:             '#ef4444',
-  dangerLight:        'rgba(239,68,68,0.12)',
-  allowable:          '#22c55e',
-  allowableLight:     'rgba(34,197,94,0.12)',
-  notAllowable:       '#ef4444',
-  notAllowableLight:  'rgba(239,68,68,0.12)',
-  pendingReview:      '#f5a623',
-  pendingReviewLight: 'rgba(245,166,35,0.12)',
-  urgent:             '#ef4444',
-  urgentLight:        'rgba(239,68,68,0.12)',
-  attention:          '#f5a623',
-  attentionLight:     'rgba(245,166,35,0.12)',
-  info:               '#3b82f6',
-  infoLight:          'rgba(59,130,246,0.12)',
-  teal:               '#22c55e',
-  tealLight:          'rgba(34,197,94,0.12)',
+  income:             '#22d3a5',
+  incomeLight:        'rgba(34,211,165,0.14)',
+  expense:            '#f87171',
+  expenseLight:       'rgba(248,113,113,0.14)',
+  warning:            '#fbbf24',
+  warningLight:       'rgba(251,191,36,0.14)',
+  warningDark:        '#f59e0b',
+  danger:             '#f87171',
+  dangerLight:        'rgba(248,113,113,0.14)',
+  allowable:          '#22d3a5',
+  allowableLight:     'rgba(34,211,165,0.14)',
+  notAllowable:       '#f87171',
+  notAllowableLight:  'rgba(248,113,113,0.14)',
+  pendingReview:      '#fbbf24',
+  pendingReviewLight: 'rgba(251,191,36,0.14)',
+  urgent:             '#f87171',
+  urgentLight:        'rgba(248,113,113,0.14)',
+  attention:          '#fbbf24',
+  attentionLight:     'rgba(251,191,36,0.14)',
+  info:               '#60a5fa',
+  infoLight:          'rgba(96,165,250,0.12)',
+  teal:               '#22d3a5',
+  tealLight:          'rgba(34,211,165,0.14)',
 } as const
 
 export const colours = light

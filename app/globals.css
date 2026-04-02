@@ -64,9 +64,8 @@ input, select, textarea, button {
 }
 
 /* ────────────────────────────────────────────────────────────────────────────
-   CTA BUTTON — gold shimmer border on hover
-   Authority: mockup .btn-export::before (conic-gradient shimmer)
-   Uses @property for animatable custom angle (same technique as mockup).
+   CTA BUTTON — copper/teal/sapphire shimmer border on hover
+   Uses @property for animatable custom angle.
 ──────────────────────────────────────────────────────────────────────────── */
 @property --cta-angle {
   syntax: '<angle>';
@@ -95,11 +94,11 @@ input, select, textarea, button {
     transparent 0deg,
     transparent 50deg,
     rgba(255,255,255,0) 60deg,
-    #fbbf24 100deg,
-    #f97316 145deg,
-    #a78bfa 195deg,
-    rgba(255,255,255,0) 220deg,
-    transparent 240deg,
+    #e8922a 100deg,
+    #14b8a6 155deg,
+    #3b82f6 205deg,
+    rgba(255,255,255,0) 230deg,
+    transparent 250deg,
     transparent 360deg
   );
   z-index: -1;
@@ -118,7 +117,7 @@ input, select, textarea, button {
   position: absolute;
   inset: 0;
   border-radius: 100px;
-  background: linear-gradient(135deg, #f5a623, #f97316);
+  background: linear-gradient(135deg, #e8922a, #d4731a);
   z-index: -1;
 }
 
@@ -127,27 +126,61 @@ input, select, textarea, button {
   animation-play-state: running;
 }
 
+/* ────────────────────────────────────────────────────────────────────────────
+   GLASS CARD — sapphire→teal gradient border on hover
+   Add className="glass-card" alongside glass.card() styles.
+──────────────────────────────────────────────────────────────────────────── */
+.glass-card {
+  position: relative;
+}
+
+.glass-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(160deg, rgba(59,130,246,0.70) 0%, rgba(45,212,191,0.40) 35%, transparent 75%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.glass-card:hover::before {
+  opacity: 1;
+}
+
+/* Light mode: copper→sapphire gradient on hover */
+[data-theme="light"] .glass-card::before {
+  background: linear-gradient(160deg, rgba(220,130,30,0.60) 0%, rgba(29,78,216,0.25) 45%, transparent 80%);
+}
+
 /* ── CSS custom properties consumed by components using CSS vars ───────────── */
 [data-theme="light"] {
-  --color-bg-base:      #ddd8ce;
-  --color-bg-surface:   rgba(248,243,235,0.78);
-  --color-text-primary: #1a1612;
-  --color-accent:       #f5a623;
+  --color-bg-base:      radial-gradient(ellipse 110% 90% at 100% 0%, #fdf5ec 0%, #faf7f3 50%, #ffffff 100%);
+  --color-bg-surface:   rgba(255,255,255,0.72);
+  --color-text-primary: #0a0f1a;
+  --color-accent:       #1d4ed8;
 }
 
 [data-theme="dark"] {
-  --color-bg-base:      #0a0806;
-  --color-bg-surface:   rgba(13,10,7,0.72);
-  --color-text-primary: #f2ece3;
-  --color-accent:       #f5a623;
+  --color-bg-base:      radial-gradient(ellipse 110% 90% at 100% 0%, #0c1826 0%, #050810 55%, #000000 100%);
+  --color-bg-surface:   rgba(8,12,22,0.65);
+  --color-text-primary: #ffffff;
+  --color-accent:       #3b82f6;
 }
 
 /* ── Scrollbar styling ─────────────────────────────────────────────────────── */
 [data-theme="dark"] * {
   scrollbar-width: thin;
-  scrollbar-color: #1c1915 transparent;
+  scrollbar-color: #0f1a2e transparent;
 }
 [data-theme="light"] * {
   scrollbar-width: thin;
-  scrollbar-color: #d9d1c5 transparent;
+  scrollbar-color: #c5cfe0 transparent;
 }

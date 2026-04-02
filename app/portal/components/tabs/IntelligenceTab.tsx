@@ -37,7 +37,7 @@ interface Insight {
 const SEVERITY_ORB: Record<Severity, string> = {
   urgent:    'rgba(239,68,68,0.22)',     // red
   attention: 'rgba(245,158,11,0.22)',    // amber
-  info:      'rgba(0,194,255,0.18)',     // electric cyan — NOT iOS blue
+  info:      'rgba(59,130,246,0.18)',    // sapphire
 }
 
 const SEVERITY_ICON: Record<Severity, string> = {
@@ -237,11 +237,11 @@ export default function IntelligenceTab({ client }: { client: Client }) {
           width:         '280px',
           height:        '280px',
           borderRadius:  '50%',
-          background:    'radial-gradient(circle, rgba(0,194,255,0.14) 0%, transparent 65%)',
+          background:    'radial-gradient(circle, rgba(59,130,246,0.14) 0%, transparent 65%)',
           filter:        'blur(60px)',
           pointerEvents: 'none',
         }} />
-        {/* Green orb top-left */}
+        {/* Teal orb top-left */}
         <div style={{
           position:      'absolute',
           top:           '-40px',
@@ -249,7 +249,7 @@ export default function IntelligenceTab({ client }: { client: Client }) {
           width:         '200px',
           height:        '200px',
           borderRadius:  '50%',
-          background:    'radial-gradient(circle, rgba(16,185,129,0.10) 0%, transparent 65%)',
+          background:    'radial-gradient(circle, rgba(34,211,165,0.10) 0%, transparent 65%)',
           filter:        'blur(50px)',
           pointerEvents: 'none',
         }} />

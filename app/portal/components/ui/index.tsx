@@ -329,8 +329,8 @@ export function EmptyState({ icon, headline, sub, action, onAction }: EmptyState
           className="cta-btn"
           style={{
             padding:      '9px 20px',
-            background:   `linear-gradient(135deg, ${colours.accent}, ${colours.orange})`,
-            color:        '#000000',
+            background:   colours.cta,
+            color:        colours.ctaText,
             border:       'none',
             borderRadius: radius.pill,
             fontSize:     fontSize.sm,
@@ -488,22 +488,20 @@ export function Button({
     switch (variant) {
       case 'primary':
         return {
-          background: hovered
-            ? `linear-gradient(135deg, ${colours.accentHover}, ${colours.orange})`
-            : `linear-gradient(135deg, ${colours.accent}, ${colours.orange})`,
-          color:     '#000000',
-          border:    'none',
-          boxShadow: hovered ? shadows.accentHover : shadows.accent,
-          transform: hovered && !disabled ? 'translateY(-1px)' : 'none',
+          background: colours.cta,
+          color:      colours.ctaText,
+          border:     'none',
+          boxShadow:  hovered ? `${colours.ctaGlow} 0 6px 28px` : `${colours.ctaGlow} 0 4px 24px`,
+          transform:  hovered && !disabled ? 'translateY(-1px)' : 'none',
         }
       case 'secondary':
         return {
           background:  hovered
-            ? `rgba(245,166,35,0.08)`
+            ? colours.accentSoft
             : colours.simpleBg,
           color:       hovered ? colours.textPrimary : colours.textSecondary,
           border:      hovered
-            ? `1px solid rgba(245,166,35,0.24)`
+            ? `1px solid ${colours.accentBorder}`
             : `1px solid ${colours.simpleBorder}`,
         }
       case 'ghost':

@@ -109,7 +109,7 @@ function OcrResultCard({
             borderRadius: radius.sm,
             background:   colours.accent,
             border:       'none',
-            color:        '#0D1117',
+            color:        colours.ctaText,
             fontSize:     fontSize.xs,
             fontWeight:   fontWeight.medium,
             cursor:       'pointer',
