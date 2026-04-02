@@ -74,17 +74,6 @@ const EMPTY_FORM: IncomeFormState = {
   notes:       '',
 }
 
-// ─── Field group container (Task 3) ──────────────────────────────────────────
-
-const fieldGroup: React.CSSProperties = {
-  background:   'rgba(0,0,0,0.03)',
-  borderRadius: radius.md,
-  padding:      '14px',
-  display:      'flex',
-  flexDirection: 'column',
-  gap:          spacing.form.fieldGap,
-}
-
 // ─── Props ────────────────────────────────────────────────────────────────────
 
 interface Props {
@@ -384,72 +373,68 @@ export default function IncomeTab({ client, readOnly = false }: Props) {
           {editItem ? (
             /* ── Edit / view mode ── */
             <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.form.fieldGap }}>
-              <div style={fieldGroup}>
+              <Input
+                label="Description"
+                value={editForm.description}
+                onChange={v => setEditForm(f => ({ ...f, description: v }))}
+                placeholder="e.g. Invoice #023 — Acme Ltd"
+                autoFocus
+              />
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: spacing.form.fieldGap }}>
                 <Input
-                  label="Description"
-                  value={editForm.description}
-                  onChange={v => setEditForm(f => ({ ...f, description: v }))}
-                  placeholder="e.g. Invoice #023 — Acme Ltd"
-                  autoFocus
+                  label="Amount (£)"
+                  type="number"
+                  value={editForm.amount}
+                  onChange={v => setEditForm(f => ({ ...f, amount: v }))}
+                  placeholder="0.00"
                 />
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: spacing.form.fieldGap }}>
-                  <Input
-                    label="Amount (£)"
-                    type="number"
-                    value={editForm.amount}
-                    onChange={v => setEditForm(f => ({ ...f, amount: v }))}
-                    placeholder="0.00"
-                  />
-                  <Input
-                    label="Date"
-                    type="date"
-                    value={editForm.date}
-                    onChange={v => setEditForm(f => ({ ...f, date: v }))}
-                  />
-                </div>
-                <Select
-                  label="Category"
-                  value={editForm.category}
-                  onChange={v => setEditForm(f => ({ ...f, category: v as IncomeCategory }))}
-                  options={INCOME_CATEGORIES}
+                <Input
+                  label="Date"
+                  type="date"
+                  value={editForm.date}
+                  onChange={v => setEditForm(f => ({ ...f, date: v }))}
                 />
               </div>
+              <Select
+                label="Category"
+                value={editForm.category}
+                onChange={v => setEditForm(f => ({ ...f, category: v as IncomeCategory }))}
+                options={INCOME_CATEGORIES}
+              />
 
               {/* Notes */}
-              <div style={fieldGroup}>
-                <div>
-                  <div style={{
-                    fontSize:     fontSize.xs,
-                    fontWeight:   fontWeight.medium,
-                    color:        colours.textSecondary,
-                    fontFamily:   fonts.sans,
-                    marginBottom: '6px',
-                    textTransform: 'uppercase' as const,
-                    letterSpacing: '0.05em',
-                  }}>
-                    Notes
-                  </div>
-                  <textarea
-                    value={editNotes}
-                    onChange={e => setEditNotes(e.target.value)}
-                    placeholder="Optional notes for your records…"
-                    rows={3}
-                    style={{
-                      width:        '100%',
-                      padding:      '8px 10px',
-                      background:   colours.inputBg,
-                      border:       `1px solid ${colours.borderMedium}`,
-                      borderRadius: radius.sm,
-                      fontSize:     fontSize.sm,
-                      fontFamily:   fonts.sans,
-                      color:        colours.textPrimary,
-                      resize:       'vertical' as const,
-                      outline:      'none',
-                      lineHeight:   1.5,
-                      boxSizing:    'border-box' as const,
-                    }}
-                  />
+              <div>
+                <div style={{
+                  fontSize:     fontSize.xs,
+                  fontWeight:   fontWeight.medium,
+                  color:        colours.textSecondary,
+                  fontFamily:   fonts.sans,
+                  marginBottom: '6px',
+                  textTransform: 'uppercase' as const,
+                  letterSpacing: '0.05em',
+                }}>
+                  Notes
                 </div>
+                <textarea
+                  value={editNotes}
+                  onChange={e => setEditNotes(e.target.value)}
+                  placeholder="Optional notes for your records…"
+                  rows={3}
+                  style={{
+                    width:        '100%',
+                    padding:      '8px 10px',
+                    background:   colours.inputBg,
+                    border:       `1px solid ${colours.borderMedium}`,
+                    borderRadius: radius.sm,
+                    fontSize:     fontSize.sm,
+                    fontFamily:   fonts.sans,
+                    color:        colours.textPrimary,
+                    resize:       'vertical' as const,
+                    outline:      'none',
+                    lineHeight:   1.5,
+                    boxSizing:    'border-box' as const,
+                  }}
+                />
               </div>
 
               {/* Actions */}
@@ -485,36 +470,34 @@ export default function IncomeTab({ client, readOnly = false }: Props) {
             <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.form.fieldGap }}>
               {hasDraft && <DraftBanner onDiscard={() => { clearDraft(); hookSetForm(() => EMPTY_FORM) }} />}
 
-              <div style={fieldGroup}>
+              <Input
+                label="Description"
+                value={draftForm.description}
+                onChange={v => handleFieldChange('description', v)}
+                placeholder="e.g. Invoice #023 — Acme Ltd"
+                autoFocus
+              />
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: spacing.form.fieldGap }}>
                 <Input
-                  label="Description"
-                  value={draftForm.description}
-                  onChange={v => handleFieldChange('description', v)}
-                  placeholder="e.g. Invoice #023 — Acme Ltd"
-                  autoFocus
+                  label="Amount (£)"
+                  type="number"
+                  value={draftForm.amount}
+                  onChange={v => handleFieldChange('amount', v)}
+                  placeholder="0.00"
                 />
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: spacing.form.fieldGap }}>
-                  <Input
-                    label="Amount (£)"
-                    type="number"
-                    value={draftForm.amount}
-                    onChange={v => handleFieldChange('amount', v)}
-                    placeholder="0.00"
-                  />
-                  <Input
-                    label="Date"
-                    type="date"
-                    value={draftForm.date}
-                    onChange={v => handleFieldChange('date', v)}
-                  />
-                </div>
-                <Select
-                  label="Category"
-                  value={draftForm.category}
-                  onChange={v => handleFieldChange('category', v)}
-                  options={INCOME_CATEGORIES}
+                <Input
+                  label="Date"
+                  type="date"
+                  value={draftForm.date}
+                  onChange={v => handleFieldChange('date', v)}
                 />
               </div>
+              <Select
+                label="Category"
+                value={draftForm.category}
+                onChange={v => handleFieldChange('category', v)}
+                options={INCOME_CATEGORIES}
+              />
 
               <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', marginTop: '4px' }}>
                 <Button

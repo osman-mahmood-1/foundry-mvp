@@ -84,7 +84,7 @@ export default function EntryPanel({
         paddingLeft:   spacing.tab.gap,
       }}>
         <div style={{
-          ...glass.slidePanel(mode),
+          ...glass.card(mode),
           display:       'flex',
           flexDirection: 'column',
           height:        '100%',

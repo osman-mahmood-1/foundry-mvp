@@ -80,17 +80,6 @@ const STATUS_CONFIG: Record<InvoiceStatus, {
   overdue: { label: 'Overdue', variant: 'danger' },
 }
 
-// ─── Field group container (Task 3) ──────────────────────────────────────────
-
-const fieldGroup: React.CSSProperties = {
-  background:    'rgba(0,0,0,0.03)',
-  borderRadius:  radius.md,
-  padding:       '14px',
-  display:       'flex',
-  flexDirection: 'column',
-  gap:           spacing.form.fieldGap,
-}
-
 // ─── Read-only field ──────────────────────────────────────────────────────────
 
 function ReadField({ label, value }: { label: string; value: string }) {
@@ -428,21 +417,19 @@ export default function InvoicesTab({ client }: { client: Client }) {
         {panelMode === 'view' && selectedInvoice ? (
           /* ── Read-only view (sent / paid / overdue) ── */
           <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.form.fieldGap }}>
-            <div style={fieldGroup}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div style={{ fontFamily: fonts.mono, fontSize: '22px', fontWeight: fontWeight.semibold, color: selectedInvoice.status === 'paid' ? colours.income : colours.textPrimary }}>
-                  {formatGBP(selectedInvoice.amount)}
-                </div>
-                <Badge variant={STATUS_CONFIG[selectedInvoice.status].variant}>
-                  {STATUS_CONFIG[selectedInvoice.status].label}
-                </Badge>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ fontFamily: fonts.mono, fontSize: '22px', fontWeight: fontWeight.semibold, color: selectedInvoice.status === 'paid' ? colours.income : colours.textPrimary }}>
+                {formatGBP(selectedInvoice.amount)}
               </div>
-              <ReadField label="Recipient"    value={selectedInvoice.recipient} />
-              <ReadField label="Description"  value={selectedInvoice.description} />
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: spacing.form.fieldGap }}>
-                <ReadField label="Issued"   value={formatDate(selectedInvoice.date)} />
-                <ReadField label="Due date" value={formatDate(selectedInvoice.dueDate)} />
-              </div>
+              <Badge variant={STATUS_CONFIG[selectedInvoice.status].variant}>
+                {STATUS_CONFIG[selectedInvoice.status].label}
+              </Badge>
+            </div>
+            <ReadField label="Recipient"    value={selectedInvoice.recipient} />
+            <ReadField label="Description"  value={selectedInvoice.description} />
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: spacing.form.fieldGap }}>
+              <ReadField label="Issued"   value={formatDate(selectedInvoice.date)} />
+              <ReadField label="Due date" value={formatDate(selectedInvoice.dueDate)} />
             </div>
 
             {/* Actions */}
@@ -469,42 +456,40 @@ export default function InvoicesTab({ client }: { client: Client }) {
         ) : panelMode === 'edit' && selectedInvoice ? (
           /* ── Edit draft invoice ── */
           <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.form.fieldGap }}>
-            <div style={fieldGroup}>
+            <Input
+              label="Recipient"
+              value={editForm.recipient}
+              onChange={v => setEditForm(f => ({ ...f, recipient: v }))}
+              placeholder="e.g. Acme Ltd"
+              autoFocus
+            />
+            <Input
+              label="Description"
+              value={editForm.description}
+              onChange={v => setEditForm(f => ({ ...f, description: v }))}
+              placeholder="e.g. Web development — July"
+            />
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: spacing.form.fieldGap }}>
               <Input
-                label="Recipient"
-                value={editForm.recipient}
-                onChange={v => setEditForm(f => ({ ...f, recipient: v }))}
-                placeholder="e.g. Acme Ltd"
-                autoFocus
+                label="Amount (£)"
+                type="number"
+                value={editForm.amount}
+                onChange={v => setEditForm(f => ({ ...f, amount: v }))}
+                placeholder="0.00"
               />
               <Input
-                label="Description"
-                value={editForm.description}
-                onChange={v => setEditForm(f => ({ ...f, description: v }))}
-                placeholder="e.g. Web development — July"
-              />
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: spacing.form.fieldGap }}>
-                <Input
-                  label="Amount (£)"
-                  type="number"
-                  value={editForm.amount}
-                  onChange={v => setEditForm(f => ({ ...f, amount: v }))}
-                  placeholder="0.00"
-                />
-                <Input
-                  label="Invoice date"
-                  type="date"
-                  value={editForm.date}
-                  onChange={v => setEditForm(f => ({ ...f, date: v }))}
-                />
-              </div>
-              <Input
-                label="Due date"
+                label="Invoice date"
                 type="date"
-                value={editForm.dueDate}
-                onChange={v => setEditForm(f => ({ ...f, dueDate: v }))}
+                value={editForm.date}
+                onChange={v => setEditForm(f => ({ ...f, date: v }))}
               />
             </div>
+            <Input
+              label="Due date"
+              type="date"
+              value={editForm.dueDate}
+              onChange={v => setEditForm(f => ({ ...f, dueDate: v }))}
+            />
 
             <div style={{ display: 'flex', gap: '8px', justifyContent: 'space-between', marginTop: '4px' }}>
               <button
@@ -536,42 +521,40 @@ export default function InvoicesTab({ client }: { client: Client }) {
         ) : (
           /* ── New invoice form ── */
           <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.form.fieldGap }}>
-            <div style={fieldGroup}>
+            <Input
+              label="Recipient"
+              value={form.recipient}
+              onChange={v => setForm(f => ({ ...f, recipient: v }))}
+              placeholder="e.g. Acme Ltd"
+              autoFocus
+            />
+            <Input
+              label="Description"
+              value={form.description}
+              onChange={v => setForm(f => ({ ...f, description: v }))}
+              placeholder="e.g. Web development — July"
+            />
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: spacing.form.fieldGap }}>
               <Input
-                label="Recipient"
-                value={form.recipient}
-                onChange={v => setForm(f => ({ ...f, recipient: v }))}
-                placeholder="e.g. Acme Ltd"
-                autoFocus
+                label="Amount (£)"
+                type="number"
+                value={form.amount}
+                onChange={v => setForm(f => ({ ...f, amount: v }))}
+                placeholder="0.00"
               />
               <Input
-                label="Description"
-                value={form.description}
-                onChange={v => setForm(f => ({ ...f, description: v }))}
-                placeholder="e.g. Web development — July"
-              />
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: spacing.form.fieldGap }}>
-                <Input
-                  label="Amount (£)"
-                  type="number"
-                  value={form.amount}
-                  onChange={v => setForm(f => ({ ...f, amount: v }))}
-                  placeholder="0.00"
-                />
-                <Input
-                  label="Invoice date"
-                  type="date"
-                  value={form.date}
-                  onChange={v => setForm(f => ({ ...f, date: v }))}
-                />
-              </div>
-              <Input
-                label="Due date"
+                label="Invoice date"
                 type="date"
-                value={form.dueDate}
-                onChange={v => setForm(f => ({ ...f, dueDate: v }))}
+                value={form.date}
+                onChange={v => setForm(f => ({ ...f, date: v }))}
               />
             </div>
+            <Input
+              label="Due date"
+              type="date"
+              value={form.dueDate}
+              onChange={v => setForm(f => ({ ...f, dueDate: v }))}
+            />
 
             <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', marginTop: '4px' }}>
               <Button
