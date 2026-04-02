@@ -329,14 +329,14 @@ function LockedField({ label, value, lockId }: {
           left:            pos.left,
           width:           pos.width,
           padding:         '12px 14px',
-          background:      colours.accentSoft,
+          background:      colours.panelBgSolid,
           border:          `1px solid ${colours.accentBorder}`,
           borderRadius:    radius.md,
           zIndex:          99999,
           transformOrigin: 'top center',
           animation:       'expandDown 0.18s cubic-bezier(0.22,1,0.36,1) both',
           overflow:        'hidden',
-          boxShadow:       '0 6px 24px rgba(0,0,0,0.20)',
+          boxShadow:       '0 8px 28px rgba(0,0,0,0.32)',
         }}>
           <div style={{
             fontSize:     fontSize.xs,
