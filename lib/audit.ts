@@ -25,23 +25,29 @@ export async function logAudit({
   action,
   targetType,
   targetId,
+  beforeState,
+  afterState,
 }: {
-  actorId:    string
-  actorRole?: SenderRole
-  clientId:   string
-  action:     string
-  targetType: string
-  targetId:   string
+  actorId:      string
+  actorRole?:   SenderRole
+  clientId:     string
+  action:       string
+  targetType:   string
+  targetId:     string
+  beforeState?: Record<string, unknown>
+  afterState?:  Record<string, unknown>
 }): Promise<void> {
   try {
     const supabase = createAdminClient()
     const { error } = await supabase.from('audit_log').insert({
-      actor_id:    actorId,
-      actor_role:  actorRole,
-      client_id:   clientId,
+      actor_id:     actorId,
+      actor_role:   actorRole,
+      client_id:    clientId,
       action,
-      target_type: targetType,
-      target_id:   targetId,
+      target_type:  targetType,
+      target_id:    targetId,
+      before_state: beforeState ?? null,
+      after_state:  afterState  ?? null,
     })
     if (error) {
       console.error('AUDIT_001', { action, targetType, targetId, error })
