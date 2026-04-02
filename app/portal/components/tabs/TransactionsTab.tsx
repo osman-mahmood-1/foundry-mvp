@@ -91,7 +91,7 @@ export default function TransactionsTab({ client }: { client: Client }) {
   const net      = totalIn - totalOut
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.tab.gap }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.tab.gap, flex: 1 }}>
 
       {/* ── Summary row ── */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: spacing.tab.gap }}>
@@ -116,7 +116,7 @@ export default function TransactionsTab({ client }: { client: Client }) {
       )}
 
       {/* ── Filter + list ── */}
-      <Panel padding="0">
+      <Panel padding="0" style={{ flex: 1 }}>
         <div style={{
           display:      'flex',
           alignItems:   'center',

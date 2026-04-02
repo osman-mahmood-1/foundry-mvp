@@ -167,7 +167,7 @@ export default function PortalShell({ client }: Props) {
       onNavSelect={id => setActiveTab(id as PortalTab)}
     >
       {/* Main content: greeting + tab */}
-      <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
         {/* Greeting header */}
         <div style={{ padding: '16px 20px 20px', flexShrink: 0 }}>
           <div style={{
@@ -193,7 +193,7 @@ export default function PortalShell({ client }: Props) {
         </div>
 
         {/* Tab content */}
-        <div key={activeTab} style={{ flex: 1, padding: '0 20px 24px', animation: 'fadeUp 0.35s ease' }}>
+        <div key={activeTab} style={{ flex: 1, padding: '0 20px 24px', animation: 'fadeUp 0.35s ease', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
           <TabErrorBoundary key={activeTab}>
             <TabRenderer activeTab={activeTab} client={client} onTabChange={id => setActiveTab(id as PortalTab)} />
           </TabErrorBoundary>

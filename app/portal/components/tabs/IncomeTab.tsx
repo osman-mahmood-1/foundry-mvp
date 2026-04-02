@@ -250,7 +250,7 @@ export default function IncomeTab({ client, readOnly = false }: Props) {
   const isEditFormValid = editForm.description.trim() && editForm.amount && editForm.date
 
   return (
-    <div style={{ display: 'flex', gap: spacing.tab.gap, minHeight: 0 }}>
+    <div style={{ display: 'flex', gap: spacing.tab.gap, minHeight: 0, flex: 1 }}>
 
       {/* ── Left: income list (always visible) ── */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: spacing.tab.gap, minWidth: 0 }}>
@@ -271,7 +271,7 @@ export default function IncomeTab({ client, readOnly = false }: Props) {
         {error && <ErrorBanner error={error} />}
 
         {/* Income list */}
-        <Panel padding="0">
+        <Panel padding="0" style={{ flex: 1 }}>
           <div style={{
             display:        'flex',
             alignItems:     'center',

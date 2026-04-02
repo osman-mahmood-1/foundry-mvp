@@ -355,7 +355,7 @@ export default function InvoicesTab({ client }: { client: Client }) {
     : undefined
 
   return (
-    <div style={{ display: 'flex', gap: spacing.tab.gap, minHeight: 0 }}>
+    <div style={{ display: 'flex', gap: spacing.tab.gap, minHeight: 0, flex: 1 }}>
       {/* ── Left: invoice list ── */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: spacing.tab.gap, minWidth: 0 }}>
 
@@ -380,7 +380,7 @@ export default function InvoicesTab({ client }: { client: Client }) {
         </div>
 
         {/* Invoice list */}
-        <Panel padding="0">
+        <Panel padding="0" style={{ flex: 1 }}>
           <div style={{
             display:        'flex',
             alignItems:     'center',

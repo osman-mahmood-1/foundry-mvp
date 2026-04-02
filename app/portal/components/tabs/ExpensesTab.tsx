@@ -315,7 +315,7 @@ export default function ExpensesTab({ client, readOnly = false, onExpenseSelect 
   const isEditFormValid = editForm.description.trim() && editForm.amount && editForm.date
 
   return (
-    <div style={{ display: 'flex', gap: spacing.tab.gap, minHeight: 0 }}>
+    <div style={{ display: 'flex', gap: spacing.tab.gap, minHeight: 0, flex: 1 }}>
 
       {/* ── Left: expense list (always visible) ── */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: spacing.tab.gap, minWidth: 0 }}>
@@ -336,7 +336,7 @@ export default function ExpensesTab({ client, readOnly = false, onExpenseSelect 
         {error && <ErrorBanner error={error} />}
 
         {/* Expense list */}
-        <Panel padding="0">
+        <Panel padding="0" style={{ flex: 1 }}>
           <div style={{
             display:        'flex',
             alignItems:     'center',

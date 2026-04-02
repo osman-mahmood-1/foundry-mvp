@@ -775,9 +775,11 @@ export default function BaseShell({
           }}>
             {/* Scrollable content area */}
             <div style={{
-              flex:      1,
-              overflowY: 'auto',
-              overflowX: 'hidden',
+              flex:          1,
+              overflowY:     'auto',
+              overflowX:     'hidden',
+              display:       'flex',
+              flexDirection: 'column',
             }}>
               {children}
             </div>

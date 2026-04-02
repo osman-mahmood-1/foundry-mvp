@@ -121,8 +121,8 @@ export default function ClientsTab({ client: _client }: { client: Client }) {
   )
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.tab.gap }}>
-      <Panel padding="0">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.tab.gap, flex: 1 }}>
+      <Panel padding="0" style={{ flex: 1 }}>
         <div style={{
           padding:      `${spacing.panel.paddingTight} ${spacing.panel.padding}`,
           borderBottom: `1px solid ${colours.borderHairline}`,

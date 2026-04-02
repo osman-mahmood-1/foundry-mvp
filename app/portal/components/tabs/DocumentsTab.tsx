@@ -301,7 +301,7 @@ export default function DocumentsTab({ client, readOnly = false }: Props) {
   const ocrFields = selectedDoc ? (MOCK_OCR[selectedDoc.category] ?? []) : []
 
   return (
-    <div style={{ display: 'flex', gap: spacing.tab.gap, minHeight: 0 }}>
+    <div style={{ display: 'flex', gap: spacing.tab.gap, minHeight: 0, flex: 1 }}>
 
       {/* ── Left: upload + document list ── */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: spacing.tab.gap, minWidth: 0 }}>
@@ -401,7 +401,7 @@ export default function DocumentsTab({ client, readOnly = false }: Props) {
         )}
 
         {/* ── Document list ── */}
-        <Panel padding="0">
+        <Panel padding="0" style={{ flex: 1 }}>
           <div style={{
             display:        'flex',
             alignItems:     'center',
