@@ -63,7 +63,7 @@ export default async function PassportPage({ params }: Props) {
       fontFamily: "var(--font-outfit, 'Outfit', sans-serif)",
     }}>
       {/* Orb — top right, sapphire, matches global ambient */}
-      <div style={{ position: 'fixed', top: '-220px', right: '-160px', width: '1080px', height: '1080px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(59,130,246,0.40) 0%, rgba(59,130,246,0.12) 45%, transparent 72%)', filter: 'blur(90px)', pointerEvents: 'none', opacity: 0.85 }} />
+      <div style={{ position: 'fixed', top: '-300px', right: '-240px', width: '1080px', height: '1080px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(59,130,246,0.20) 0%, rgba(59,130,246,0.06) 45%, transparent 72%)', filter: 'blur(90px)', pointerEvents: 'none', opacity: 0.60 }} />
 
       <div style={{ position: 'relative', zIndex: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', maxWidth: 400 }}>
 

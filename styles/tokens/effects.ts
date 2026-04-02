@@ -156,28 +156,28 @@ export const orbs = {
   /** Main ambient orb: fixed top-right, 1080px, pure sapphire. */
   ambient: {
     position:     'fixed' as const,
-    top:          '-220px',
-    right:        '-160px',
+    top:          '-300px',
+    right:        '-240px',
     width:        '1080px',
     height:       '1080px',
     borderRadius: '50%',
-    background:   'radial-gradient(circle, rgba(59,130,246,0.40) 0%, rgba(59,130,246,0.12) 45%, transparent 72%)',
+    background:   'radial-gradient(circle, rgba(59,130,246,0.20) 0%, rgba(59,130,246,0.06) 45%, transparent 72%)',
     filter:       'blur(90px)',
     pointerEvents:'none' as const,
     zIndex:       0,
   },
   /** Ambient orb opacity per theme */
-  ambientOpacityDark:  1,
+  ambientOpacityDark:  0.60,
   ambientOpacityLight: 0.50,
 
   /** Legacy names kept for any existing references */
   blueTopRight: {
-    top:          '-220px',
-    right:        '-160px',
+    top:          '-300px',
+    right:        '-240px',
     width:        '1080px',
     height:       '1080px',
     borderRadius: '50%',
-    background:   'radial-gradient(circle, rgba(59,130,246,0.40) 0%, rgba(59,130,246,0.12) 45%, transparent 72%)',
+    background:   'radial-gradient(circle, rgba(59,130,246,0.20) 0%, rgba(59,130,246,0.06) 45%, transparent 72%)',
     filter:       'blur(90px)',
   },
   skyBottomLeft: {
