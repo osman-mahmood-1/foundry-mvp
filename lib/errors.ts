@@ -194,6 +194,16 @@ export const APP_ERRORS = {
     internal: false,
   },
 
+  // ── Profile ───────────────────────────────────────────────────────────────
+
+  PROFILE_001: {
+    code:     'PROFILE_001',
+    title:    'Changes not saved',
+    message:  'Your profile couldn\'t be updated.',
+    action:   'Please try saving again.',
+    internal: false,
+  },
+
   // ── Expense reviews ───────────────────────────────────────────────────────
 
   REVIEW_001: {
