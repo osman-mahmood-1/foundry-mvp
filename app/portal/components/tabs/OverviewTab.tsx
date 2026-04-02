@@ -252,7 +252,7 @@ export default function OverviewTab({ clientId, readOnly = false, onTabChange }:
 
   return (
     /* Outer container — full width, relative for orb positioning */
-    <div style={{ position: 'relative', padding: '24px 24px 40px', overflow: 'hidden', minHeight: '100%' }}>
+    <div style={{ position: 'relative', padding: '4px 0 40px', overflow: 'hidden', minHeight: '100%' }}>
 
       {/* ── Two large background orbs ── */}
       <div style={{

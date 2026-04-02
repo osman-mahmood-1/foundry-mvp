@@ -193,7 +193,7 @@ export default function PortalShell({ client }: Props) {
         </div>
 
         {/* Tab content */}
-        <div key={activeTab} style={{ flex: 1, animation: 'fadeUp 0.35s ease' }}>
+        <div key={activeTab} style={{ flex: 1, padding: '0 20px 24px', animation: 'fadeUp 0.35s ease' }}>
           <TabErrorBoundary key={activeTab}>
             <TabRenderer activeTab={activeTab} client={client} onTabChange={id => setActiveTab(id as PortalTab)} />
           </TabErrorBoundary>

@@ -516,8 +516,8 @@ export default function BaseShell({
         flexDirection:  'column',
         // The right padding creates the visual gap between nav items and inner container
         padding:        collapsed
-          ? `22px 0 18px 0`
-          : `22px 10px 18px 0`,
+          ? `22px 0 18px 8px`
+          : `22px 10px 18px 8px`,
         zIndex:         3,
         position:       'relative',
         transition:     collapsible ? transition.fast : undefined,
