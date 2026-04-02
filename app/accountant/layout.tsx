@@ -27,7 +27,7 @@ import { redirect }           from 'next/navigation'
 import { createClient }       from '@/lib/supabase-server'
 import { createAdminClient }  from '@/lib/supabase-admin'
 import { getAccountantId, getUserRole } from '@/lib/roles'
-import { ThemeProvider }      from '@/styles/ThemeContext'
+import PortalThemeProvider    from '@/app/portal/components/PortalThemeProvider'
 import AccountantShell        from './components/AccountantShell'
 import type { Accountant, PlatformEditor } from '@/types'
 
@@ -80,11 +80,11 @@ export default async function AccountantLayout({
     }
 
     return (
-      <ThemeProvider theme="light">
+      <PortalThemeProvider storageKey="foundry-accountant-theme" defaultMode="light">
         <AccountantShell accountant={syntheticAccountant}>
           {children}
         </AccountantShell>
-      </ThemeProvider>
+      </PortalThemeProvider>
     )
   }
 
@@ -102,10 +102,10 @@ export default async function AccountantLayout({
   if (!accountant) redirect('/login')
 
   return (
-    <ThemeProvider theme="light">
+    <PortalThemeProvider storageKey="foundry-accountant-theme" defaultMode="light">
       <AccountantShell accountant={accountant}>
         {children}
       </AccountantShell>
-    </ThemeProvider>
+    </PortalThemeProvider>
   )
 }

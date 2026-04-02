@@ -13,7 +13,6 @@ import { useThemePreference } from '../PortalThemeProvider'
 import type { ThemeMode } from '../PortalThemeProvider'
 import { fonts, fontSize, fontWeight, letterSpacing } from '@/styles/tokens/typography'
 import { radius, spacing } from '@/styles/tokens'
-import { glassStatic } from '@/styles/tokens/effects'
 import { Panel, Label } from '../ui'
 
 // ─── Section wrapper ─────────────────────────────────────────────────────────

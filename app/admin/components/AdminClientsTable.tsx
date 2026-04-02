@@ -11,9 +11,10 @@
  * Inspired by the Shoor data tables (images 3–4).
  */
 
-import { useState }       from 'react'
+import { useState, useEffect } from 'react'
 import Link               from 'next/link'
 import { useColours }     from '@/styles/ThemeContext'
+import { useShellSearch } from '@/app/components/shells/BaseShell'
 import { fonts, fontSize, fontWeight, letterSpacing } from '@/styles/tokens/typography'
 import { radius, transition } from '@/styles/tokens'
 import { spacing }        from '@/styles/tokens/spacing'
@@ -84,7 +85,16 @@ function StatCard({
 
 export default function AdminClientsTable({ clients, totalAccountants }: Props) {
   const colours = useColours()
+  const { query, setPlaceholder } = useShellSearch()
+  useEffect(() => { setPlaceholder('Search clients…') }, [setPlaceholder])
+
   const [hoveredRow, setHoveredRow] = useState<string | null>(null)
+
+  const filteredClients = clients.filter(c =>
+    !query ||
+    c.full_name?.toLowerCase().includes(query.toLowerCase()) ||
+    c.email?.toLowerCase().includes(query.toLowerCase())
+  )
 
   const unassigned = clients.filter(c => !c.accountant).length
   const missingInfo = clients.filter(c => !c.hasUtr || !c.hasNi).length
@@ -163,7 +173,7 @@ export default function AdminClientsTable({ clients, totalAccountants }: Props) 
         </div>
 
         {/* Data rows */}
-        {clients.length === 0 ? (
+        {filteredClients.length === 0 ? (
           <div style={{
             padding:    '40px 20px',
             textAlign:  'center',
@@ -173,7 +183,7 @@ export default function AdminClientsTable({ clients, totalAccountants }: Props) 
             No clients yet.
           </div>
         ) : (
-          clients.map(client => (
+          filteredClients.map(client => (
             <Link
               key={client.id}
               href={`/accountant/clients/${client.id}`}

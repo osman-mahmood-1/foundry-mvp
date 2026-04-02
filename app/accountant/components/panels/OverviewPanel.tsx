@@ -9,9 +9,9 @@
  */
 
 import { useAccountantNotes } from '../../hooks/useAccountantNotes'
-import { light as colours }   from '@/styles/tokens/colours'
+import { useColours, useThemeMode } from '@/styles/ThemeContext'
 import { fonts, fontSize, fontWeight, letterSpacing } from '@/styles/tokens/typography'
-import { glassStatic }        from '@/styles/tokens/effects'
+import { glass }              from '@/styles/tokens/effects'
 import { radius, transition } from '@/styles/tokens'
 import { spacing }            from '@/styles/tokens/spacing'
 import type { Client, SplitPanelInitialData } from '@/types'
@@ -25,6 +25,7 @@ interface Props {
 // ─── Section header ───────────────────────────────────────────────────────────
 
 function SectionHeader({ title }: { title: string }) {
+  const colours = useColours()
   return (
     <div style={{
       fontSize:      fontSize.label,
@@ -52,6 +53,7 @@ function CheckItem({
   label:  string
   count?: number
 }) {
+  const colours = useColours()
   return (
     <div style={{
       display:    'flex',
@@ -89,6 +91,8 @@ function CheckItem({
 // ─── Panel ────────────────────────────────────────────────────────────────────
 
 export default function OverviewPanel({ client, accountantId, initialData }: Props) {
+  const colours = useColours()
+  const mode = useThemeMode()
   const {
     body,
     setBody,
@@ -117,7 +121,7 @@ export default function OverviewPanel({ client, accountantId, initialData }: Pro
     <div style={{ padding: spacing.panel.padding, display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
       {/* ── SA Deadline ── */}
-      <div style={{ ...glassStatic.panel, padding: spacing.panel.paddingTight }}>
+      <div style={{ ...glass.card(mode), padding: spacing.panel.paddingTight }}>
         <SectionHeader title="SA Deadline" />
         {saDaysRemaining === null ? (
           <div style={{ fontSize: fontSize.sm, color: colours.textMuted }}>No upcoming deadline found.</div>
@@ -137,7 +141,7 @@ export default function OverviewPanel({ client, accountantId, initialData }: Pro
       </div>
 
       {/* ── Missing items checklist ── */}
-      <div style={{ ...glassStatic.panel, padding: spacing.panel.paddingTight }}>
+      <div style={{ ...glass.card(mode), padding: spacing.panel.paddingTight }}>
         <SectionHeader title="Checklist" />
         <CheckItem
           done={unreadMessages === 0}
@@ -165,7 +169,7 @@ export default function OverviewPanel({ client, accountantId, initialData }: Pro
       </div>
 
       {/* ── Working notes ── */}
-      <div style={{ ...glassStatic.panel, padding: spacing.panel.paddingTight }}>
+      <div style={{ ...glass.card(mode), padding: spacing.panel.paddingTight }}>
         <SectionHeader title="Working notes" />
         <div style={{
           fontSize:     fontSize.xs,

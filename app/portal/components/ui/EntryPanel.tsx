@@ -17,9 +17,10 @@
  */
 
 import { useEffect, useRef } from 'react'
-import { light as colours }  from '@/styles/tokens/colours'
+import { useColours, useThemeMode } from '@/styles/ThemeContext'
 import { fonts, fontSize, fontWeight } from '@/styles/tokens/typography'
-import { radius, transition, glassStatic } from '@/styles/tokens'
+import { radius, transition } from '@/styles/tokens'
+import { glass } from '@/styles/tokens/effects'
 import { spacing } from '@/styles/tokens/spacing'
 
 interface EntryPanelProps {
@@ -38,6 +39,8 @@ export default function EntryPanel({
   children,
   subtitle,
 }: EntryPanelProps) {
+  const colours = useColours()
+  const mode = useThemeMode()
   // Dismiss on Escape
   useEffect(() => {
     if (!open) return
@@ -81,7 +84,7 @@ export default function EntryPanel({
         paddingLeft:   spacing.tab.gap,
       }}>
         <div style={{
-          ...glassStatic.panel,
+          ...glass.slidePanel(mode),
           display:       'flex',
           flexDirection: 'column',
           height:        '100%',

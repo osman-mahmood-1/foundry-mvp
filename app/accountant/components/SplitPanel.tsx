@@ -19,7 +19,7 @@
 
 import { useState }       from 'react'
 import type { Client, SplitPanelInitialData } from '@/types'
-import { light as colours }   from '@/styles/tokens/colours'
+import { useColours }         from '@/styles/ThemeContext'
 import { fonts, fontSize, fontWeight, letterSpacing } from '@/styles/tokens/typography'
 import { radius, transition } from '@/styles/tokens'
 import { spacing }            from '@/styles/tokens/spacing'
@@ -74,6 +74,7 @@ function LeftTabRenderer({
 // ─── Header ───────────────────────────────────────────────────────────────────
 
 function SplitHeader({ client, saDaysRemaining }: { client: Client; saDaysRemaining: number | null }) {
+  const colours  = useColours()
   const saColour = saDaysRemaining === null
     ? colours.textMuted
     : saDaysRemaining <= 14
@@ -158,6 +159,7 @@ function TabBar({
   activeTab: SplitTab
   onSelect:  (tab: SplitTab) => void
 }) {
+  const colours = useColours()
   return (
     <div style={{
       display:      'flex',
@@ -204,6 +206,7 @@ interface Props {
 }
 
 export default function SplitPanel({ client, accountantId, accountantUserId, initialData }: Props) {
+  const colours              = useColours()
   const [activeTab,         setActiveTab]         = useState<SplitTab>('overview')
   const [selectedExpenseId, setSelectedExpenseId] = useState<string | null>(null)
 

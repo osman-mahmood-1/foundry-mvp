@@ -1,9 +1,9 @@
 'use client'
 
 /**
- * app/admin/components/AdminSettingsPanel.tsx
+ * app/accountant/settings/page.tsx
  *
- * Admin settings — theme switcher + placeholder for future config.
+ * Accountant portal settings — theme switcher.
  */
 
 import { useState } from 'react'
@@ -47,9 +47,9 @@ function ThemePill({ label, icon, active, onClick }: {
   )
 }
 
-export default function AdminSettingsPanel() {
-  const colours             = useColours()
-  const { mode, setMode }   = useThemePreference()
+export default function AccountantSettingsPage() {
+  const colours           = useColours()
+  const { mode, setMode } = useThemePreference()
 
   const THEME_OPTIONS: { mode: ThemeMode; label: string; icon: string }[] = [
     { mode: 'light',  label: 'Light',  icon: '☀' },
@@ -72,17 +72,15 @@ export default function AdminSettingsPanel() {
           Settings
         </h1>
         <p style={{ fontSize: fontSize.sm, color: colours.textMuted, margin: 0 }}>
-          Platform configuration
+          Accountant portal preferences
         </p>
       </div>
 
-      {/* Appearance */}
       <div style={{
         background:   colours.panelBgSolid,
         border:       `1px solid ${colours.borderHairline}`,
         borderRadius: radius.lg,
         padding:      spacing.panel.padding,
-        marginBottom: '16px',
       }}>
         <div style={{
           fontSize:      fontSize.label,
@@ -95,7 +93,7 @@ export default function AdminSettingsPanel() {
           Appearance
         </div>
         <div style={{ fontSize: fontSize.sm, color: colours.textSecondary, marginBottom: '16px', fontFamily: fonts.sans }}>
-          Choose how the admin portal looks on this device.
+          Choose how the accountant portal looks on this device.
         </div>
         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' as const }}>
           {THEME_OPTIONS.map(opt => (
@@ -110,18 +108,6 @@ export default function AdminSettingsPanel() {
         </div>
       </div>
 
-      {/* Placeholder */}
-      <div style={{
-        background:   colours.panelBgSolid,
-        border:       `1px solid ${colours.borderHairline}`,
-        borderRadius: radius.lg,
-        padding:      '40px 20px',
-        textAlign:    'center' as const,
-      }}>
-        <div style={{ fontSize: fontSize.base, color: colours.textMuted }}>
-          Platform settings will appear here in a future update.
-        </div>
-      </div>
     </div>
   )
 }

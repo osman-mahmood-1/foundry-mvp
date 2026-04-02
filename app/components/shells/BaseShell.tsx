@@ -20,10 +20,11 @@
  * Authority: lotech-dashboard-v9.html mockup — no other source.
  */
 
-import { useState, useRef, useEffect, useCallback } from 'react'
+import { useState, useRef, useEffect, useCallback, createContext, useContext } from 'react'
 import { usePathname }   from 'next/navigation'
 import Link              from 'next/link'
 import { useColours, useThemeMode } from '@/styles/ThemeContext'
+import { useThemePreference } from '@/app/portal/components/PortalThemeProvider'
 import { fonts, fontSize, fontWeight, letterSpacing } from '@/styles/tokens/typography'
 import { radius }        from '@/styles/tokens/radius'
 import { transition }    from '@/styles/tokens/motion'
@@ -57,21 +58,40 @@ export interface ShellFooterItem {
 }
 
 export interface BaseShellProps {
-  topBarContent:  React.ReactNode
-  footerIdentity: { name: string; subtitle: string; avatarLetter: string }
-  email:          string
-  footerItems:    ShellFooterItem[]
-  navGroups:      ShellNavGroup[]
-  children:       React.ReactNode
-  collapsible?:   boolean
-  storageKey?:    string
+  topBarContent:      React.ReactNode
+  footerIdentity:     { name: string; subtitle: string; avatarLetter: string }
+  email:              string
+  footerItems:        ShellFooterItem[]
+  navGroups:          ShellNavGroup[]
+  children:           React.ReactNode
+  collapsible?:       boolean
+  storageKey?:        string
   /** Show ambient orb (both themes use the orb; light mode reduces opacity) */
-  showOrbs?:      boolean
+  showOrbs?:          boolean
   /** 'floating' = transparent sidebar with right-padding gap (default)
    *  'docked'   = transparent sidebar with border-right */
-  sidebarStyle?:  'floating' | 'docked'
-  activeId?:      string
-  onNavSelect?:   (id: string) => void
+  sidebarStyle?:      'floating' | 'docked'
+  activeId?:          string
+  onNavSelect?:       (id: string) => void
+  /** Initial placeholder for the topbar search input */
+  searchPlaceholder?: string
+}
+
+// ─── ShellSearchContext ───────────────────────────────────────────────────────
+
+interface ShellSearchCtx {
+  query:          string
+  setQuery:       (q: string) => void
+  placeholder:    string
+  setPlaceholder: (p: string) => void
+}
+
+const ShellSearchContext = createContext<ShellSearchCtx>({
+  query: '', setQuery: () => {}, placeholder: '', setPlaceholder: () => {},
+})
+
+export function useShellSearch(): ShellSearchCtx {
+  return useContext(ShellSearchContext)
 }
 
 const EXPANDED_W  = '200px'
@@ -419,19 +439,23 @@ export default function BaseShell({
   footerItems,
   navGroups,
   children,
-  collapsible   = false,
+  collapsible       = false,
   storageKey,
-  showOrbs      = false,
-  sidebarStyle  = 'floating',
+  showOrbs          = false,
+  sidebarStyle      = 'floating',
   activeId,
   onNavSelect,
+  searchPlaceholder = '',
 }: BaseShellProps) {
   const colours  = useColours()
   const mode     = useThemeMode()
   const pathname = usePathname()
+  const { mode: prefMode, setMode } = useThemePreference()
 
-  const [collapsed,   setCollapsed]   = useState(false)
-  const [popoverOpen, setPopoverOpen] = useState(false)
+  const [collapsed,         setCollapsed]         = useState(false)
+  const [popoverOpen,       setPopoverOpen]        = useState(false)
+  const [searchQuery,       setSearchQuery]        = useState('')
+  const [searchPlaceholderState, setSearchPlaceholderState] = useState(searchPlaceholder)
 
   // Hydrate collapse state from localStorage
   useEffect(() => {
@@ -456,6 +480,12 @@ export default function BaseShell({
   const glassStyles = glass.panel(mode)
 
   return (
+    <ShellSearchContext.Provider value={{
+      query:          searchQuery,
+      setQuery:       setSearchQuery,
+      placeholder:    searchPlaceholderState,
+      setPlaceholder: setSearchPlaceholderState,
+    }}>
     <div style={{
       display:    'flex',
       height:     '100vh',
@@ -649,7 +679,7 @@ export default function BaseShell({
         </div>
       </aside>
 
-      {/* ── Right area: inner-wrapper → inner-container → content ── */}
+      {/* ── Right area: topbar → inner-wrapper → inner-container → content ── */}
       <div style={{
         flex:          1,
         display:       'flex',
@@ -658,6 +688,74 @@ export default function BaseShell({
         position:      'relative',
         zIndex:        1,
       }}>
+
+        {/* ── Topbar — floats outside the glass panel, creates top gap ── */}
+        <div style={{
+          display:        'flex',
+          alignItems:     'center',
+          justifyContent: 'space-between',
+          padding:        '12px 12px 8px 0',
+          flexShrink:     0,
+        }}>
+          {/* Search input */}
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            placeholder={searchPlaceholderState || 'Search…'}
+            style={{
+              width:              '220px',
+              height:             '32px',
+              background:         colours.topbarItemBg,
+              backdropFilter:     'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              border:             `1px solid ${colours.topbarItemBorder}`,
+              borderRadius:       radius.pill,
+              padding:            '0 14px',
+              fontSize:           fontSize.sm,
+              color:              colours.textPrimary,
+              fontFamily:         fonts.sans,
+              outline:            'none',
+              transition:         transition.snap,
+            }}
+          />
+
+          {/* Theme toggle */}
+          <button
+            onClick={() => setMode(prefMode === 'dark' ? 'light' : 'dark')}
+            aria-label="Toggle theme"
+            style={{
+              width:          '32px',
+              height:         '32px',
+              display:        'flex',
+              alignItems:     'center',
+              justifyContent: 'center',
+              background:     colours.topbarItemBg,
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              border:         `1px solid ${colours.topbarItemBorder}`,
+              borderRadius:   radius.md,
+              color:          colours.textMuted,
+              cursor:         'pointer',
+              fontSize:       '14px',
+              transition:     transition.snap,
+              flexShrink:     0,
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.background  = colours.accentLight
+              e.currentTarget.style.borderColor = colours.accentBorder
+              e.currentTarget.style.color       = colours.accent
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.background  = colours.topbarItemBg
+              e.currentTarget.style.borderColor = colours.topbarItemBorder
+              e.currentTarget.style.color       = colours.textMuted
+            }}
+          >
+            {mode === 'dark' ? '☀' : '◑'}
+          </button>
+        </div>
+
         {/* Inner wrapper — adds the bottom + right margin/gap */}
         <div style={{
           flex:       1,
@@ -688,5 +786,6 @@ export default function BaseShell({
       </div>
 
     </div>
+    </ShellSearchContext.Provider>
   )
 }

@@ -20,7 +20,7 @@ import { redirect }           from 'next/navigation'
 import { createClient }       from '@/lib/supabase-server'
 import { createAdminClient }  from '@/lib/supabase-admin'
 import { getUserRole }        from '@/lib/roles'
-import { ThemeProvider }      from '@/styles/ThemeContext'
+import PortalThemeProvider    from '@/app/portal/components/PortalThemeProvider'
 import AdminShell             from './components/AdminShell'
 import type { PlatformEditor } from '@/types'
 
@@ -53,10 +53,10 @@ export default async function AdminLayout({
   if (!editor) redirect('/login')
 
   return (
-    <ThemeProvider theme="dark">
+    <PortalThemeProvider storageKey="foundry-admin-theme" defaultMode="dark">
       <AdminShell editor={editor}>
         {children}
       </AdminShell>
-    </ThemeProvider>
+    </PortalThemeProvider>
   )
 }

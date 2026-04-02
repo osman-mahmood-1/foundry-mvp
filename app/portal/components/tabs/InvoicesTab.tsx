@@ -11,10 +11,11 @@
  * - Sent/Paid/Overdue: read-only view with status actions
  */
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import type { Client } from '@/types'
 import { Panel, Label, EmptyState, Button, Input, Badge, formatGBP, formatDate } from '../ui'
-import { light as colours } from '@/styles/tokens/colours'
+import { useColours } from '@/styles/ThemeContext'
+import { useShellSearch } from '@/app/components/shells/BaseShell'
 import { fonts, fontSize, fontWeight, letterSpacing } from '@/styles/tokens/typography'
 import { radius, transition, spacing } from '@/styles/tokens'
 import EntryPanel from '../ui/EntryPanel'
@@ -93,6 +94,7 @@ const fieldGroup: React.CSSProperties = {
 // ─── Read-only field ──────────────────────────────────────────────────────────
 
 function ReadField({ label, value }: { label: string; value: string }) {
+  const colours = useColours()
   return (
     <div>
       <div style={{
@@ -128,6 +130,7 @@ function InvoiceRow({
 }: {
   invoice: Invoice; isLast: boolean; selected: boolean; onSelect: () => void
 }) {
+  const colours = useColours()
   const [hovered, setHovered] = useState(false)
   const { label, variant }    = STATUS_CONFIG[invoice.status]
 
@@ -223,6 +226,10 @@ const EMPTY_FORM: InvoiceForm = {
 }
 
 export default function InvoicesTab({ client }: { client: Client }) {
+  const colours = useColours()
+  const { query, setPlaceholder } = useShellSearch()
+  useEffect(() => { setPlaceholder('Search invoices…') }, [setPlaceholder])
+
   const [panelOpen, setPanelOpen]       = useState(false)
   const [panelMode, setPanelMode]       = useState<'new' | 'view' | 'edit'>('new')
   const [selectedInvoice, setSelected]  = useState<Invoice | null>(null)
@@ -327,6 +334,12 @@ export default function InvoicesTab({ client }: { client: Client }) {
     setForm(EMPTY_FORM)
   }
 
+  const filteredInvoices = invoices.filter(i =>
+    !query ||
+    i.recipient?.toLowerCase().includes(query.toLowerCase()) ||
+    i.number?.toLowerCase().includes(query.toLowerCase())
+  )
+
   const totalPaid        = invoices.filter(i => i.status === 'paid').reduce((s, i) => s + i.amount, 0)
   const totalOutstanding = invoices.filter(i => i.status !== 'paid').reduce((s, i) => s + i.amount, 0)
 
@@ -393,11 +406,11 @@ export default function InvoicesTab({ client }: { client: Client }) {
             />
           )}
 
-          {invoices.map((invoice, idx) => (
+          {filteredInvoices.map((invoice, idx) => (
             <InvoiceRow
               key={invoice.id}
               invoice={invoice}
-              isLast={idx === invoices.length - 1}
+              isLast={idx === filteredInvoices.length - 1}
               selected={selectedInvoice?.id === invoice.id}
               onSelect={() => openInvoice(invoice)}
             />

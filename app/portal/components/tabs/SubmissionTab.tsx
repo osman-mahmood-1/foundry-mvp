@@ -15,9 +15,10 @@ import type { Client } from '@/types'
 import { useIncome }   from './useIncome'
 import { useExpenses } from './useExpenses'
 import { Spinner, Button, formatGBP } from '../ui'
-import { light as colours } from '@/styles/tokens/colours'
+import { useColours, useThemeMode } from '@/styles/ThemeContext'
 import { fonts, fontSize, fontWeight, letterSpacing } from '@/styles/tokens/typography'
-import { radius, glassStatic, transition, spacing } from '@/styles/tokens'
+import { radius, transition, spacing } from '@/styles/tokens'
+import { glass } from '@/styles/tokens/effects'
 
 // ─── Step config ──────────────────────────────────────────────────────────────
 
@@ -66,6 +67,7 @@ function getHmrcDates(taxYear: string): HmrcDate[] {
 // ─── Step bar ─────────────────────────────────────────────────────────────────
 
 function StepBar({ current }: { current: number }) {
+  const colours = useColours()
   return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0', marginBottom: '32px' }}>
       {STEPS.map((step, idx) => {
@@ -118,6 +120,7 @@ function StepBar({ current }: { current: number }) {
 // ─── Summary row ─────────────────────────────────────────────────────────────
 
 function SummaryRow({ label, value, colour }: { label: string; value: string; colour?: string }) {
+  const colours = useColours()
   return (
     <div style={{
       display:        'flex',
@@ -137,6 +140,8 @@ function SummaryRow({ label, value, colour }: { label: string; value: string; co
 // ─── HMRC Calendar panel ──────────────────────────────────────────────────────
 
 function HmrcCalendar({ taxYear }: { taxYear: string }) {
+  const colours = useColours()
+  const mode = useThemeMode()
   const dates = getHmrcDates(taxYear)
   const now   = new Date()
 
@@ -154,7 +159,7 @@ function HmrcCalendar({ taxYear }: { taxYear: string }) {
 
   return (
     <div style={{
-      ...glassStatic.panel,
+      ...glass.card(mode),
       padding:         '20px',
       position:        'relative',
       overflow:        'hidden',
@@ -266,6 +271,8 @@ function HmrcCalendar({ taxYear }: { taxYear: string }) {
 // ─── Main component ───────────────────────────────────────────────────────────
 
 export default function SubmissionTab({ client }: { client: Client }) {
+  const colours = useColours()
+  const mode = useThemeMode()
   const DRAFT_KEY = `foundry-submission-draft-${client.id}`
 
   const [step,         setStep]         = useState(1)
@@ -326,7 +333,7 @@ export default function SubmissionTab({ client }: { client: Client }) {
     return (
       <div style={{ display: 'flex', gap: spacing.tab.gap }}>
         <div style={{
-          ...glassStatic.panel,
+          ...glass.card(mode),
           flex:       1,
           textAlign:  'center' as const,
           padding:    '64px 32px',
@@ -396,7 +403,7 @@ export default function SubmissionTab({ client }: { client: Client }) {
           </div>
         )}
 
-        <div style={{ ...glassStatic.panel, padding: spacing.panel.padding }}>
+        <div style={{ ...glass.card(mode), padding: spacing.panel.padding }}>
           <StepBar current={step} />
 
           {/* Step 1: Income */}

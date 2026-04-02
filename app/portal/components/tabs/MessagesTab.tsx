@@ -21,7 +21,8 @@ import { useEffect, useRef } from 'react'
 import type { Client } from '@/types'
 import { useMessages } from './useMessages'
 import { Spinner, EmptyState, ErrorBanner } from '../ui'
-import { light as colours } from '@/styles/tokens/colours'
+import { useColours } from '@/styles/ThemeContext'
+import { useShellSearch } from '@/app/components/shells/BaseShell'
 import { fonts, fontSize, fontWeight } from '@/styles/tokens/typography'
 import { radius, transition, spacing } from '@/styles/tokens'
 
@@ -35,6 +36,10 @@ interface Props {
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export default function MessagesTab({ client, readOnly = false }: Props) {
+  const colours = useColours()
+  const { query, setPlaceholder } = useShellSearch()
+  useEffect(() => { setPlaceholder('Search messages…') }, [setPlaceholder])
+
   const scrollRef = useRef<HTMLDivElement>(null)
 
   const {
@@ -53,6 +58,10 @@ export default function MessagesTab({ client, readOnly = false }: Props) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight
     }
   }, [messages])
+
+  const filteredMessages = messages.filter(m =>
+    !query || m.body?.toLowerCase().includes(query.toLowerCase())
+  )
 
   if (loading) return <Spinner />
 
@@ -89,7 +98,7 @@ export default function MessagesTab({ client, readOnly = false }: Props) {
             sub="Your accountant will reach out here with questions, updates, and confirmations. You can also send them a message below."
           />
         ) : (
-          messages.map(message => (
+          filteredMessages.map(message => (
             <MessageBubble
               key={message.id}
               message={message}
@@ -191,6 +200,7 @@ interface MessageBubbleProps {
 }
 
 function MessageBubble({ message, isClient }: MessageBubbleProps) {
+  const colours = useColours()
   const time = new Date(message.created_at).toLocaleTimeString('en-GB', {
     hour:   '2-digit',
     minute: '2-digit',

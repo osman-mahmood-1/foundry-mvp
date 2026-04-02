@@ -15,9 +15,10 @@ import type { Client } from '@/types'
 import { useIncome }   from './useIncome'
 import { useExpenses } from './useExpenses'
 import { Spinner, formatGBP } from '../ui'
-import { light as colours } from '@/styles/tokens/colours'
+import { useColours, useThemeMode } from '@/styles/ThemeContext'
 import { fonts, fontSize, fontWeight, letterSpacing } from '@/styles/tokens/typography'
-import { radius, glassStatic, spacing } from '@/styles/tokens'
+import { radius, spacing } from '@/styles/tokens'
+import { glass } from '@/styles/tokens/effects'
 
 // ─── Insight types ────────────────────────────────────────────────────────────
 
@@ -45,21 +46,24 @@ const SEVERITY_ICON: Record<Severity, string> = {
   info:      '✦',
 }
 
-const SEVERITY_COLOUR: Record<Severity, string> = {
-  urgent:    colours.danger,
-  attention: colours.warning,
-  info:      colours.info,
-}
-
-const SEVERITY_BG: Record<Severity, string> = {
-  urgent:    colours.dangerLight,
-  attention: colours.warningLight,
-  info:      colours.infoLight,
-}
-
 // ─── Insight card — orb+glass, no left border ─────────────────────────────────
 
 function InsightCard({ insight }: { insight: Insight }) {
+  const colours = useColours()
+  const mode = useThemeMode()
+
+  const SEVERITY_COLOUR: Record<Severity, string> = {
+    urgent:    colours.danger,
+    attention: colours.warning,
+    info:      colours.info,
+  }
+
+  const SEVERITY_BG: Record<Severity, string> = {
+    urgent:    colours.dangerLight,
+    attention: colours.warningLight,
+    info:      colours.infoLight,
+  }
+
   const orb    = SEVERITY_ORB[insight.severity]
   const icon   = SEVERITY_ICON[insight.severity]
   const colour = SEVERITY_COLOUR[insight.severity]
@@ -67,7 +71,7 @@ function InsightCard({ insight }: { insight: Insight }) {
 
   return (
     <div style={{
-      ...glassStatic.panel,
+      ...glass.card(mode),
       position:  'relative',
       overflow:  'hidden',
       padding:   '16px 20px',
@@ -141,6 +145,8 @@ function InsightCard({ insight }: { insight: Insight }) {
 // ─── Main component ───────────────────────────────────────────────────────────
 
 export default function IntelligenceTab({ client }: { client: Client }) {
+  const colours = useColours()
+  const mode = useThemeMode()
   const { income,   loading: li } = useIncome(client.id, client.tax_year, client.user_id)
   const { expenses, loading: le } = useExpenses(client.id, client.tax_year, client.user_id)
 
@@ -215,7 +221,7 @@ export default function IntelligenceTab({ client }: { client: Client }) {
 
       {/* ── Header card — 2-orb treatment ── */}
       <div style={{
-        ...glassStatic.panel,
+        ...glass.card(mode),
         position:    'relative',
         overflow:    'hidden',
         padding:     spacing.panel.padding,

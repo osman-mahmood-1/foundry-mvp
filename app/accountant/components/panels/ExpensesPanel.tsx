@@ -19,9 +19,9 @@
 
 import { useState, useEffect }      from 'react'
 import { useExpenseReviews }        from '../../hooks/useExpenseReviews'
-import { light as colours }         from '@/styles/tokens/colours'
+import { useColours, useThemeMode } from '@/styles/ThemeContext'
 import { fonts, fontSize, fontWeight, letterSpacing } from '@/styles/tokens/typography'
-import { glassStatic }              from '@/styles/tokens/effects'
+import { glass }                    from '@/styles/tokens/effects'
 import { radius, transition }       from '@/styles/tokens'
 import { spacing }                  from '@/styles/tokens/spacing'
 import type { Client, Expense, HmrcTreatment, SplitPanelInitialData } from '@/types'
@@ -55,6 +55,7 @@ function catLabel(cat: string): string {
 }
 
 function SectionHeader({ title }: { title: string }) {
+  const colours = useColours()
   return (
     <div style={{
       fontSize:      fontSize.label,
@@ -81,6 +82,7 @@ interface ReviewFormProps {
 }
 
 function ReviewForm({ expense, accountantId, accountantUserId, clientId }: ReviewFormProps) {
+  const colours = useColours()
   const {
     reviews,
     saving,
@@ -277,6 +279,8 @@ export default function ExpensesPanel({
   selectedExpenseId,
   onExpenseSelect,
 }: Props) {
+  const colours = useColours()
+  const mode = useThemeMode()
   const { expenses } = initialData
   const {
     reviews,
@@ -296,7 +300,7 @@ export default function ExpensesPanel({
     <div style={{ padding: spacing.panel.padding, display: 'flex', flexDirection: 'column', gap: '16px' }}>
 
       {/* ── Status summary ── */}
-      <div style={{ ...glassStatic.panel, padding: spacing.panel.paddingTight }}>
+      <div style={{ ...glass.card(mode), padding: spacing.panel.paddingTight }}>
         <SectionHeader title="Status" />
         <div style={{ display: 'flex', gap: '12px' }}>
           {[
@@ -321,7 +325,7 @@ export default function ExpensesPanel({
 
       {/* ── Selected expense ── */}
       {selectedExpense ? (
-        <div style={{ ...glassStatic.panel, padding: spacing.panel.paddingTight }}>
+        <div style={{ ...glass.card(mode), padding: spacing.panel.paddingTight }}>
           <SectionHeader title="Review Selected Expense" />
           <ReviewForm
             expense={selectedExpense}
@@ -332,7 +336,7 @@ export default function ExpensesPanel({
         </div>
       ) : (
         <div style={{
-          ...glassStatic.panel,
+          ...glass.card(mode),
           padding:        spacing.panel.padding,
           textAlign:      'center',
           color:          colours.textMuted,
@@ -348,7 +352,7 @@ export default function ExpensesPanel({
 
       {/* ── Pending list ── */}
       {pendingExpenses.length > 0 && (
-        <div style={{ ...glassStatic.panel, padding: spacing.panel.paddingTight }}>
+        <div style={{ ...glass.card(mode), padding: spacing.panel.paddingTight }}>
           <SectionHeader title={`Pending (${pendingExpenses.length})`} />
           <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
             {pendingExpenses.slice(0, 8).map(exp => (

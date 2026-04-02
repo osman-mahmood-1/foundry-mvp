@@ -18,7 +18,7 @@ import { useState } from 'react'
 import type { Client } from '@/types'
 import { Panel, Label, Badge, Button } from '../ui'
 import EntryPanel from '../ui/EntryPanel'
-import { light as colours } from '@/styles/tokens/colours'
+import { useColours } from '@/styles/ThemeContext'
 import { fonts, fontSize, fontWeight, letterSpacing } from '@/styles/tokens/typography'
 import { radius, transition, spacing } from '@/styles/tokens'
 
@@ -85,6 +85,7 @@ function fmt(pence: number): string {
 // ─── Detail field ─────────────────────────────────────────────────────────────
 
 function DetailField({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
+  const colours = useColours()
   return (
     <div>
       <div style={{
@@ -120,6 +121,7 @@ function ReturnRow({
 }: {
   ret: PriorReturn; isLast: boolean; selected: boolean; onSelect: () => void
 }) {
+  const colours  = useColours()
   const [hovered, setHovered] = useState(false)
   const cfg = STATUS_CONFIG[ret.status]
 
@@ -184,6 +186,7 @@ function ReturnRow({
 // ─── Main component ───────────────────────────────────────────────────────────
 
 export default function PriorReturnsTab({ client }: { client: Client }) {
+  const colours  = useColours()
   const [selected, setSelected] = useState<PriorReturn | null>(null)
   const [panelOpen, setPanelOpen] = useState(false)
 

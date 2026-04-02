@@ -2,10 +2,10 @@
 import React from 'react'
 import { useOverview } from './useOverview'
 import { ErrorBanner } from '../ui'
-import { light as colours } from '@/styles/tokens/colours'
+import { useColours, useThemeMode } from '@/styles/ThemeContext'
 import { fonts, fontSize, fontWeight } from '@/styles/tokens/typography'
 import { radius } from '@/styles/tokens'
-import { glassStatic } from '@/styles/tokens/effects'
+import { glass } from '@/styles/tokens/effects'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -28,9 +28,11 @@ function StatCard({ label, value, sub, accent, icon }: {
   label: string; value: string; sub?: string
   accent: string; icon: string
 }) {
+  const colours = useColours()
+  const mode = useThemeMode()
   return (
     <div style={{
-      ...glassStatic.panel,
+      ...glass.card(mode),
       padding:   '20px',
       flex:      '1 1 200px',
       minWidth:  '180px',
@@ -94,6 +96,7 @@ function TxRow({ description, category, date, amount, type, status }: {
   description: string; category: string; date: string
   amount: number; type: 'income' | 'expense'; status: string
 }) {
+  const colours = useColours()
   const isIncome = type === 'income'
   const isDraft  = status === 'draft'
   const col      = isIncome ? colours.income : colours.expense
@@ -182,6 +185,7 @@ function QuickAction({
 }: {
   icon: string; label: string; onClick: () => void
 }) {
+  const colours = useColours()
   const [hovered, setHovered] = React.useState(false)
   return (
     <button
@@ -220,6 +224,8 @@ interface Props {
 }
 
 export default function OverviewTab({ clientId, readOnly = false, onTabChange }: Props) {
+  const colours = useColours()
+  const mode = useThemeMode()
   const { stats, recent, taxYear, clientName, loading, error } = useOverview(clientId)
 
   if (loading) return (
@@ -347,7 +353,7 @@ export default function OverviewTab({ clientId, readOnly = false, onTabChange }:
 
         {/* Recent transactions */}
         <div style={{
-          ...glassStatic.panel,
+          ...glass.card(mode),
           padding: '20px',
         }}>
           <div style={{

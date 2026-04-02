@@ -16,7 +16,7 @@
  * - Button sizing: intrinsic width, right-aligned — never full-width on desktop
  */
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import type { Client, IncomeCategory } from '@/types'
 import { useIncome }   from './useIncome'
 import { useDraft }    from '@/lib/useDraft'
@@ -26,7 +26,8 @@ import {
   ErrorBanner, formatGBP, formatDate,
 } from '../ui'
 import EntryPanel from '../ui/EntryPanel'
-import { light as colours } from '@/styles/tokens/colours'
+import { useColours } from '@/styles/ThemeContext'
+import { useShellSearch } from '@/app/components/shells/BaseShell'
 import { fonts, fontSize, fontWeight, letterSpacing } from '@/styles/tokens/typography'
 import { radius, transition, spacing } from '@/styles/tokens'
 
@@ -94,6 +95,7 @@ interface Props {
 // ─── Draft banner ─────────────────────────────────────────────────────────────
 
 function DraftBanner({ onDiscard }: { onDiscard: () => void }) {
+  const colours = useColours()
   return (
     <div style={{
       display:        'flex',
@@ -130,6 +132,10 @@ function DraftBanner({ onDiscard }: { onDiscard: () => void }) {
 type IncomeItem = ReturnType<typeof useIncome>['income'][number]
 
 export default function IncomeTab({ client, readOnly = false }: Props) {
+  const colours = useColours()
+  const { query, setPlaceholder } = useShellSearch()
+  useEffect(() => { setPlaceholder('Search income…') }, [setPlaceholder])
+
   const [panelOpen, setPanelOpen] = useState(false)
   const [editItem, setEditItem]   = useState<IncomeItem | null>(null)
   const [editNotes, setEditNotes] = useState('')
@@ -221,9 +227,16 @@ export default function IncomeTab({ client, readOnly = false }: Props) {
     setPanelOpen(false)
   }
 
+  // Filter by shell search query
+  const filteredIncome = income.filter(item =>
+    !query ||
+    item.description?.toLowerCase().includes(query.toLowerCase()) ||
+    item.category?.toLowerCase().includes(query.toLowerCase())
+  )
+
   // Month grouping
   const groups: Record<string, typeof income> = {}
-  for (const item of income) {
+  for (const item of filteredIncome) {
     const m = item.date.slice(0, 7)
     if (!groups[m]) groups[m] = []
     groups[m].push(item)
@@ -274,7 +287,7 @@ export default function IncomeTab({ client, readOnly = false }: Props) {
             )}
           </div>
 
-          {income.length === 0 && entryCount === 0 && (
+          {filteredIncome.length === 0 && entryCount === 0 && (
             <EmptyState
               icon="↑"
               headline="No income logged yet."
@@ -539,6 +552,7 @@ interface IncomeRowProps {
 }
 
 function IncomeRow({ item, isLast, selected, onSelect, onDelete }: IncomeRowProps) {
+  const colours = useColours()
   const [hovered, setHovered] = useState(false)
 
   const categoryLabel = INCOME_CATEGORIES.find(c => c.value === item.category)?.label

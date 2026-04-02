@@ -7,9 +7,9 @@
  * Shows income summary, source breakdown, and HMRC treatment flags.
  */
 
-import { light as colours }   from '@/styles/tokens/colours'
+import { useColours, useThemeMode } from '@/styles/ThemeContext'
 import { fonts, fontSize, fontWeight, letterSpacing } from '@/styles/tokens/typography'
-import { glassStatic }        from '@/styles/tokens/effects'
+import { glass }              from '@/styles/tokens/effects'
 import { radius }             from '@/styles/tokens'
 import { spacing }            from '@/styles/tokens/spacing'
 import type { Client, SplitPanelInitialData } from '@/types'
@@ -31,6 +31,7 @@ function catLabel(cat: string): string {
 }
 
 function SectionHeader({ title }: { title: string }) {
+  const colours = useColours()
   return (
     <div style={{
       fontSize:      fontSize.label,
@@ -48,13 +49,15 @@ function SectionHeader({ title }: { title: string }) {
 }
 
 export default function IncomePanel({ client, initialData }: Props) {
+  const colours = useColours()
+  const mode = useThemeMode()
   const { incomeTotal, incomeSources } = initialData
 
   return (
     <div style={{ padding: spacing.panel.padding, display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
       {/* ── Summary ── */}
-      <div style={{ ...glassStatic.panel, padding: spacing.panel.paddingTight }}>
+      <div style={{ ...glass.card(mode), padding: spacing.panel.paddingTight }}>
         <SectionHeader title="Income Summary" />
         <div style={{
           fontFamily:   fonts.sans,
@@ -95,7 +98,7 @@ export default function IncomePanel({ client, initialData }: Props) {
       </div>
 
       {/* ── Client type ── */}
-      <div style={{ ...glassStatic.panel, padding: spacing.panel.paddingTight }}>
+      <div style={{ ...glass.card(mode), padding: spacing.panel.paddingTight }}>
         <SectionHeader title="HMRC Profile" />
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: fontSize.sm }}>
@@ -132,7 +135,7 @@ export default function IncomePanel({ client, initialData }: Props) {
       </div>
 
       {/* ── Tax year ── */}
-      <div style={{ ...glassStatic.panel, padding: spacing.panel.paddingTight }}>
+      <div style={{ ...glass.card(mode), padding: spacing.panel.paddingTight }}>
         <SectionHeader title="Accounting Period" />
         <div style={{ fontSize: fontSize.sm, color: colours.textSecondary, lineHeight: 1.6 }}>
           <div>

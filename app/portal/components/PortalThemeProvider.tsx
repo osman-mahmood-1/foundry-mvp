@@ -14,8 +14,6 @@ import type { ColourMode } from '@/styles/tokens/colours'
 
 export type ThemeMode = 'light' | 'dark' | 'system'
 
-const STORAGE_KEY = 'foundry-theme'
-
 interface ThemePreferenceCtx {
   mode:    ThemeMode
   setMode: (m: ThemeMode) => void
@@ -39,14 +37,24 @@ function resolveTheme(mode: ThemeMode): ColourMode {
   return mode
 }
 
-export default function PortalThemeProvider({ children }: { children: React.ReactNode }) {
-  const [mode, setModeState] = useState<ThemeMode>('light')
-  const [resolved, setResolved] = useState<ColourMode>('light')
+interface PortalThemeProviderProps {
+  children:     React.ReactNode
+  storageKey?:  string
+  defaultMode?: ThemeMode
+}
+
+export default function PortalThemeProvider({
+  children,
+  storageKey  = 'foundry-theme',
+  defaultMode = 'light',
+}: PortalThemeProviderProps) {
+  const [mode, setModeState] = useState<ThemeMode>(defaultMode)
+  const [resolved, setResolved] = useState<ColourMode>(resolveTheme(defaultMode))
 
   // Hydrate from localStorage on mount
   useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY) as ThemeMode | null
-    const initial = (stored === 'light' || stored === 'dark' || stored === 'system') ? stored : 'light'
+    const stored = localStorage.getItem(storageKey) as ThemeMode | null
+    const initial = (stored === 'light' || stored === 'dark' || stored === 'system') ? stored : defaultMode
     setModeState(initial)
     const r = resolveTheme(initial)
     setResolved(r)
@@ -68,7 +76,7 @@ export default function PortalThemeProvider({ children }: { children: React.Reac
 
   function setMode(m: ThemeMode) {
     setModeState(m)
-    localStorage.setItem(STORAGE_KEY, m)
+    localStorage.setItem(storageKey, m)
     const r = resolveTheme(m)
     setResolved(r)
     document.documentElement.setAttribute('data-theme', r)

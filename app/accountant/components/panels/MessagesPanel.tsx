@@ -11,9 +11,9 @@
  * This right panel provides context — not a second compose area.
  */
 
-import { light as colours }   from '@/styles/tokens/colours'
+import { useColours, useThemeMode } from '@/styles/ThemeContext'
 import { fonts, fontSize, fontWeight, letterSpacing } from '@/styles/tokens/typography'
-import { glassStatic }        from '@/styles/tokens/effects'
+import { glass }              from '@/styles/tokens/effects'
 import { spacing }            from '@/styles/tokens/spacing'
 import type { Client, SplitPanelInitialData } from '@/types'
 
@@ -27,6 +27,7 @@ function fmt(pence: number): string {
 }
 
 function SectionHeader({ title }: { title: string }) {
+  const colours = useColours()
   return (
     <div style={{
       fontSize:      fontSize.label,
@@ -56,6 +57,7 @@ function ActivityRow({
   date:        string
   colour:      string
 }) {
+  const colours = useColours()
   return (
     <div style={{
       display:   'flex',
@@ -93,6 +95,8 @@ function ActivityRow({
 }
 
 export default function MessagesPanel({ client, initialData }: Props) {
+  const colours = useColours()
+  const mode = useThemeMode()
   const { recentIncome, recentExpenses } = initialData
   const firstName = client.full_name?.split(' ')[0] ?? 'the client'
 
@@ -109,7 +113,7 @@ export default function MessagesPanel({ client, initialData }: Props) {
 
       {/* ── Recent income ── */}
       {recentIncome.length > 0 && (
-        <div style={{ ...glassStatic.panel, padding: spacing.panel.paddingTight }}>
+        <div style={{ ...glass.card(mode), padding: spacing.panel.paddingTight }}>
           <SectionHeader title="Recent Income" />
           {recentIncome.map(item => (
             <ActivityRow
@@ -126,7 +130,7 @@ export default function MessagesPanel({ client, initialData }: Props) {
 
       {/* ── Recent expenses ── */}
       {recentExpenses.length > 0 && (
-        <div style={{ ...glassStatic.panel, padding: spacing.panel.paddingTight }}>
+        <div style={{ ...glass.card(mode), padding: spacing.panel.paddingTight }}>
           <SectionHeader title="Recent Expenses" />
           {recentExpenses.map(item => (
             <ActivityRow
@@ -143,7 +147,7 @@ export default function MessagesPanel({ client, initialData }: Props) {
 
       {recentIncome.length === 0 && recentExpenses.length === 0 && (
         <div style={{
-          ...glassStatic.panel,
+          ...glass.card(mode),
           padding:        spacing.panel.padding,
           textAlign:      'center',
           color:          colours.textMuted,

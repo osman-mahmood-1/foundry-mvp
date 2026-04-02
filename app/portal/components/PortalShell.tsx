@@ -169,7 +169,7 @@ export default function PortalShell({ client }: Props) {
       {/* Main content: greeting + tab */}
       <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
         {/* Greeting header */}
-        <div style={{ padding: '4px 4px 20px', flexShrink: 0 }}>
+        <div style={{ padding: '16px 20px 20px', flexShrink: 0 }}>
           <div style={{
             fontSize:      fontSize.label,
             color:         colours.textMuted,

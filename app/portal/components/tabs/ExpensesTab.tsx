@@ -16,7 +16,7 @@
  * - Draft auto-saved to localStorage on every keystroke
  */
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import type { Client, ExpenseCategory } from '@/types'
 import { useExpenses } from './useExpenses'
 import { useDraft }    from '@/lib/useDraft'
@@ -26,7 +26,8 @@ import {
   ErrorBanner, formatGBP, formatDate,
 } from '../ui'
 import EntryPanel from '../ui/EntryPanel'
-import { light as colours } from '@/styles/tokens/colours'
+import { useColours } from '@/styles/ThemeContext'
+import { useShellSearch } from '@/app/components/shells/BaseShell'
 import { fonts, fontSize, fontWeight, letterSpacing } from '@/styles/tokens/typography'
 import { radius, transition, spacing } from '@/styles/tokens'
 
@@ -123,6 +124,7 @@ interface Props {
 // ─── Draft banner ─────────────────────────────────────────────────────────────
 
 function DraftBanner({ onDiscard }: { onDiscard: () => void }) {
+  const colours = useColours()
   return (
     <div style={{
       display:        'flex',
@@ -159,6 +161,7 @@ function DraftBanner({ onDiscard }: { onDiscard: () => void }) {
 function ReceiptButton({
   file, onClick,
 }: { file: File | null; onClick: () => void }) {
+  const colours = useColours()
   return (
     <button
       type="button"
@@ -191,6 +194,11 @@ function ReceiptButton({
 type ExpenseItem = import('@/types').Expense
 
 export default function ExpensesTab({ client, readOnly = false, onExpenseSelect }: Props) {
+  const colours = useColours()
+  const { query, setPlaceholder } = useShellSearch()
+
+  useEffect(() => { setPlaceholder('Search expenses…') }, [setPlaceholder])
+
   const [panelOpen, setPanelOpen]       = useState(false)
   const [editItem, setEditItem]         = useState<ExpenseItem | null>(null)
   const [editForm, setEditForm]         = useState<ExpenseFormState>(EMPTY_FORM)
@@ -284,9 +292,16 @@ export default function ExpensesTab({ client, readOnly = false, onExpenseSelect 
     setPanelOpen(false)
   }
 
+  // Search filter
+  const filteredExpenses = expenses.filter(e =>
+    !query ||
+    e.description?.toLowerCase().includes(query.toLowerCase()) ||
+    e.category?.toLowerCase().includes(query.toLowerCase())
+  )
+
   // Month grouping
   const groups: Record<string, typeof expenses> = {}
-  for (const item of expenses) {
+  for (const item of filteredExpenses) {
     const m = item.date.slice(0, 7)
     if (!groups[m]) groups[m] = []
     groups[m].push(item)
@@ -670,6 +685,7 @@ interface ExpenseRowProps {
 }
 
 function ExpenseRow({ item, isLast, selected, onSelect, onDelete }: ExpenseRowProps) {
+  const colours = useColours()
   const [hovered, setHovered] = useState(false)
 
   const categoryLabel = EXPENSE_CATEGORIES.find(c => c.value === item.category)?.label

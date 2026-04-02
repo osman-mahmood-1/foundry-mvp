@@ -24,6 +24,15 @@ const ACCOUNTANT_NAV: ShellNavGroup[] = [
       { id: 'messages', label: 'Messages', icon: '◇', href: '/accountant/messages' },
     ],
   },
+  {
+    id:          'config',
+    label:       'Settings',
+    collapsible: true,
+    defaultOpen: false,
+    items: [
+      { id: 'settings', label: 'Settings', icon: '⚙', href: '/accountant/settings' },
+    ],
+  },
 ]
 
 // ─── Brand top bar ────────────────────────────────────────────────────────────

@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx next:*)",
+      "Bash(npm run:*)",
+      "Bash(git -c core.preloadindex=false status)",
+      "Bash(git commit -m 'feat: replace design system with Lotech mockup palette:*)",
+      "Bash(rm /Users/osman/Desktop/foundry-mvp/.git/index.lock)",
+      "Bash(git push:*)",
+      "Bash(git config:*)",
+      "Bash(git gc:*)",
+      "Bash(gh auth:*)",
+      "Bash(gh repo:*)",
+      "Bash(GIT_PACK_WRITE_REVERSE_INDEX=0 GIT_PACK_COMPRESSION=0 git push origin main)",
+      "Bash(git --version)",
+      "Bash(xattr -l .git/objects/pack/pack-bbf8ef780c675198aa1cfdfeb7d8b23b6d16b952.pack)",
+      "Bash(sudo xattr:*)",
+      "Bash(chmod u+w .git/objects/pack/pack-bbf8ef780c675198aa1cfdfeb7d8b23b6d16b952.pack)",
+      "Bash(xattr -c .git/objects/pack/pack-bbf8ef780c675198aa1cfdfeb7d8b23b6d16b952.pack)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"https://api.github.com/repos/osman-mahmood-1/foundry-mvp\")",
+      "Bash(GIT_SSH_COMMAND=\"ssh -o StrictHostKeyChecking=no\" git push origin main)",
+      "Bash(git fsck:*)",
+      "Bash(pkill -f \"next build\")",
+      "Bash(git add:*)",
+      "Bash(git commit -m ':*)"
+    ]
+  }
+}

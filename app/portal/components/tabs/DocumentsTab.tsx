@@ -19,7 +19,8 @@ import {
   Badge, Button, Select, ErrorBanner, formatBytes, formatDate,
 } from '../ui'
 import EntryPanel from '../ui/EntryPanel'
-import { light as colours } from '@/styles/tokens/colours'
+import { useColours } from '@/styles/ThemeContext'
+import { useShellSearch } from '@/app/components/shells/BaseShell'
 import { fonts, fontSize, fontWeight } from '@/styles/tokens/typography'
 import { radius, transition, spacing } from '@/styles/tokens'
 
@@ -72,6 +73,7 @@ function OcrResultCard({
   onAccept: () => void
   onRetake: () => void
 }) {
+  const colours = useColours()
   const fields = MOCK_OCR[category] ?? [{ label: 'Document type', value: category.replace(/_/g, ' ') }]
   return (
     <div style={{
@@ -139,6 +141,7 @@ function OcrResultCard({
 // ─── Shimmer reviewing state ──────────────────────────────────────────────────
 
 function ReviewingBanner() {
+  const colours = useColours()
   return (
     <div style={{
       display:      'flex',
@@ -169,6 +172,7 @@ function ReviewingBanner() {
 // ─── Read-only detail field ───────────────────────────────────────────────────
 
 function DetailField({ label, value }: { label: string; value: string }) {
+  const colours = useColours()
   return (
     <div>
       <div style={{
@@ -203,6 +207,10 @@ function DetailField({ label, value }: { label: string; value: string }) {
 type ReviewState = 'idle' | 'reviewing' | 'complete'
 
 export default function DocumentsTab({ client, readOnly = false }: Props) {
+  const colours = useColours()
+  const { query, setPlaceholder } = useShellSearch()
+  useEffect(() => { setPlaceholder('Search documents…') }, [setPlaceholder])
+
   const fileInputRef                            = useRef<HTMLInputElement>(null)
   const [selectedFile,     setSelectedFile]     = useState<File | null>(null)
   const [selectedCategory, setSelectedCategory] = useState<DocumentCategory>('other')
@@ -272,8 +280,12 @@ export default function DocumentsTab({ client, readOnly = false }: Props) {
   }
 
   // Month grouping
+  const filteredDocuments = documents.filter(doc =>
+    !query || doc.original_filename?.toLowerCase().includes(query.toLowerCase())
+  )
+
   const groups: Record<string, FoundryDocument[]> = {}
-  for (const doc of documents) {
+  for (const doc of filteredDocuments) {
     const m = doc.created_at.slice(0, 7)
     if (!groups[m]) groups[m] = []
     groups[m].push(doc)
@@ -405,7 +417,7 @@ export default function DocumentsTab({ client, readOnly = false }: Props) {
             )}
           </div>
 
-          {documents.length === 0 && totalCount === 0 && (
+          {filteredDocuments.length === 0 && totalCount === 0 && (
             <EmptyState
               icon="◈"
               headline="No documents uploaded yet."
@@ -536,6 +548,7 @@ interface DocumentRowProps {
 }
 
 function DocumentRow({ doc, isLast, selected, onSelect, onDelete }: DocumentRowProps) {
+  const colours = useColours()
   const [hovered, setHovered] = useState(false)
 
   const categoryLabel = DOCUMENT_CATEGORIES.find(c => c.value === doc.category)?.label

@@ -13,9 +13,9 @@
 
 import { useState }             from 'react'
 import { markDocumentReviewed } from '../../actions'
-import { light as colours }     from '@/styles/tokens/colours'
+import { useColours, useThemeMode } from '@/styles/ThemeContext'
 import { fonts, fontSize, fontWeight, letterSpacing } from '@/styles/tokens/typography'
-import { glassStatic }          from '@/styles/tokens/effects'
+import { glass }                from '@/styles/tokens/effects'
 import { radius, transition }   from '@/styles/tokens'
 import { spacing }              from '@/styles/tokens/spacing'
 import type { Client, Document as FoundryDocument, SplitPanelInitialData } from '@/types'
@@ -32,6 +32,7 @@ function formatBytes(bytes: number): string {
 }
 
 function SectionHeader({ title }: { title: string }) {
+  const colours = useColours()
   return (
     <div style={{
       fontSize:      fontSize.label,
@@ -59,6 +60,7 @@ function DocumentReviewRow({
   clientId:   string
   onReviewed: (id: string) => void
 }) {
+  const colours = useColours()
   const [loading, setLoading] = useState(false)
   const [error,   setError]   = useState<string | null>(null)
   const ext = doc.original_filename.split('.').pop()?.toUpperCase() ?? 'FILE'
@@ -154,6 +156,8 @@ function DocumentReviewRow({
 // ─── Panel ────────────────────────────────────────────────────────────────────
 
 export default function DocumentsPanel({ client, initialData }: Props) {
+  const colours = useColours()
+  const mode = useThemeMode()
   const [documents, setDocuments] = useState<FoundryDocument[]>(initialData.documents)
 
   const reviewed   = documents.filter(d => d.reviewed)
@@ -169,7 +173,7 @@ export default function DocumentsPanel({ client, initialData }: Props) {
     <div style={{ padding: spacing.panel.padding, display: 'flex', flexDirection: 'column', gap: '16px' }}>
 
       {/* ── Status summary ── */}
-      <div style={{ ...glassStatic.panel, padding: spacing.panel.paddingTight }}>
+      <div style={{ ...glass.card(mode), padding: spacing.panel.paddingTight }}>
         <SectionHeader title="Status" />
         <div style={{ display: 'flex', gap: '20px' }}>
           <div>
@@ -189,7 +193,7 @@ export default function DocumentsPanel({ client, initialData }: Props) {
 
       {/* ── Unreviewed documents ── */}
       {unreviewed.length > 0 && (
-        <div style={{ ...glassStatic.panel, padding: spacing.panel.paddingTight }}>
+        <div style={{ ...glass.card(mode), padding: spacing.panel.paddingTight }}>
           <SectionHeader title={`To review (${unreviewed.length})`} />
           {unreviewed.map(doc => (
             <DocumentReviewRow
@@ -204,7 +208,7 @@ export default function DocumentsPanel({ client, initialData }: Props) {
 
       {/* ── Reviewed documents ── */}
       {reviewed.length > 0 && (
-        <div style={{ ...glassStatic.panel, padding: spacing.panel.paddingTight }}>
+        <div style={{ ...glass.card(mode), padding: spacing.panel.paddingTight }}>
           <SectionHeader title={`Reviewed (${reviewed.length})`} />
           {reviewed.map(doc => (
             <DocumentReviewRow
@@ -218,7 +222,7 @@ export default function DocumentsPanel({ client, initialData }: Props) {
       )}
 
       {documents.length === 0 && (
-        <div style={{ ...glassStatic.panel, padding: spacing.panel.padding, textAlign: 'center', color: colours.textMuted, fontSize: fontSize.sm }}>
+        <div style={{ ...glass.card(mode), padding: spacing.panel.padding, textAlign: 'center', color: colours.textMuted, fontSize: fontSize.sm }}>
           No documents uploaded yet.
         </div>
       )}

@@ -7,10 +7,11 @@
  * Linked to Invoices tab for quick client-based filtering.
  */
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import type { Client } from '@/types'
-import { Panel, Label, EmptyState, Input } from '../ui'
-import { light as colours } from '@/styles/tokens/colours'
+import { Panel, Label, EmptyState } from '../ui'
+import { useColours } from '@/styles/ThemeContext'
+import { useShellSearch } from '@/app/components/shells/BaseShell'
 import { fonts, fontSize, fontWeight } from '@/styles/tokens/typography'
 import { radius, transition, spacing } from '@/styles/tokens'
 
@@ -31,6 +32,7 @@ const DEMO_CONTACTS: ContactEntry[] = [
 ]
 
 function ContactRow({ contact, isLast }: { contact: ContactEntry; isLast: boolean }) {
+  const colours = useColours()
   const [hovered, setHovered] = useState(false)
   const initial = contact.name.charAt(0).toUpperCase()
 
@@ -110,10 +112,12 @@ function ContactRow({ contact, isLast }: { contact: ContactEntry; isLast: boolea
 }
 
 export default function ClientsTab({ client: _client }: { client: Client }) {
-  const [search, setSearch] = useState('')
+  const colours = useColours()
+  const { query, setPlaceholder } = useShellSearch()
+  useEffect(() => { setPlaceholder('Search clients…') }, [setPlaceholder])
 
   const filtered = DEMO_CONTACTS.filter(c =>
-    c.name.toLowerCase().includes(search.toLowerCase())
+    !query || c.name.toLowerCase().includes(query.toLowerCase())
   )
 
   return (
@@ -122,19 +126,8 @@ export default function ClientsTab({ client: _client }: { client: Client }) {
         <div style={{
           padding:      `${spacing.panel.paddingTight} ${spacing.panel.padding}`,
           borderBottom: `1px solid ${colours.borderHairline}`,
-          display:      'flex',
-          alignItems:   'center',
-          justifyContent: 'space-between',
-          gap:          '12px',
         }}>
           <Label>Clients & contacts</Label>
-          <div style={{ width: '220px' }}>
-            <Input
-              value={search}
-              onChange={setSearch}
-              placeholder="Search…"
-            />
-          </div>
         </div>
 
         {filtered.length === 0 && (

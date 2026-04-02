@@ -7,18 +7,20 @@
  * Pulls from both useIncome and useExpenses hooks.
  */
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import type { Client } from '@/types'
 import { useIncome }   from './useIncome'
 import { useExpenses } from './useExpenses'
 import { Panel, Label, Spinner, Badge, ErrorBanner, formatGBP, formatDate } from '../ui'
-import { light as colours } from '@/styles/tokens/colours'
+import { useColours } from '@/styles/ThemeContext'
+import { useShellSearch } from '@/app/components/shells/BaseShell'
 import { fonts, fontSize, fontWeight, letterSpacing } from '@/styles/tokens/typography'
 import { radius, transition, spacing } from '@/styles/tokens'
 
 type Filter = 'all' | 'income' | 'expense'
 
 function FilterPill({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) {
+  const colours = useColours()
   const [hovered, setHovered] = useState(false)
   return (
     <button
@@ -44,6 +46,10 @@ function FilterPill({ label, active, onClick }: { label: string; active: boolean
 }
 
 export default function TransactionsTab({ client }: { client: Client }) {
+  const colours = useColours()
+  const { query, setPlaceholder } = useShellSearch()
+  useEffect(() => { setPlaceholder('Search transactions…') }, [setPlaceholder])
+
   const [filter, setFilter] = useState<Filter>('all')
 
   const {
@@ -76,7 +82,9 @@ export default function TransactionsTab({ client }: { client: Client }) {
     })),
   ].sort((a, b) => b.date.localeCompare(a.date))
 
-  const filtered = filter === 'all' ? all : all.filter(t => t.type === filter)
+  const filtered = all
+    .filter(t => filter === 'all' || t.type === filter)
+    .filter(t => !query || t.description?.toLowerCase().includes(query.toLowerCase()))
 
   const totalIn  = income.reduce((s, i) => s + i.amount_pence, 0)
   const totalOut = expenses.reduce((s, e) => s + e.amount_pence, 0)
