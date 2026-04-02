@@ -29,6 +29,7 @@ import MobileInvoicesTab     from './mobile/tabs/MobileInvoicesTab'
 import MobileDocumentsTab    from './mobile/tabs/MobileDocumentsTab'
 import MobileMessagesTab     from './mobile/tabs/MobileMessagesTab'
 import MobileSubmissionTab   from './mobile/tabs/MobileSubmissionTab'
+import MobileIntelligenceTab from './mobile/tabs/MobileIntelligenceTab'
 
 interface Props {
   client: Client
@@ -50,7 +51,7 @@ function TabContent({
     case 'documents':    return <MobileDocumentsTab    client={client} />
     case 'messages':     return <MobileMessagesTab     client={client} />
     case 'submission':   return <MobileSubmissionTab   client={client} onTabChange={onTabChange} />
-    case 'intelligence': return <MobileOverviewTab     client={client} onTabChange={onTabChange} />
+    case 'intelligence': return <MobileIntelligenceTab client={client} />
     default:             return <MobileOverviewTab     client={client} onTabChange={onTabChange} />
   }
 }
