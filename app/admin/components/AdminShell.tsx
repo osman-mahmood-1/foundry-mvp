@@ -115,7 +115,7 @@ export default function AdminShell({ editor, children }: Props) {
       navGroups={ADMIN_NAV}
       collapsible
       storageKey="foundry-admin-sidebar"
-      showOrbs={false}
+      showOrbs={true}
       sidebarStyle="docked"
     >
       {children}

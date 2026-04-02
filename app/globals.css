@@ -2,43 +2,60 @@
 
 /* ── Font variables (set by next/font in layout.tsx) ──────────────────────── */
 :root {
-  --font-display: var(--font-inter, 'Inter', sans-serif);
-  --font-mono:    var(--font-jetbrains-mono, 'JetBrains Mono', monospace);
+  --font-display: var(--font-outfit, 'Outfit', sans-serif);
 }
 
 /* ── Base reset ────────────────────────────────────────────────────────────── */
 *, *::before, *::after {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 html, body {
-  margin:      0;
-  padding:     0;
+  height: 100%;
   font-family: var(--font-display);
-  font-size:   14px;
+  font-size: 13px;
   line-height: 1.6;
   -webkit-font-smoothing:  antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
 }
 
-/* ── Spinner keyframe (used by Spinner component) ─────────────────────────── */
-@keyframes spin {
-  from { transform: rotate(0deg);   }
-  to   { transform: rotate(360deg); }
-}
-
-/* ── Pulse keyframe (used by status indicator dots) ──────────────────────── */
-@keyframes pulse {
-  0%, 100% { opacity: 1;   }
-  50%       { opacity: 0.4; }
-}
-
-/* ── Input/select appearance reset ────────────────────────────────────────── */
+/* ── Input / form element font inheritance ─────────────────────────────────── */
 input, select, textarea, button {
   font-family: inherit;
 }
 
-/* ── CTA button — slowly rotating gradient border on hover ───────────────── */
+/* ── Spinner keyframe ─────────────────────────────────────────────────────── */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* ── Pulse keyframe ───────────────────────────────────────────────────────── */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+/* ── FadeUp keyframe (tab transitions, panel entrances) ───────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── FadeIn keyframe ──────────────────────────────────────────────────────── */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
+   CTA BUTTON — gold shimmer border on hover
+   Authority: mockup .btn-export::before (conic-gradient shimmer)
+   Uses @property for animatable custom angle (same technique as mockup).
+──────────────────────────────────────────────────────────────────────────── */
 @property --cta-angle {
   syntax: '<angle>';
   initial-value: 0deg;
@@ -52,43 +69,73 @@ input, select, textarea, button {
 .cta-btn {
   position: relative;
   isolation: isolate;
+  overflow: visible;
+}
+
+/* Shimmer ring sits outside the button boundary */
+.cta-btn::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 102px; /* pill (100px) + 2px */
+  background: conic-gradient(
+    from var(--cta-angle),
+    transparent 0deg,
+    transparent 50deg,
+    rgba(255,255,255,0) 60deg,
+    #fbbf24 100deg,
+    #f97316 145deg,
+    #a78bfa 195deg,
+    rgba(255,255,255,0) 220deg,
+    transparent 240deg,
+    transparent 360deg
+  );
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  animation: cta-border-spin 5s linear infinite paused;
+  /* Mask to show only the border strip */
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  padding: 2px;
 }
 
 .cta-btn::after {
   content: '';
   position: absolute;
-  inset: -2px;
-  border-radius: 102px; /* pill (100px) + 2px border */
-  background: conic-gradient(
-    from var(--cta-angle),
-    rgba(0,194,255,0.15) 0deg,
-    #00C2FF 80deg,
-    rgba(255,255,255,0.90) 180deg,
-    #00C2FF 280deg,
-    rgba(0,194,255,0.15) 360deg
-  );
+  inset: 0;
+  border-radius: 100px;
+  background: linear-gradient(135deg, #f5a623, #f97316);
   z-index: -1;
-  opacity: 0;
-  transition: opacity 0.35s ease;
-  animation: cta-border-spin 3s linear infinite paused;
 }
 
-.cta-btn:hover::after {
+.cta-btn:hover::before {
   opacity: 1;
   animation-play-state: running;
 }
 
-/* Light theme data-theme vars (consumed by components that need CSS vars) */
+/* ── CSS custom properties consumed by components using CSS vars ───────────── */
 [data-theme="light"] {
-  --color-bg-base:      #F4F6FA;
-  --color-bg-surface:   #FFFFFF;
-  --color-text-primary: #0D1117;
-  --color-accent:       #00C2FF;
+  --color-bg-base:      #ddd8ce;
+  --color-bg-surface:   rgba(248,243,235,0.78);
+  --color-text-primary: #1a1612;
+  --color-accent:       #f5a623;
 }
 
 [data-theme="dark"] {
-  --color-bg-base:      #0D0F14;
-  --color-bg-surface:   #13161D;
-  --color-text-primary: #EDF2F7;
-  --color-accent:       #00C2FF;
+  --color-bg-base:      #0a0806;
+  --color-bg-surface:   rgba(13,10,7,0.72);
+  --color-text-primary: #f2ece3;
+  --color-accent:       #f5a623;
+}
+
+/* ── Scrollbar styling ─────────────────────────────────────────────────────── */
+[data-theme="dark"] * {
+  scrollbar-width: thin;
+  scrollbar-color: #1c1915 transparent;
+}
+[data-theme="light"] * {
+  scrollbar-width: thin;
+  scrollbar-color: #d9d1c5 transparent;
 }

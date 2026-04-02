@@ -1,30 +1,30 @@
 /**
  * styles/tokens/radius.ts
  *
- * Border radius scale.
+ * Border radius scale — all from the mockup.
  *
- * Named by visual feel, not pixel value.
- * 'pill' is always a fully-rounded button/badge.
- * 'card' is always a large-radius content panel.
+ * Authority: lotech-dashboard-v9.html — no other source.
  *
- * To make the entire UI more rounded: increase these values.
- * To make it sharper and more corporate: decrease them.
- * One file, one change, entire product re-skins.
+ * --radius:    14px  → card (stat cards, standard panels)
+ * --radius-sm: 10px  → input fields, nav items, small buttons
+ * container:   18px  → inner container (main glass panel)
+ * pill:        100px → fully-rounded buttons and badges
  */
 
 export const radius = {
-  none:   '0px',
-  xs:     '6px',    // inline badges, small chips
-  sm:     '8px',    // nav items, small buttons
-  md:     '10px',   // form inputs
-  lg:     '12px',   // standard buttons
-  xl:     '14px',   // select cards (trade type picker)
-  panel:  '16px',   // standard glassmorphic panels
-  sidebar:'18px',   // sidebar panel
-  card:   '24px',   // onboarding card, intelligence cards
-  modal:  '28px',   // passport card, large modals
-  pill:   '100px',  // fully-rounded buttons, category badges
-  circle: '50%',    // avatar, spinner, status dots
+  none:      '0px',
+  xs:        '6px',    // inline badges, tiny chips
+  sm:        '8px',    // small buttons
+  md:        '10px',   // --radius-sm: form inputs, nav items
+  lg:        '12px',   // medium panels
+  xl:        '14px',   // --radius: stat cards, standard panels
+  container: '18px',   // inner container (the glass shell)
+  sidebar:   '18px',   // alias: sidebar panel radius
+  panel:     '14px',   // standard glassmorphic panels (alias for xl)
+  card:      '14px',   // --radius: cards
+  modal:     '18px',   // large modals / overlays
+  pill:      '100px',  // fully-rounded buttons, category badges
+  circle:    '50%',    // avatar, spinner, status dots
 } as const
 
 export type RadiusToken = keyof typeof radius

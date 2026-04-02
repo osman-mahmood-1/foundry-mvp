@@ -7,18 +7,16 @@
  *
  * Rules:
  * - No data fetching. No Supabase imports. Pure presentation.
- * - All design values come from @/styles/tokens — never hardcoded.
+ * - All design values from @/styles/tokens — never hardcoded.
+ * - Theme-aware via useColours() / useThemeMode() where needed.
  * - Each component does exactly one thing.
- * - Props are typed explicitly — no `any`, no `style` prop overrides
- *   unless explicitly needed (use the `style` escape hatch sparingly).
  *
- * A senior dev should be able to read any component here
- * in under 30 seconds and understand exactly what it renders.
+ * Authority: lotech-dashboard-v9.html mockup — no other source.
  */
 
 import React, { useState, Component } from 'react'
 import {
-  colours,
+  colours as staticColours,
   fonts,
   fontSize,
   fontWeight,
@@ -29,32 +27,25 @@ import {
   transition,
   shadows,
 } from '@/styles/tokens'
+import { useColours, useThemeMode } from '@/styles/ThemeContext'
 import type { AppError } from '@/lib/errors'
 
 
 // ─── ErrorBanner ──────────────────────────────────────────────────────────────
 
-/**
- * Renders a structured error banner from an AppError.
- *
- * - Non-internal: amber left-border, shows title + message + action + copyable code
- * - Internal:     blue left-border, "we're reviewing it" tone + copyable code
- *
- * The reference code is copyable so users can quote it to support.
- * Every render also console.errors the code for Vercel log visibility.
- */
 export function ErrorBanner({ error }: { error: AppError }) {
+  const colours = useColours()
   const [copied, setCopied] = useState(false)
 
   function copyCode() {
-    navigator.clipboard.writeText(error.code).catch(() => {/* clipboard unavailable */})
+    navigator.clipboard.writeText(error.code).catch(() => {})
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
 
-  const borderColour = error.internal ? colours.info            : colours.pendingReview
-  const bgColour     = error.internal ? colours.infoLight       : colours.pendingReviewLight
-  const codeColour   = error.internal ? colours.info            : colours.pendingReview
+  const borderColour = error.internal ? colours.info          : colours.pendingReview
+  const bgColour     = error.internal ? colours.infoLight     : colours.pendingReviewLight
+  const codeColour   = error.internal ? colours.info          : colours.pendingReview
 
   return (
     <div style={{
@@ -71,7 +62,7 @@ export function ErrorBanner({ error }: { error: AppError }) {
       <div style={{ flex: 1 }}>
         <div style={{
           fontFamily:   fonts.sans,
-          fontWeight:   fontWeight.medium,
+          fontWeight:   fontWeight.semibold,
           fontSize:     fontSize.sm,
           color:        colours.textPrimary,
           marginBottom: '2px',
@@ -91,13 +82,13 @@ export function ErrorBanner({ error }: { error: AppError }) {
         </div>
       </div>
 
-      {/* Copyable reference code */}
       <button
         onClick={copyCode}
         title="Copy reference code"
         style={{
-          fontFamily:    fonts.mono,
+          fontFamily:    fonts.sans,
           fontSize:      '10px',
+          letterSpacing: '0.04em',
           color:         copied ? colours.allowable : codeColour,
           background:    'transparent',
           border:        `1px solid ${copied ? colours.allowable : borderColour}`,
@@ -106,7 +97,6 @@ export function ErrorBanner({ error }: { error: AppError }) {
           cursor:        'pointer',
           flexShrink:    0,
           transition:    transition.snap,
-          letterSpacing: '0.04em',
           whiteSpace:    'nowrap' as const,
           alignSelf:     'flex-start',
         }}
@@ -125,16 +115,6 @@ interface TabErrorBoundaryState {
   code:   string
 }
 
-/**
- * Class-based error boundary wrapping each portal tab.
- *
- * If a tab throws during render, this catches it and shows a calm recovery
- * UI instead of crashing the entire portal. The user can navigate to other
- * tabs normally. Switching tabs resets the boundary (via key prop in caller).
- *
- * Error boundaries must be class components — React does not support them
- * as function components.
- */
 export class TabErrorBoundary extends Component<
   { children: React.ReactNode },
   TabErrorBoundaryState
@@ -159,9 +139,11 @@ export class TabErrorBoundary extends Component<
   render() {
     if (!this.state.caught) return this.props.children
 
+    // Class components cannot use hooks; use static light colours as fallback
+    const c = staticColours
     return (
       <div style={{
-        ...glass.panel,
+        ...glass.panel('light'),
         padding:        '48px 36px',
         display:        'flex',
         flexDirection:  'column',
@@ -175,14 +157,14 @@ export class TabErrorBoundary extends Component<
         <div style={{
           fontFamily: fonts.sans,
           fontSize:   '18px',
-          fontWeight: fontWeight.medium,
-          color:      colours.textPrimary,
+          fontWeight: fontWeight.semibold,
+          color:      c.textPrimary,
         }}>
           This section hit a snag.
         </div>
         <div style={{
           fontSize:   fontSize.sm,
-          color:      colours.textMuted,
+          color:      c.textMuted,
           lineHeight: 1.6,
           maxWidth:   '300px',
         }}>
@@ -195,10 +177,10 @@ export class TabErrorBoundary extends Component<
             marginTop:     '8px',
             padding:       '8px 20px',
             background:    'transparent',
-            border:        `1px solid ${colours.borderMedium}`,
+            border:        `1px solid ${c.borderMedium}`,
             borderRadius:  radius.pill,
             fontSize:      fontSize.sm,
-            color:         colours.textSecondary,
+            color:         c.textSecondary,
             fontFamily:    fonts.sans,
             cursor:        'pointer',
             transition:    transition.snap,
@@ -207,9 +189,9 @@ export class TabErrorBoundary extends Component<
           Reload page
         </button>
         <div style={{
-          fontFamily:    fonts.mono,
+          fontFamily:    fonts.sans,
           fontSize:      '10px',
-          color:         colours.textMuted,
+          color:         c.textMuted,
           letterSpacing: '0.08em',
           opacity:       0.6,
         }}>
@@ -226,17 +208,18 @@ export class TabErrorBoundary extends Component<
 interface PanelProps {
   children: React.ReactNode
   padding?: string
-  style?: React.CSSProperties
+  style?:   React.CSSProperties
 }
 
 /**
- * The standard glassmorphic content card.
- * Wrap any section of content in a Panel.
+ * Standard glassmorphic content card.
+ * Uses glass.card styles (smaller card-level glass, 14px radius).
  */
 export function Panel({ children, padding = spacing.panel.padding, style }: PanelProps) {
+  const mode = useThemeMode()
   return (
     <div style={{
-      ...glass.panel,
+      ...glass.card(mode),
       padding,
       ...style,
     }}>
@@ -248,23 +231,19 @@ export function Panel({ children, padding = spacing.panel.padding, style }: Pane
 
 // ─── Label ────────────────────────────────────────────────────────────────────
 
-interface LabelProps {
-  children: React.ReactNode
-}
+interface LabelProps { children: React.ReactNode }
 
-/**
- * Section label — mono uppercase, muted.
- * Used as the heading above a data group within a panel.
- * e.g. "Recent activity", "Upload documents · 2024-25"
- */
+/** Uppercase section label. */
 export function Label({ children }: LabelProps) {
+  const colours = useColours()
   return (
     <div style={{
       fontSize:      fontSize.label,
       color:         colours.textMuted,
       textTransform: 'uppercase' as const,
       letterSpacing: letterSpacing.label,
-      fontFamily:    fonts.mono,
+      fontFamily:    fonts.sans,
+      fontWeight:    fontWeight.semibold,
       marginBottom:  '14px',
     }}>
       {children}
@@ -275,11 +254,8 @@ export function Label({ children }: LabelProps) {
 
 // ─── Spinner ──────────────────────────────────────────────────────────────────
 
-/**
- * Loading spinner. Centered in its container.
- * Sized for inline use inside panels — not a full-page loader.
- */
 export function Spinner() {
+  const colours = useColours()
   return (
     <div style={{
       display:        'flex',
@@ -290,7 +266,7 @@ export function Spinner() {
       <div style={{
         width:        '24px',
         height:       '24px',
-        border:       `2px solid ${colours.borderLight}`,
+        border:       `2px solid ${colours.borderHairline}`,
         borderTop:    `2px solid ${colours.accent}`,
         borderRadius: radius.circle,
         animation:    'spin 0.8s linear infinite',
@@ -310,12 +286,8 @@ interface EmptyStateProps {
   onAction?: () => void
 }
 
-/**
- * Empty state for tabs and panels with no data yet.
- * Always provides meaningful copy — never "No data found".
- * The optional action button links directly to resolving the empty state.
- */
 export function EmptyState({ icon, headline, sub, action, onAction }: EmptyStateProps) {
+  const colours = useColours()
   return (
     <div style={{
       display:        'flex',
@@ -335,7 +307,7 @@ export function EmptyState({ icon, headline, sub, action, onAction }: EmptyState
       <div style={{
         fontFamily:    fonts.sans,
         fontSize:      '18px',
-        fontWeight:    fontWeight.medium,
+        fontWeight:    fontWeight.bold,
         color:         colours.textPrimary,
         marginBottom:  '8px',
         letterSpacing: letterSpacing.tight,
@@ -354,18 +326,19 @@ export function EmptyState({ icon, headline, sub, action, onAction }: EmptyState
       {action && onAction && (
         <button
           onClick={onAction}
+          className="cta-btn"
           style={{
-            padding:     `9px 20px`,
-            background:  colours.accent,
-            color:       colours.textInverse,
-            border:      'none',
+            padding:      '9px 20px',
+            background:   `linear-gradient(135deg, ${colours.accent}, ${colours.orange})`,
+            color:        '#000000',
+            border:       'none',
             borderRadius: radius.pill,
-            fontSize:    fontSize.sm,
-            fontWeight:  fontWeight.medium,
-            cursor:      'pointer',
-            fontFamily:  fonts.sans,
-            letterSpacing: letterSpacing.tight,
-            transition:  transition.snap,
+            fontSize:     fontSize.sm,
+            fontWeight:   fontWeight.bold,
+            cursor:       'pointer',
+            fontFamily:   fonts.sans,
+            boxShadow:    shadows.accent,
+            transition:   transition.snap,
           }}
         >
           {action}
@@ -379,35 +352,38 @@ export function EmptyState({ icon, headline, sub, action, onAction }: EmptyState
 // ─── StatCard ─────────────────────────────────────────────────────────────────
 
 interface StatCardProps {
-  label: string
-  value: string
-  sub?:  string
+  label:   string
+  value:   string
+  sub?:    string
   colour?: string
 }
 
-/**
- * Metric display card. Used in the Overview stat row.
- * The value is rendered in JetBrains Mono for numerical clarity.
- */
-export function StatCard({ label, value, sub, colour = colours.textPrimary }: StatCardProps) {
+export function StatCard({ label, value, sub, colour }: StatCardProps) {
+  const colours = useColours()
+  const mode    = useThemeMode()
   return (
-    <Panel padding={spacing.panel.paddingTight}>
+    <div style={{
+      ...glass.card(mode),
+      padding: spacing.panel.paddingTight,
+    }}>
       <div style={{
         fontSize:      fontSize.label,
         color:         colours.textMuted,
         textTransform: 'uppercase' as const,
-        letterSpacing: letterSpacing.wider,
-        fontFamily:    fonts.mono,
+        letterSpacing: letterSpacing.label,
+        fontFamily:    fonts.sans,
+        fontWeight:    fontWeight.semibold,
         marginBottom:  '10px',
       }}>
         {label}
       </div>
       <div style={{
-        fontFamily:   fonts.mono,
+        fontFamily:   fonts.sans,
         fontSize:     '28px',
-        fontWeight:   fontWeight.medium,
-        color:        colour,
+        fontWeight:   fontWeight.black,
+        color:        colour ?? colours.textPrimary,
         lineHeight:   1,
+        letterSpacing: letterSpacing.tight,
         marginBottom: sub ? '6px' : '0',
       }}>
         {value}
@@ -420,7 +396,7 @@ export function StatCard({ label, value, sub, colour = colours.textPrimary }: St
           {sub}
         </div>
       )}
-    </Panel>
+    </div>
   )
 }
 
@@ -434,26 +410,24 @@ interface BadgeProps {
   variant?: BadgeVariant
 }
 
-const BADGE_STYLES: Record<BadgeVariant, { background: string; color: string }> = {
-  success:  { background: colours.allowableLight,       color: colours.allowable },
-  warning:  { background: colours.pendingReviewLight,   color: colours.pendingReview },
-  danger:   { background: colours.dangerLight,          color: colours.danger },
-  info:     { background: colours.infoLight,            color: colours.info },
-  neutral:  { background: `rgba(5,28,44,0.05)`,         color: colours.textSecondary },
-  income:   { background: colours.incomeLight,          color: colours.income },
-  expense:  { background: colours.expenseLight,         color: colours.expense },
-}
-
-/**
- * Status and category pill badge.
- * Used for transaction status, allowability, document category, etc.
- */
 export function Badge({ children, variant = 'neutral' }: BadgeProps) {
+  const colours = useColours()
+
+  const BADGE_STYLES: Record<BadgeVariant, { background: string; color: string }> = {
+    success:  { background: colours.allowableLight,     color: colours.allowable },
+    warning:  { background: colours.warningLight,       color: colours.warning },
+    danger:   { background: colours.dangerLight,        color: colours.danger },
+    info:     { background: colours.infoLight,          color: colours.info },
+    neutral:  { background: colours.borderHairline,     color: colours.textSecondary },
+    income:   { background: colours.incomeLight,        color: colours.income },
+    expense:  { background: colours.expenseLight,       color: colours.expense },
+  }
+
   const { background, color } = BADGE_STYLES[variant]
   return (
     <span style={{
       fontSize:      fontSize.xs,
-      fontWeight:    fontWeight.medium,
+      fontWeight:    fontWeight.semibold,
       padding:       '2px 8px',
       background,
       color,
@@ -485,39 +459,18 @@ interface ButtonProps {
   type?:      'button' | 'submit'
 }
 
-const BUTTON_VARIANTS: Record<ButtonVariant, React.CSSProperties> = {
-  primary: {
-    background:  'linear-gradient(135deg, #00C2FF 0%, #0094CC 100%)',
-    color:       '#0D1117',
-    border:      'none',
-    boxShadow:   '0 2px 8px rgba(0,194,255,0.28)',
-  },
-  secondary: {
-    background:  colours.hoverBg,
-    color:       colours.textSecondary,
-    border:      `1px solid ${colours.borderMedium}`,
-  },
-  ghost: {
-    background:  'transparent',
-    color:       colours.textMuted,
-    border:      'none',
-  },
-  danger: {
-    background:  colours.dangerLight,
-    color:       colours.danger,
-    border:      `1px solid ${colours.dangerLight}`,
-  },
-}
-
 const BUTTON_SIZES: Record<ButtonSize, React.CSSProperties> = {
-  sm: { padding: '7px 14px', fontSize: fontSize.sm },
-  md: { padding: '9px 20px', fontSize: fontSize.base },
-  lg: { padding: '14px 28px', fontSize: '14px' },
+  sm: { padding: '7px 14px',  fontSize: fontSize.sm },
+  md: { padding: '7.5px 15px', fontSize: fontSize.base },
+  lg: { padding: '10px 20px', fontSize: fontSize.md },
 }
 
 /**
- * Button with primary, secondary, ghost, and danger variants.
- * Always pill-shaped — consistent with the Foundry design language.
+ * Button variants — exactly as in mockup:
+ *   primary   = btn-fill: gold→orange gradient, black text, pill, box-shadow
+ *   secondary = btn-simple: subtle bg/border, text2 colour, pill
+ *   ghost     = transparent, no border
+ *   danger    = danger tint background
  */
 export function Button({
   children,
@@ -528,11 +481,45 @@ export function Button({
   fullWidth = false,
   type      = 'button',
 }: ButtonProps) {
-  const [hovered, setHovered] = useState(false)
+  const colours            = useColours()
+  const [hovered, setHov] = useState(false)
 
-  const hoverOverride: React.CSSProperties = hovered && !disabled && variant === 'primary'
-    ? { background: 'linear-gradient(135deg, #1ACEFF 0%, #00AADD 100%)', boxShadow: '0 4px 16px rgba(0,194,255,0.40)' }
-    : {}
+  function variantStyles(): React.CSSProperties {
+    switch (variant) {
+      case 'primary':
+        return {
+          background: hovered
+            ? `linear-gradient(135deg, ${colours.accentHover}, ${colours.orange})`
+            : `linear-gradient(135deg, ${colours.accent}, ${colours.orange})`,
+          color:     '#000000',
+          border:    'none',
+          boxShadow: hovered ? shadows.accentHover : shadows.accent,
+          transform: hovered && !disabled ? 'translateY(-1px)' : 'none',
+        }
+      case 'secondary':
+        return {
+          background:  hovered
+            ? `rgba(245,166,35,0.08)`
+            : colours.simpleBg,
+          color:       hovered ? colours.textPrimary : colours.textSecondary,
+          border:      hovered
+            ? `1px solid rgba(245,166,35,0.24)`
+            : `1px solid ${colours.simpleBorder}`,
+        }
+      case 'ghost':
+        return {
+          background: hovered ? colours.hoverBg : 'transparent',
+          color:      hovered ? colours.textPrimary : colours.textMuted,
+          border:     'none',
+        }
+      case 'danger':
+        return {
+          background: colours.dangerLight,
+          color:      colours.danger,
+          border:     `1px solid ${colours.dangerLight}`,
+        }
+    }
+  }
 
   return (
     <button
@@ -540,21 +527,22 @@ export function Button({
       onClick={onClick}
       disabled={disabled}
       className={variant === 'primary' ? 'cta-btn' : undefined}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
       style={{
-        ...BUTTON_VARIANTS[variant],
+        ...variantStyles(),
         ...BUTTON_SIZES[size],
-        ...hoverOverride,
         borderRadius:  radius.pill,
-        fontWeight:    fontWeight.medium,
+        fontWeight:    variant === 'primary' ? fontWeight.bold : fontWeight.medium,
         fontFamily:    fonts.sans,
         cursor:        disabled ? 'not-allowed' : 'pointer',
         opacity:       disabled ? 0.5 : 1,
         transition:    transition.snap,
         width:         fullWidth ? '100%' : 'auto',
-        letterSpacing: letterSpacing.tight,
-        display:       'inline-block',
+        letterSpacing: letterSpacing.tight2,
+        display:       'inline-flex',
+        alignItems:    'center',
+        gap:           '7px',
       }}
     >
       {children}
@@ -576,11 +564,6 @@ interface InputProps {
   onEnter?:     () => void
 }
 
-/**
- * Standard form text input.
- * All form inputs across the portal use this component.
- * Focus ring uses the teal accent.
- */
 export function Input({
   value,
   onChange,
@@ -591,6 +574,7 @@ export function Input({
   autoFocus = false,
   onEnter,
 }: InputProps) {
+  const colours = useColours()
   return (
     <div>
       {label && (
@@ -616,8 +600,8 @@ export function Input({
         style={{
           width:        '100%',
           height:       '40px',
-          padding:      '0 12px',
-          border:       `1px solid ${colours.borderInput}`,
+          padding:      '0 13px',
+          border:       `1px solid ${colours.inputBorder}`,
           borderRadius: radius.md,
           fontSize:     fontSize.base,
           color:        colours.textPrimary,
@@ -628,12 +612,14 @@ export function Input({
           transition:   transition.snap,
           opacity:      disabled ? 0.6 : 1,
         }}
-        onFocus={e  => {
+        onFocus={e => {
           e.target.style.borderColor = colours.accentBorder
-          e.target.style.boxShadow   = '0 0 0 3px rgba(0,194,255,0.12)'
+          e.target.style.background  = colours.accentSoft
+          e.target.style.boxShadow   = `0 0 0 3px ${colours.accentLight}`
         }}
-        onBlur={e   => {
-          e.target.style.borderColor = colours.borderMedium
+        onBlur={e => {
+          e.target.style.borderColor = colours.inputBorder
+          e.target.style.background  = colours.inputBg
           e.target.style.boxShadow   = 'none'
         }}
       />
@@ -650,18 +636,15 @@ interface SelectOption {
 }
 
 interface SelectProps {
-  value:    string
-  onChange: (value: string) => void
-  options:  SelectOption[]
-  label?:   string
+  value:     string
+  onChange:  (value: string) => void
+  options:   SelectOption[]
+  label?:    string
   disabled?: boolean
 }
 
-/**
- * Standard form select / dropdown.
- * Consistent with Input styling — same border, radius, focus behaviour.
- */
 export function Select({ value, onChange, options, label, disabled = false }: SelectProps) {
+  const colours = useColours()
   return (
     <div>
       {label && (
@@ -682,8 +665,8 @@ export function Select({ value, onChange, options, label, disabled = false }: Se
         style={{
           width:        '100%',
           height:       '40px',
-          padding:      '0 12px',
-          border:       `1px solid ${colours.borderInput}`,
+          padding:      '0 32px 0 13px',
+          border:       `1px solid ${colours.inputBorder}`,
           borderRadius: radius.md,
           fontSize:     fontSize.base,
           color:        colours.textPrimary,
@@ -693,6 +676,7 @@ export function Select({ value, onChange, options, label, disabled = false }: Se
           boxSizing:    'border-box' as const,
           cursor:       disabled ? 'not-allowed' : 'pointer',
           opacity:      disabled ? 0.6 : 1,
+          appearance:   'none' as const,
         }}
       >
         {options.map(opt => (
@@ -708,26 +692,20 @@ export function Select({ value, onChange, options, label, disabled = false }: Se
 
 // ─── Divider ─────────────────────────────────────────────────────────────────
 
-/**
- * Horizontal rule. Used between sections in panels and the sidebar.
- */
 export function Divider() {
+  const colours = useColours()
   return (
     <div style={{
       height:     '1px',
-      background: colours.borderLight,
-      margin:     `0 ${spacing.sidebar.padding}`,
+      background: colours.borderHairline,
+      margin:     `0`,
     }} />
   )
 }
 
 
-// ─── Formatters (co-located with UI — no Supabase, pure functions) ─────────────
+// ─── Formatters ──────────────────────────────────────────────────────────────
 
-/**
- * Format pence to GBP display string.
- * e.g. 105000 → "£1,050"
- */
 export function formatGBP(pence: number): string {
   return new Intl.NumberFormat('en-GB', {
     style:                 'currency',
@@ -737,10 +715,6 @@ export function formatGBP(pence: number): string {
   }).format(pence / 100)
 }
 
-/**
- * Format ISO date string to readable UK date.
- * e.g. "2025-01-31" → "31 Jan 2025"
- */
 export function formatDate(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString('en-GB', {
     day:   'numeric',
@@ -749,10 +723,6 @@ export function formatDate(dateStr: string): string {
   })
 }
 
-/**
- * Format bytes to human-readable file size.
- * e.g. 1048576 → "1.0 MB"
- */
 export function formatBytes(bytes: number): string {
   if (bytes < 1024)    return `${bytes} B`
   if (bytes < 1048576) return `${(bytes / 1024).toFixed(1)} KB`
