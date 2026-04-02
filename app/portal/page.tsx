@@ -20,7 +20,7 @@
 import { redirect }           from 'next/navigation'
 import { createClient }       from '@/lib/supabase-server'
 import PortalThemeProvider    from './components/PortalThemeProvider'
-import PortalShell            from './components/PortalShell'
+import PortalShellRouter      from './components/PortalShellRouter'
 import type { Client }        from '@/types'
 
 export const dynamic = 'force-dynamic'
@@ -49,7 +49,7 @@ export default async function PortalPage() {
 
   return (
     <PortalThemeProvider>
-      <PortalShell client={clientData as Client} />
+      <PortalShellRouter client={clientData as Client} />
     </PortalThemeProvider>
   )
 }

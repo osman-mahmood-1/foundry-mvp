@@ -10,11 +10,22 @@
   --radius-lg: 14px;  /* cards, panels, modals, drawers, slide panels, toasts */
 }
 
+/* ── Safe area inset variables (iOS notch / Dynamic Island) ────────────────── */
+:root {
+  --sat: env(safe-area-inset-top, 0px);
+  --sar: env(safe-area-inset-right, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px);
+}
+
 /* ── Base reset ────────────────────────────────────────────────────────────── */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  /* Remove iOS tap flash and long-press callout globally */
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
 }
 
 html, body {
@@ -185,4 +196,151 @@ input, select, textarea, button {
 [data-theme="light"] * {
   scrollbar-width: thin;
   scrollbar-color: #c5cfe0 transparent;
+}
+
+/* ── Mobile: prevent input zoom on iOS (font-size < 16px auto-zooms) ───────── */
+@media (max-width: 768px) {
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* ── Mobile scroll area — safe area bottom padding ─────────────────────────── */
+.mobile-scroll-area {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+}
+
+/* ── Hamburger overlay (portal via React Portal → document.body) ────────────── */
+.hamburger-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 100dvh;
+  min-height: 100vh;     /* fallback */
+  min-height: 100dvh;
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: auto;
+  z-index: 200;
+}
+
+.hamburger-panel {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* ── Bottom sheet (profile / toasts — portalled) ─────────────────────────── */
+.bottom-sheet-portal {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  z-index: 210;
+}
+
+/* ── Sync toast ─────────────────────────────────────────────────────────────── */
+.sync-toast {
+  position: fixed;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 300;
+  padding: 10px 20px;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-family: var(--font-display);
+  white-space: nowrap;
+  animation: fadeIn 0.2s ease both;
+}
+
+/* ── Mobile form sheet animation ────────────────────────────────────────────── */
+@keyframes formFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.form-screen {
+  animation: formFadeIn 180ms ease-out both;
+}
+
+/* ── Mobile particle burst (income save delight) ────────────────────────────── */
+@keyframes particle-burst {
+  to {
+    opacity: 0;
+    transform: translate(var(--tx), var(--ty)) scale(0.3);
+  }
+}
+
+/* ── Mobile save checkmark draw ─────────────────────────────────────────────── */
+@keyframes draw-check {
+  from { stroke-dashoffset: 40; }
+  to   { stroke-dashoffset: 0; }
+}
+
+/* ── Mobile scroll cards — horizontal snap ──────────────────────────────────── */
+.card-scroll {
+  display: flex;
+  gap: 12px;
+  overflow-x: scroll;   /* 'scroll' not 'auto' for iOS reliability */
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory;
+  -webkit-scroll-snap-type: x mandatory;
+  scroll-padding: 16px;
+  padding: 0 16px;
+  scrollbar-width: none;
+  scroll-behavior: smooth;
+}
+.card-scroll::-webkit-scrollbar { display: none; }
+
+.stat-card-mobile {
+  scroll-snap-align: start;
+  -webkit-scroll-snap-align: start;
+  scroll-snap-stop: always;
+  flex-shrink: 0;
+  width: calc(100vw - 64px);
+}
+
+/* ── Pull-to-refresh spinner ────────────────────────────────────────────────── */
+@keyframes ptr-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* ── Reduced-motion: hamburger and form sheet skip animation ─────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .hamburger-overlay {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+  .form-screen {
+    animation: none;
+  }
+}
+
+/* ── Stagger animation for hamburger nav items ──────────────────────────────── */
+@keyframes navItemIn {
+  from { opacity: 0; filter: blur(8px); transform: translateY(-10px); }
+  to   { opacity: 1; filter: blur(0);   transform: translateY(0); }
+}
+@keyframes navItemOut {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+/* ── Hamburger backdrop-filter performance fallback ─────────────────────────── */
+.hamburger-overlay {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+@media (prefers-reduced-motion: reduce) {
+  .hamburger-overlay {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: rgba(5, 8, 16, 0.97) !important;
+  }
 }

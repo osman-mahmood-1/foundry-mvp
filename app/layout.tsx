@@ -21,6 +21,18 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" data-theme="light" className={outfit.variable}>
+      <head>
+        {/* Theme colour — matches pageBg per mode for Dynamic Island / status bar */}
+        <meta name="theme-color" content="#07101e" media="(prefers-color-scheme: dark)" />
+        <meta name="theme-color" content="#fdf5ec" media="(prefers-color-scheme: light)" />
+
+        {/* PWA / home screen */}
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="Tax Foundry" />
+        <link rel="manifest" href="/manifest.json" />
+        <link rel="apple-touch-icon" href="/icon-192.png" />
+      </head>
       <body>
         {children}
       </body>

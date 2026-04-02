@@ -74,12 +74,21 @@ export default function PortalThemeProvider({
     return () => mq.removeEventListener('change', handler)
   }, [mode])
 
+  function updateThemeColorMeta(resolved: ColourMode) {
+    const meta = document.querySelector('meta[name="theme-color"]:not([media])')
+      ?? document.createElement('meta')
+    meta.setAttribute('name', 'theme-color')
+    meta.setAttribute('content', resolved === 'dark' ? '#07101e' : '#fdf5ec')
+    if (!meta.parentNode) document.head.appendChild(meta)
+  }
+
   function setMode(m: ThemeMode) {
     setModeState(m)
     localStorage.setItem(storageKey, m)
     const r = resolveTheme(m)
     setResolved(r)
     document.documentElement.setAttribute('data-theme', r)
+    updateThemeColorMeta(r)
   }
 
   return (
