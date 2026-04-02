@@ -270,23 +270,9 @@ export default function ClientsTab({ client: _client }: { client: Client }) {
 
           {selected ? (
             <div style={{ display: 'flex', gap: '8px', justifyContent: 'space-between', marginTop: '4px' }}>
-              <button
-                onClick={handleDelete}
-                style={{
-                  background:   colours.dangerLight,
-                  border:       `1px solid ${colours.danger}33`,
-                  borderRadius: radius.sm,
-                  color:        colours.danger,
-                  fontSize:     fontSize.sm,
-                  fontFamily:   fonts.sans,
-                  fontWeight:   fontWeight.medium,
-                  padding:      '7px 14px',
-                  cursor:       'pointer',
-                  transition:   transition.snap,
-                }}
-              >
+              <Button variant="danger" size="sm" onClick={handleDelete}>
                 Delete
-              </button>
+              </Button>
               <Button size="sm" onClick={handleSaveEdit} disabled={saving || !isFormValid}>
                 {saving ? 'Saving…' : 'Save changes'}
               </Button>

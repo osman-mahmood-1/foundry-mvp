@@ -445,7 +445,6 @@ export default function InvoicesTab({ client }: { client: Client }) {
                 </Button>
               )}
               <Button
-                variant="secondary"
                 size="sm"
                 onClick={() => alert('PDF download — coming soon')}
               >

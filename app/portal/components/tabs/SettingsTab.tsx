@@ -1267,39 +1267,18 @@ export default function SettingsTab({ client }: { client: Client }) {
         </div>
 
         <div style={{ display: 'flex', gap: '10px' }}>
-          <button
-            onClick={() => alert('Upgrade — contact support@taxfoundry.co.uk.')}
-            style={{
-              padding:      '10px 22px',
-              borderRadius: radius.md,
-              border:       'none',
-              background:   colours.cta,
-              color:        colours.ctaText,
-              fontSize:     fontSize.sm,
-              fontWeight:   fontWeight.semibold,
-              fontFamily:   fonts.sans,
-              cursor:       'pointer',
-              transition:   transition.snap,
-            }}
+          <Button
+            shimmer
+            onClick={() => alert('Upgrade — message us in the app.')}
           >
             Upgrade to Core — £39/mo
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="ghost"
             onClick={() => alert('Plan comparison — coming soon.')}
-            style={{
-              padding:      '10px 20px',
-              borderRadius: radius.md,
-              border:       `1px solid ${colours.borderMedium}`,
-              background:   'transparent',
-              color:        colours.textSecondary,
-              fontSize:     fontSize.sm,
-              fontFamily:   fonts.sans,
-              cursor:       'pointer',
-              transition:   transition.snap,
-            }}
           >
             View all plans
-          </button>
+          </Button>
         </div>
       </Panel>
 

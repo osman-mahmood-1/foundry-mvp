@@ -28,20 +28,20 @@ function FilterPill({ label, active, onClick }: { label: string; active: boolean
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
+        display:      'flex',
+        alignItems:   'center',
+        gap:          '8px',
         padding:      '8px 16px',
+        background:   active ? colours.accentLight : (hovered ? colours.accentLight : colours.hoverBg),
+        border:       `1px solid ${active ? colours.accentBorder : (hovered ? colours.accentBorder : colours.borderMedium)}`,
         borderRadius: radius.md,
-        border:       active
-          ? '1px solid rgba(255,255,255,0.14)'
-          : '1px solid rgba(255,255,255,0.06)',
-        background:   active
-          ? 'rgba(255,255,255,0.10)'
-          : (hovered ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.06)'),
-        color:        active ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.40)',
-        fontSize:     '13.5px',
-        fontWeight:   active ? fontWeight.medium : fontWeight.regular,
         cursor:       'pointer',
+        fontSize:     '13.5px',
         fontFamily:   fonts.sans,
-        transition:   transition.snap,
+        fontWeight:   active ? fontWeight.medium : fontWeight.regular,
+        color:        active ? colours.accent : (hovered ? colours.accent : colours.textSecondary),
+        transition:   'all 0.15s ease',
+        flexShrink:   0,
       }}
     >
       {label}
