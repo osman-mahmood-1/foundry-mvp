@@ -334,10 +334,10 @@ export function EmptyState({ icon, headline, sub, action, onAction }: EmptyState
             border:       'none',
             borderRadius: radius.pill,
             fontSize:     fontSize.sm,
-            fontWeight:   fontWeight.bold,
+            fontWeight:   fontWeight.medium,
             cursor:       'pointer',
             fontFamily:   fonts.sans,
-            boxShadow:    shadows.accent,
+            boxShadow:    'none',
             transition:   transition.snap,
           }}
         >
@@ -491,7 +491,7 @@ export function Button({
           background: colours.cta,
           color:      colours.ctaText,
           border:     'none',
-          boxShadow:  hovered ? `${colours.ctaGlow} 0 6px 28px` : `${colours.ctaGlow} 0 4px 24px`,
+          boxShadow:  hovered ? `0 6px 24px ${colours.ctaGlow}` : 'none',
           transform:  hovered && !disabled ? 'translateY(-1px)' : 'none',
         }
       case 'secondary':
@@ -501,8 +501,8 @@ export function Button({
             : colours.simpleBg,
           color:       hovered ? colours.textPrimary : colours.textSecondary,
           border:      hovered
-            ? `1px solid ${colours.accentBorder}`
-            : `1px solid ${colours.simpleBorder}`,
+            ? 'none'
+            : `1px solid ${colours.borderHairline}`,
         }
       case 'ghost':
         return {
@@ -514,7 +514,7 @@ export function Button({
         return {
           background: colours.dangerLight,
           color:      colours.danger,
-          border:     `1px solid ${colours.dangerLight}`,
+          border:     'none',
         }
     }
   }
@@ -531,7 +531,7 @@ export function Button({
         ...variantStyles(),
         ...BUTTON_SIZES[size],
         borderRadius:  radius.pill,
-        fontWeight:    variant === 'primary' ? fontWeight.bold : fontWeight.medium,
+        fontWeight:    fontWeight.medium,
         fontFamily:    fonts.sans,
         cursor:        disabled ? 'not-allowed' : 'pointer',
         opacity:       disabled ? 0.5 : 1,

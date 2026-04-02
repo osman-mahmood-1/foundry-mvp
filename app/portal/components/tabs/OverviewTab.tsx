@@ -251,37 +251,11 @@ export default function OverviewTab({ clientId, readOnly = false, onTabChange }:
   const profit = stats.incomePence - stats.expensesPence
 
   return (
-    /* Outer container — full width, relative for orb positioning */
-    <div style={{ position: 'relative', padding: '4px 0 40px', overflow: 'hidden', minHeight: '100%' }}>
+    /* Outer container — full width */
+    <div style={{ padding: '4px 0 40px', minHeight: '100%' }}>
 
-      {/* ── Two large background orbs ── */}
-      <div style={{
-        position:      'absolute',
-        top:           '-80px',
-        right:         '-60px',
-        width:         '560px',
-        height:        '560px',
-        borderRadius:  '50%',
-        background:    'radial-gradient(circle, rgba(59,130,246,0.18) 0%, transparent 65%)',
-        filter:        'blur(80px)',
-        pointerEvents: 'none',
-        zIndex:        0,
-      }} />
-      <div style={{
-        position:      'absolute',
-        top:           '-40px',
-        left:          '-40px',
-        width:         '400px',
-        height:        '400px',
-        borderRadius:  '50%',
-        background:    'radial-gradient(circle, rgba(34,211,165,0.10) 0%, transparent 65%)',
-        filter:        'blur(100px)',
-        pointerEvents: 'none',
-        zIndex:        0,
-      }} />
-
-      {/* Content sits above orbs */}
-      <div style={{ position: 'relative', zIndex: 1 }}>
+      {/* Content */}
+      <div>
 
         {/* Header */}
         <div style={{ marginBottom: '24px' }}>

@@ -37,10 +37,10 @@ export const dark = {
   inputFocusBorder:'rgba(59,130,246,0.30)',
   inputFocusGlow:  '0 0 0 3px rgba(59,130,246,0.18)',
 
-  // ── Text — 4 levels
+  // ── Text — 4 levels (boosted one step for contrast)
   textPrimary:     '#ffffff',
-  textSecondary:   'rgba(255,255,255,0.70)',
-  textMuted:       'rgba(255,255,255,0.35)',
+  textSecondary:   'rgba(255,255,255,0.85)',
+  textMuted:       'rgba(255,255,255,0.55)',
   textInverse:     '#000000',
 
   // ── Primary interactive — sapphire
@@ -52,13 +52,13 @@ export const dark = {
   accentBorder:    'rgba(59,130,246,0.30)',
   accentText:      '#3b82f6',
 
-  // ── CTA — copper (one primary action per screen)
-  cta:             'linear-gradient(135deg, #e8922a, #d4731a)',
-  ctaGlow:         'rgba(232,146,42,0.40)',
-  ctaText:         '#000000',
+  // ── CTA — sapphire→teal gradient (one primary action per screen)
+  cta:             'linear-gradient(135deg, #3b82f6, #14b8a6)',
+  ctaGlow:         'rgba(59,130,246,0.35)',
+  ctaText:         '#ffffff',
 
-  // ── Copper / teal / extra palette
-  orange:          '#e8922a',   // copper — CTA colour alias
+  // ── Teal / extra palette
+  orange:          '#14b8a6',   // teal — replaces copper as CTA secondary alias
   teal:            '#14b8a6',   // teal 500
   tealLight:       'rgba(20,184,166,0.14)',
   tealBar:         '#2dd4bf',   // teal 400
@@ -81,11 +81,11 @@ export const dark = {
 
   // ── Nav
   hoverBg:         'rgba(255,255,255,0.05)',
-  navActive:       '#000000',                                   // text on copper gradient
-  navActiveBg:     'linear-gradient(135deg, #e8922a, #d4731a)', // copper gradient
-  navActiveShadow: '0 4px 20px rgba(232,146,42,0.40)',
-  navInactive:     'rgba(255,255,255,0.38)',
-  navGroupLabel:   'rgba(255,255,255,0.18)',
+  navActive:       '#ffffff',                                    // text on sapphire/teal gradient
+  navActiveBg:     'linear-gradient(135deg, #3b82f6, #14b8a6)', // sapphire→teal gradient
+  navActiveShadow: '0 4px 20px rgba(59,130,246,0.30)',
+  navInactive:     'rgba(255,255,255,0.55)',
+  navGroupLabel:   'rgba(255,255,255,0.28)',
 
   // ── Topbar action items
   topbarItemBg:     'rgba(255,255,255,0.06)',
@@ -182,10 +182,10 @@ export const light = {
   inputFocusBorder:'rgba(29,78,216,0.22)',
   inputFocusGlow:  '0 0 0 3px rgba(29,78,216,0.12)',
 
-  // ── Text — 4 levels
-  textPrimary:     '#0a0f1a',
-  textSecondary:   '#1e2d3d',
-  textMuted:       '#4a5f78',
+  // ── Text — 4 levels (boosted one step for contrast)
+  textPrimary:     '#050a12',
+  textSecondary:   '#0f1e2d',
+  textMuted:       '#2d4257',
   textInverse:     '#ffffff',
 
   // ── Primary interactive — deep sapphire for legibility on white
@@ -197,13 +197,13 @@ export const light = {
   accentBorder:    'rgba(29,78,216,0.18)',
   accentText:      '#1d4ed8',
 
-  // ── CTA — copper
-  cta:             'linear-gradient(135deg, #e8922a, #d4731a)',
-  ctaGlow:         'rgba(232,146,42,0.28)',
+  // ── CTA — sapphire→teal gradient
+  cta:             'linear-gradient(135deg, #2563eb, #0d9488)',
+  ctaGlow:         'rgba(37,99,235,0.28)',
   ctaText:         '#ffffff',
 
-  // ── Copper / teal / extra palette
-  orange:          '#e8922a',
+  // ── Teal / extra palette
+  orange:          '#0d9488',   // teal — replaces copper
   teal:            '#0d9488',
   tealLight:       'rgba(13,148,136,0.12)',
   tealBar:         '#14b8a6',
@@ -227,10 +227,10 @@ export const light = {
   // ── Nav
   hoverBg:         'rgba(15,23,42,0.04)',
   navActive:       '#ffffff',
-  navActiveBg:     'linear-gradient(135deg, #e8922a, #d4731a)',
-  navActiveShadow: '0 4px 20px rgba(232,146,42,0.28)',
-  navInactive:     '#4a5f78',
-  navGroupLabel:   '#8899aa',
+  navActiveBg:     'linear-gradient(135deg, #2563eb, #0d9488)',
+  navActiveShadow: '0 4px 20px rgba(37,99,235,0.22)',
+  navInactive:     '#2d4257',
+  navGroupLabel:   '#4a5f78',
 
   // ── Topbar action items — solid bg (no backdrop-filter in light to avoid seam)
   topbarItemBg:     'rgba(255,255,255,0.85)',

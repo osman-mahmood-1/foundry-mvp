@@ -78,13 +78,14 @@ function PortalTopBar({ client }: { client: Client }) {
         width:          '38px',
         height:         '38px',
         borderRadius:   radius.circle,
-        background:     colours.accent,
+        background:     colours.accentSoft,
+        border:         `1px solid ${colours.accentBorder}`,
         display:        'flex',
         alignItems:     'center',
         justifyContent: 'center',
         fontSize:       fontSize.base,
-        color:          colours.white,
-        fontWeight:     fontWeight.semibold,
+        color:          colours.accent,
+        fontWeight:     fontWeight.medium,
         marginBottom:   '12px',
       }}>
         {initial}

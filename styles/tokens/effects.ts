@@ -19,7 +19,7 @@ export const glass = {
   /** Inner container — the main glass panel wrapping all portal content. */
   panel: (mode: ColourMode = 'light'): React.CSSProperties => ({
     background:           mode === 'dark'
-      ? 'rgba(8,12,22,0.65)'
+      ? 'radial-gradient(ellipse 80% 70% at 0% 100%, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.44) 42%, transparent 72%), rgba(8,12,22,0.65)'
       : 'rgba(255,255,255,0.72)',
     backdropFilter:       'blur(40px) saturate(140%) brightness(1.03)',
     WebkitBackdropFilter: 'blur(40px) saturate(140%) brightness(1.03)',
@@ -153,7 +153,7 @@ export const glows = {
  * 1080×1080px, sapphire/teal radial, blur 90px.
  */
 export const orbs = {
-  /** Main ambient orb: fixed top-right, 1080px, sapphire → teal. */
+  /** Main ambient orb: fixed top-right, 1080px, pure sapphire. */
   ambient: {
     position:     'fixed' as const,
     top:          '-220px',
@@ -161,14 +161,14 @@ export const orbs = {
     width:        '1080px',
     height:       '1080px',
     borderRadius: '50%',
-    background:   'radial-gradient(circle, rgba(59,130,246,0.38) 0%, rgba(45,212,191,0.12) 30%, rgba(45,212,191,0.04) 55%, transparent 72%)',
+    background:   'radial-gradient(circle, rgba(59,130,246,0.40) 0%, rgba(59,130,246,0.12) 45%, transparent 72%)',
     filter:       'blur(90px)',
     pointerEvents:'none' as const,
     zIndex:       0,
   },
   /** Ambient orb opacity per theme */
   ambientOpacityDark:  1,
-  ambientOpacityLight: 0.55,
+  ambientOpacityLight: 0.50,
 
   /** Legacy names kept for any existing references */
   blueTopRight: {
@@ -177,7 +177,7 @@ export const orbs = {
     width:        '1080px',
     height:       '1080px',
     borderRadius: '50%',
-    background:   'radial-gradient(circle, rgba(59,130,246,0.38) 0%, rgba(45,212,191,0.12) 30%, rgba(45,212,191,0.04) 55%, transparent 72%)',
+    background:   'radial-gradient(circle, rgba(59,130,246,0.40) 0%, rgba(59,130,246,0.12) 45%, transparent 72%)',
     filter:       'blur(90px)',
   },
   skyBottomLeft: {

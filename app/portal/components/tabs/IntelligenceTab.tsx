@@ -33,12 +33,6 @@ interface Insight {
   action?:  string
 }
 
-// Orb colours per severity (small, absolutely positioned, heavily blurred)
-const SEVERITY_ORB: Record<Severity, string> = {
-  urgent:    'rgba(239,68,68,0.22)',     // red
-  attention: 'rgba(245,158,11,0.22)',    // amber
-  info:      'rgba(59,130,246,0.18)',    // sapphire
-}
 
 const SEVERITY_ICON: Record<Severity, string> = {
   urgent:    '⚠',
@@ -64,7 +58,6 @@ function InsightCard({ insight }: { insight: Insight }) {
     info:      colours.infoLight,
   }
 
-  const orb    = SEVERITY_ORB[insight.severity]
   const icon   = SEVERITY_ICON[insight.severity]
   const colour = SEVERITY_COLOUR[insight.severity]
   const bg     = SEVERITY_BG[insight.severity]
@@ -79,18 +72,6 @@ function InsightCard({ insight }: { insight: Insight }) {
       gap:       '14px',
       alignItems: 'flex-start',
     }}>
-      {/* Small blurred severity orb — top-right inside card */}
-      <div style={{
-        position:      'absolute',
-        top:           '-30px',
-        right:         '-30px',
-        width:         '120px',
-        height:        '120px',
-        borderRadius:  '50%',
-        background:    `radial-gradient(circle, ${orb} 0%, transparent 70%)`,
-        filter:        'blur(40px)',
-        pointerEvents: 'none',
-      }} />
 
       {/* Icon circle */}
       <div style={{
@@ -229,30 +210,6 @@ export default function IntelligenceTab({ client }: { client: Client }) {
         alignItems:  'center',
         gap:         '20px',
       }}>
-        {/* Cyan orb top-right */}
-        <div style={{
-          position:      'absolute',
-          top:           '-60px',
-          right:         '-40px',
-          width:         '280px',
-          height:        '280px',
-          borderRadius:  '50%',
-          background:    'radial-gradient(circle, rgba(59,130,246,0.14) 0%, transparent 65%)',
-          filter:        'blur(60px)',
-          pointerEvents: 'none',
-        }} />
-        {/* Teal orb top-left */}
-        <div style={{
-          position:      'absolute',
-          top:           '-40px',
-          left:          '-20px',
-          width:         '200px',
-          height:        '200px',
-          borderRadius:  '50%',
-          background:    'radial-gradient(circle, rgba(34,211,165,0.10) 0%, transparent 65%)',
-          filter:        'blur(50px)',
-          pointerEvents: 'none',
-        }} />
 
         <div style={{
           width:          '52px',

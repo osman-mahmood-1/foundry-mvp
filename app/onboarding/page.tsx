@@ -112,7 +112,6 @@ const GOALS = [
 
 // ─── Styles ───────────────────────────────────────────────
 const FONTS = `
-  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
   * { box-sizing: border-box; margin: 0; padding: 0; }
   @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
   @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -259,7 +258,7 @@ export default function OnboardingPage() {
     <div style={{
       minHeight: '100vh',
       background: bg,
-      fontFamily: "'DM Sans', sans-serif",
+      fontFamily: "var(--font-outfit, 'Outfit', sans-serif)",
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
@@ -268,12 +267,12 @@ export default function OnboardingPage() {
     }}>
       <style>{FONTS}</style>
 
-      {/* Background orb */}
+      {/* Background orb — top right, sapphire, matches global ambient */}
       <div style={{
-        position: 'fixed', top: '-10%', right: '-5%',
-        width: '500px', height: '500px', borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(0,212,170,0.06) 0%, transparent 70%)',
-        filter: 'blur(40px)', pointerEvents: 'none',
+        position: 'fixed', top: '-220px', right: '-160px',
+        width: '1080px', height: '1080px', borderRadius: '50%',
+        background: 'radial-gradient(circle, rgba(59,130,246,0.40) 0%, rgba(59,130,246,0.12) 45%, transparent 72%)',
+        filter: 'blur(90px)', pointerEvents: 'none', opacity: 0.45,
       }} />
 
       {/* Card */}
@@ -310,7 +309,7 @@ export default function OnboardingPage() {
           }}>
             <div style={{
               fontSize: '10px', color: muted,
-              fontFamily: "'JetBrains Mono', monospace",
+              fontFamily: "var(--font-outfit, 'Outfit', sans-serif)",
               letterSpacing: '0.15em', textTransform: 'uppercase',
             }}>
               {step === 1 ? 'Step 1 of 3 · Welcome' : step === 2 ? 'Step 2 of 3 · Your work' : 'Step 3 of 3 · Your goals'}
@@ -325,7 +324,7 @@ export default function OnboardingPage() {
                 style={{
                   fontSize: '12px', color: muted, background: 'none',
                   border: 'none', cursor: 'pointer',
-                  fontFamily: "'DM Sans', sans-serif",
+                  fontFamily: "var(--font-outfit, 'Outfit', sans-serif)",
                   display: 'flex', alignItems: 'center', gap: '4px',
                 }}
               >
@@ -342,7 +341,7 @@ export default function OnboardingPage() {
           {step === 1 && (
             <div>
               <h1 style={{
-                fontFamily: "'Playfair Display', serif",
+                fontFamily: "var(--font-outfit, 'Outfit', sans-serif)",
                 fontSize: '28px', fontWeight: '500',
                 color: navy, marginBottom: '8px',
                 letterSpacing: '-0.02em', lineHeight: 1.2,
@@ -373,7 +372,7 @@ export default function OnboardingPage() {
                     border: '1px solid rgba(5,28,44,0.12)',
                     borderRadius: '12px', fontSize: '16px',
                     color: navy, outline: 'none',
-                    fontFamily: "'DM Sans', sans-serif",
+                    fontFamily: "var(--font-outfit, 'Outfit', sans-serif)",
                     background: 'rgba(255,255,255,0.8)',
                     transition: 'border-color 0.15s',
                   }}
@@ -385,7 +384,7 @@ export default function OnboardingPage() {
               <p style={{
                 fontSize: '11px', color: muted,
                 marginBottom: '24px', lineHeight: 1.5,
-                fontFamily: "'JetBrains Mono', monospace",
+                fontFamily: "var(--font-outfit, 'Outfit', sans-serif)",
               }}>
                 You can update this anytime in settings.
               </p>
@@ -400,7 +399,7 @@ export default function OnboardingPage() {
                   border: 'none', borderRadius: '100px',
                   fontSize: '14px', fontWeight: '500',
                   cursor: firstName.trim() ? 'pointer' : 'not-allowed',
-                  fontFamily: "'DM Sans', sans-serif",
+                  fontFamily: "var(--font-outfit, 'Outfit', sans-serif)",
                   transition: 'all 0.2s',
                   letterSpacing: '-0.01em',
                 }}
@@ -414,7 +413,7 @@ export default function OnboardingPage() {
           {step === 2 && (
             <div>
               <h1 style={{
-                fontFamily: "'Playfair Display', serif",
+                fontFamily: "var(--font-outfit, 'Outfit', sans-serif)",
                 fontSize: '26px', fontWeight: '500',
                 color: navy, marginBottom: '8px',
                 letterSpacing: '-0.02em', lineHeight: 1.2,
@@ -515,7 +514,7 @@ export default function OnboardingPage() {
               <p style={{
                 fontSize: '11px', color: muted,
                 marginBottom: '20px', lineHeight: 1.5,
-                fontFamily: "'JetBrains Mono', monospace",
+                fontFamily: "var(--font-outfit, 'Outfit', sans-serif)",
               }}>
                 This can be changed anytime in your settings.
               </p>
@@ -530,7 +529,7 @@ export default function OnboardingPage() {
                   border: 'none', borderRadius: '100px',
                   fontSize: '14px', fontWeight: '500',
                   cursor: clientType ? 'pointer' : 'not-allowed',
-                  fontFamily: "'DM Sans', sans-serif",
+                  fontFamily: "var(--font-outfit, 'Outfit', sans-serif)",
                   transition: 'all 0.2s',
                 }}
               >
@@ -543,7 +542,7 @@ export default function OnboardingPage() {
           {step === 3 && (
             <div>
               <h1 style={{
-                fontFamily: "'Playfair Display', serif",
+                fontFamily: "var(--font-outfit, 'Outfit', sans-serif)",
                 fontSize: '26px', fontWeight: '500',
                 color: navy, marginBottom: '8px',
                 letterSpacing: '-0.02em', lineHeight: 1.2,
@@ -615,7 +614,7 @@ export default function OnboardingPage() {
               <p style={{
                 fontSize: '11px', color: muted,
                 marginBottom: '20px', lineHeight: 1.5,
-                fontFamily: "'JetBrains Mono', monospace",
+                fontFamily: "var(--font-outfit, 'Outfit', sans-serif)",
               }}>
                 This can be changed anytime · All responses are editable in settings.
               </p>
@@ -645,7 +644,7 @@ export default function OnboardingPage() {
                   border: 'none', borderRadius: '100px',
                   fontSize: '14px', fontWeight: '500',
                   cursor: saving ? 'not-allowed' : 'pointer',
-                  fontFamily: "'DM Sans', sans-serif",
+                  fontFamily: "var(--font-outfit, 'Outfit', sans-serif)",
                   marginBottom: '10px',
                   opacity: saving ? 0.7 : 1,
                   transition: 'all 0.2s',
@@ -662,7 +661,7 @@ export default function OnboardingPage() {
                   background: 'transparent', color: muted,
                   border: 'none', borderRadius: '100px',
                   fontSize: '13px', cursor: 'pointer',
-                  fontFamily: "'DM Sans', sans-serif",
+                  fontFamily: "var(--font-outfit, 'Outfit', sans-serif)",
                 }}
               >
                 Skip for now
@@ -696,7 +695,7 @@ export default function OnboardingPage() {
       <div style={{
         marginTop: '24px',
         fontSize: '11px', color: muted,
-        fontFamily: "'JetBrains Mono', monospace",
+        fontFamily: "var(--font-outfit, 'Outfit', sans-serif)",
         letterSpacing: '0.1em',
       }}>
         FOUNDRY · Your finances, accelerated.

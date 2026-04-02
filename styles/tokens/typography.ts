@@ -19,7 +19,7 @@ export const fontWeight = {
   medium:   '500',
   semibold: '600',
   bold:     '700',
-  black:    '800',
+  black:    '700', // capped at 700 — use bold instead of heavy
 } as const
 
 /**
@@ -71,19 +71,19 @@ export const linkStyles = {
   interactive: {
     textDecoration:      'underline' as const,
     textDecorationStyle: 'solid' as const,
-    textDecorationColor: '#f5a623',
+    textDecorationColor: '#3b82f6',
     cursor:              'pointer' as const,
   },
   decorative: {
     textDecoration:      'underline' as const,
     textDecorationStyle: 'dashed' as const,
-    textDecorationColor: 'rgba(154,144,128,0.6)',
+    textDecorationColor: 'rgba(59,130,246,0.45)',
     cursor:              'default' as const,
   },
   footnote: {
     textDecoration:      'underline' as const,
     textDecorationStyle: 'dotted' as const,
-    textDecorationColor: 'rgba(154,144,128,0.4)',
+    textDecorationColor: 'rgba(59,130,246,0.28)',
     cursor:              'default' as const,
   },
 } as const

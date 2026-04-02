@@ -60,14 +60,14 @@ export default async function PassportPage({ params }: Props) {
       position: 'relative', background: '#08080f', minHeight: '100vh',
       display: 'flex', flexDirection: 'column', alignItems: 'center',
       justifyContent: 'center', padding: '48px 28px 52px', overflow: 'hidden',
-      fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
+      fontFamily: "var(--font-outfit, 'Outfit', sans-serif)",
     }}>
-      <div style={{ position: 'absolute', width: 420, height: 420, borderRadius: '50%', top: -130, left: -90, background: 'radial-gradient(circle,rgba(255,100,60,0.22) 0%,transparent 68%)', filter: 'blur(50px)', pointerEvents: 'none' }} />
-      <div style={{ position: 'absolute', width: 340, height: 340, borderRadius: '50%', bottom: -80, right: -80, background: 'radial-gradient(circle,rgba(160,60,255,0.2) 0%,transparent 70%)', filter: 'blur(48px)', pointerEvents: 'none' }} />
+      {/* Orb — top right, sapphire, matches global ambient */}
+      <div style={{ position: 'fixed', top: '-220px', right: '-160px', width: '1080px', height: '1080px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(59,130,246,0.40) 0%, rgba(59,130,246,0.12) 45%, transparent 72%)', filter: 'blur(90px)', pointerEvents: 'none', opacity: 0.85 }} />
 
       <div style={{ position: 'relative', zIndex: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', maxWidth: 400 }}>
 
-        <p style={{ fontSize: 10, letterSpacing: '0.24em', color: 'rgba(255,255,255,0.28)', textTransform: 'uppercase', marginBottom: 16, fontFamily: 'monospace' }}>
+        <p style={{ fontSize: 10, letterSpacing: '0.24em', color: 'rgba(255,255,255,0.28)', textTransform: 'uppercase', marginBottom: 16, fontFamily: "var(--font-outfit, 'Outfit', sans-serif)" }}>
           taxfoundry · founding member
         </p>
 
@@ -79,10 +79,10 @@ export default async function PassportPage({ params }: Props) {
 
             <div style={{ position: 'relative', zIndex: 1, padding: '18px 22px 14px', borderBottom: '1px solid rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div>
-                <p style={{ margin: 0, fontSize: 9, letterSpacing: '0.22em', color: 'rgba(255,255,255,0.24)', textTransform: 'uppercase', fontFamily: 'monospace' }}>Tax</p>
-                <p style={{ margin: 0, fontFamily: 'Georgia,serif', fontSize: 21, fontWeight: 400, color: '#ffffff', lineHeight: 1.1 }}>Foundry</p>
+                <p style={{ margin: 0, fontSize: 9, letterSpacing: '0.22em', color: 'rgba(255,255,255,0.24)', textTransform: 'uppercase', fontFamily: "var(--font-outfit, 'Outfit', sans-serif)" }}>Tax</p>
+                <p style={{ margin: 0, fontFamily: "var(--font-outfit, 'Outfit', sans-serif)", fontSize: 21, fontWeight: 400, color: '#ffffff', lineHeight: 1.1 }}>Foundry</p>
               </div>
-              <span style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 20, padding: '5px 11px', fontSize: 9, letterSpacing: '0.13em', color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', fontFamily: 'monospace' }}>
+              <span style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 20, padding: '5px 11px', fontSize: 9, letterSpacing: '0.13em', color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', fontFamily: "var(--font-outfit, 'Outfit', sans-serif)" }}>
                 Founding Member
               </span>
             </div>
@@ -101,7 +101,7 @@ export default async function PassportPage({ params }: Props) {
                   <circle cx="44" cy="44" r="29" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.06)" strokeWidth="0.75" />
                 </svg>
                 <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                  <span style={{ fontFamily: 'monospace', fontSize: 19, fontWeight: 500, color: '#ffffff', lineHeight: 1 }}>
+                  <span style={{ fontFamily: "var(--font-outfit, 'Outfit', sans-serif)", fontSize: 19, fontWeight: 500, color: '#ffffff', lineHeight: 1 }}>
                     {String(passport.member_number).padStart(3, '0')}
                   </span>
                   <span style={{ fontSize: 8, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.26)', textTransform: 'uppercase', marginTop: 2 }}>Member</span>
@@ -142,7 +142,7 @@ export default async function PassportPage({ params }: Props) {
             </div>
 
             <div style={{ position: 'relative', zIndex: 1, padding: '11px 22px', borderTop: '1px solid rgba(255,255,255,0.05)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontFamily: 'monospace', fontSize: 8, color: 'rgba(255,255,255,0.09)', letterSpacing: '0.07em' }}>
+              <span style={{ fontFamily: "var(--font-outfit, 'Outfit', sans-serif)", fontSize: 8, color: 'rgba(255,255,255,0.09)', letterSpacing: '0.07em' }}>
                 {`TF<${passport.name.toUpperCase().replace(/\s+/g, '<')}<<<<<<<<<<<<<<<<<`.substring(0, 24)}
               </span>
               <span style={{ fontSize: 9, letterSpacing: '0.12em', color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase' }}>Valid · Lifetime</span>
