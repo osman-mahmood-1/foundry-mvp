@@ -45,6 +45,18 @@ input, select, textarea, button {
   to   { opacity: 1; transform: translateY(0); }
 }
 
+/* ── FadeDown keyframe (tooltips that appear below their anchor) ──────────── */
+@keyframes fadeDown {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── ExpandDown keyframe (locked-field popover expand from line) ──────────── */
+@keyframes expandDown {
+  from { opacity: 0; transform: scaleY(0); }
+  to   { opacity: 1; transform: scaleY(1); }
+}
+
 /* ── FadeIn keyframe ──────────────────────────────────────────────────────── */
 @keyframes fadeIn {
   from { opacity: 0; }

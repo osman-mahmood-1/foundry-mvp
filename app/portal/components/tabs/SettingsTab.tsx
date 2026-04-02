@@ -105,23 +105,42 @@ const LOCKED_REASON: Record<string, { title: string; body: string }> = {
 function InfoTooltip({ id }: { id: keyof typeof TOOLTIPS }) {
   const colours = useColours()
   const [open, setOpen] = useState(false)
-  const ref = useRef<HTMLDivElement>(null)
+  const [pos, setPos] = useState<{ top: number; left: number } | null>(null)
+  const btnRef = useRef<HTMLButtonElement>(null)
+  const tipRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (!open) return
     function handler(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+      if (
+        btnRef.current && !btnRef.current.contains(e.target as Node) &&
+        tipRef.current  && !tipRef.current.contains(e.target as Node)
+      ) setOpen(false)
     }
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
   }, [open])
 
+  function handleClick() {
+    if (open) { setOpen(false); return }
+    if (btnRef.current) {
+      const r = btnRef.current.getBoundingClientRect()
+      const tipW = 280
+      // Position below the button, centred on it but clamped to viewport
+      let left = r.left + r.width / 2 - tipW / 2
+      left = Math.max(8, Math.min(left, window.innerWidth - tipW - 8))
+      setPos({ top: r.bottom + 8, left })
+    }
+    setOpen(true)
+  }
+
   const tip = TOOLTIPS[id]
 
   return (
-    <div ref={ref} style={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}>
+    <span style={{ display: 'inline-flex', alignItems: 'center' }}>
       <button
-        onClick={() => setOpen(o => !o)}
+        ref={btnRef}
+        onClick={handleClick}
         aria-label={`Learn more about ${tip.title}`}
         style={{
           width:          '16px',
@@ -157,13 +176,11 @@ function InfoTooltip({ id }: { id: keyof typeof TOOLTIPS }) {
         ?
       </button>
 
-      {open && (
-        <div style={{
-          position:       'absolute',
-          bottom:         '100%',
-          left:           '50%',
-          transform:      'translateX(-50%)',
-          marginBottom:   '8px',
+      {open && pos && (
+        <div ref={tipRef} style={{
+          position:       'fixed',
+          top:            pos.top,
+          left:           pos.left,
           width:          '280px',
           background:     colours.panelBgSolid,
           backdropFilter: 'blur(32px)',
@@ -172,20 +189,20 @@ function InfoTooltip({ id }: { id: keyof typeof TOOLTIPS }) {
           borderRadius:   radius.lg,
           boxShadow:      '0 8px 32px rgba(0,0,0,0.24)',
           padding:        '14px 16px',
-          zIndex:         20,
-          animation:      'fadeUp 0.15s ease',
+          zIndex:         9999,
+          animation:      'fadeDown 0.15s ease',
         }}>
-          {/* Arrow */}
+          {/* Arrow pointing up */}
           <div style={{
-            position:    'absolute',
-            bottom:      '-5px',
-            left:        '50%',
-            transform:   'translateX(-50%) rotate(45deg)',
-            width:       '8px',
-            height:      '8px',
-            background:  colours.panelBgSolid,
-            borderRight: `1px solid ${colours.borderHairline}`,
-            borderBottom: `1px solid ${colours.borderHairline}`,
+            position:   'absolute',
+            top:        '-5px',
+            left:       '50%',
+            transform:  'translateX(-50%) rotate(45deg)',
+            width:      '8px',
+            height:     '8px',
+            background: colours.panelBgSolid,
+            borderTop:  `1px solid ${colours.borderHairline}`,
+            borderLeft: `1px solid ${colours.borderHairline}`,
           }} />
           <div style={{
             fontSize:     fontSize.xs,
@@ -206,7 +223,7 @@ function InfoTooltip({ id }: { id: keyof typeof TOOLTIPS }) {
           </div>
         </div>
       )}
-    </div>
+    </span>
   )
 }
 
@@ -219,21 +236,35 @@ function LockedField({ label, value, lockId }: {
 }) {
   const colours = useColours()
   const [open, setOpen] = useState(false)
-  const ref = useRef<HTMLDivElement>(null)
+  const [pos, setPos] = useState<{ top: number; left: number; width: number } | null>(null)
+  const btnRef = useRef<HTMLButtonElement>(null)
+  const popRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (!open) return
     function handler(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+      if (
+        btnRef.current && !btnRef.current.contains(e.target as Node) &&
+        popRef.current  && !popRef.current.contains(e.target as Node)
+      ) setOpen(false)
     }
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
   }, [open])
 
+  function handleClick() {
+    if (open) { setOpen(false); return }
+    if (btnRef.current) {
+      const r = btnRef.current.getBoundingClientRect()
+      setPos({ top: r.bottom + 4, left: r.left, width: r.width })
+    }
+    setOpen(true)
+  }
+
   const reason = LOCKED_REASON[lockId]
 
   return (
-    <div ref={ref}>
+    <div>
       <div style={{
         fontSize:     fontSize.xs,
         color:        colours.textMuted,
@@ -258,7 +289,8 @@ function LockedField({ label, value, lockId }: {
       </div>
 
       <button
-        onClick={() => setOpen(o => !o)}
+        ref={btnRef}
+        onClick={handleClick}
         title="Click to learn why this field is locked"
         style={{
           width:        '100%',
@@ -287,14 +319,20 @@ function LockedField({ label, value, lockId }: {
         </span>
       </button>
 
-      {open && (
-        <div style={{
-          marginTop:    '6px',
-          padding:      '12px 14px',
-          background:   colours.accentSoft,
-          border:       `1px solid ${colours.accentBorder}`,
-          borderRadius: radius.md,
-          animation:    'fadeUp 0.15s ease',
+      {open && pos && (
+        <div ref={popRef} style={{
+          position:        'fixed',
+          top:             pos.top,
+          left:            pos.left,
+          width:           pos.width,
+          padding:         '12px 14px',
+          background:      colours.accentSoft,
+          border:          `1px solid ${colours.accentBorder}`,
+          borderRadius:    radius.md,
+          zIndex:          9999,
+          transformOrigin: 'top center',
+          animation:       'expandDown 0.18s cubic-bezier(0.22,1,0.36,1) both',
+          overflow:        'hidden',
         }}>
           <div style={{
             fontSize:     fontSize.xs,
@@ -415,6 +453,19 @@ function SectionHeader({
   onCancel: () => void
 }) {
   const colours = useColours()
+  const [showBlockMsg, setShowBlockMsg] = useState(false)
+  const btnRef = useRef<HTMLSpanElement>(null)
+  const [msgPos, setMsgPos] = useState<{ top: number; right: number } | null>(null)
+
+  function handleBlockedClick() {
+    if (btnRef.current) {
+      const r = btnRef.current.getBoundingClientRect()
+      setMsgPos({ top: r.bottom + 6, right: window.innerWidth - r.right })
+    }
+    setShowBlockMsg(true)
+    setTimeout(() => setShowBlockMsg(false), 2500)
+  }
+
   return (
     <div style={{
       display:        'flex',
@@ -447,36 +498,37 @@ function SectionHeader({
           </Button>
         </div>
       ) : (
-        <div style={{ position: 'relative' }}>
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={blocked ? undefined : onEdit}
-            disabled={blocked}
-          >
-            Edit
-          </Button>
-          {blocked && (
+        <>
+          <span ref={btnRef} style={{ display: 'inline-block' }}>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={blocked ? handleBlockedClick : onEdit}
+            >
+              Edit
+            </Button>
+          </span>
+          {showBlockMsg && msgPos && (
             <div style={{
-              position:   'absolute',
-              top:        '100%',
-              right:      0,
-              marginTop:  '6px',
-              whiteSpace: 'nowrap' as const,
-              fontSize:   fontSize.xs,
-              color:      colours.textMuted,
-              fontFamily: fonts.sans,
-              background: colours.panelBgSolid,
-              border:     `1px solid ${colours.borderHairline}`,
+              position:     'fixed',
+              top:          msgPos.top,
+              right:        msgPos.right,
+              whiteSpace:   'nowrap' as const,
+              fontSize:     fontSize.xs,
+              color:        colours.textMuted,
+              fontFamily:   fonts.sans,
+              background:   colours.panelBgSolid,
+              border:       `1px solid ${colours.borderHairline}`,
               borderRadius: radius.md,
-              padding:    '6px 10px',
-              zIndex:     10,
-              boxShadow:  '0 4px 12px rgba(0,0,0,0.16)',
+              padding:      '6px 10px',
+              zIndex:       9999,
+              boxShadow:    '0 4px 12px rgba(0,0,0,0.16)',
+              animation:    'fadeDown 0.15s ease',
             }}>
               Save or cancel your changes above first
             </div>
           )}
-        </div>
+        </>
       )}
     </div>
   )
