@@ -175,11 +175,11 @@ export class TabErrorBoundary extends Component<
           onClick={() => window.location.reload()}
           style={{
             marginTop:     '8px',
-            padding:       '8px 20px',
+            padding:       '8px 16px',
             background:    'transparent',
             border:        `1px solid ${c.borderMedium}`,
-            borderRadius:  radius.pill,
-            fontSize:      fontSize.sm,
+            borderRadius:  radius.md,
+            fontSize:      '13.5px',
             color:         c.textSecondary,
             fontFamily:    fonts.sans,
             cursor:        'pointer',
@@ -328,13 +328,13 @@ export function EmptyState({ icon, headline, sub, action, onAction }: EmptyState
           onClick={onAction}
           className="cta-btn"
           style={{
-            padding:      '9px 20px',
+            padding:      '8px 20px',
             background:   colours.cta,
             color:        colours.ctaText,
             border:       'none',
-            borderRadius: radius.pill,
-            fontSize:     fontSize.sm,
-            fontWeight:   fontWeight.medium,
+            borderRadius: radius.md,
+            fontSize:     '13.5px',
+            fontWeight:   fontWeight.semibold,
             cursor:       'pointer',
             fontFamily:   fonts.sans,
             boxShadow:    'none',
@@ -446,7 +446,7 @@ export function Badge({ children, variant = 'neutral' }: BadgeProps) {
 
 // ─── Button ───────────────────────────────────────────────────────────────────
 
-type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger'
+type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'tint'
 type ButtonSize    = 'sm' | 'md' | 'lg'
 
 interface ButtonProps {
@@ -457,20 +457,17 @@ interface ButtonProps {
   disabled?:  boolean
   fullWidth?: boolean
   type?:      'button' | 'submit'
-}
-
-const BUTTON_SIZES: Record<ButtonSize, React.CSSProperties> = {
-  sm: { padding: '7px 14px',  fontSize: fontSize.sm },
-  md: { padding: '7.5px 15px', fontSize: fontSize.base },
-  lg: { padding: '10px 20px', fontSize: fontSize.md },
+  /** Used by tint variant — marks the button as the active/selected state */
+  active?:    boolean
 }
 
 /**
- * Button variants — exactly as in mockup:
- *   primary   = btn-fill: gold→orange gradient, black text, pill, box-shadow
- *   secondary = btn-simple: subtle bg/border, text2 colour, pill
- *   ghost     = transparent, no border
+ * Button variants:
+ *   primary   = btn-cta: deep navy gradient, white text, radius-md, semibold
+ *   secondary = btn-ghost with subtle tint bg
+ *   ghost     = btn-ghost: transparent, hairline border at rest
  *   danger    = danger tint background
+ *   tint      = btn-tint: toggle groups and tertiary controls (active/inactive)
  */
 export function Button({
   children,
@@ -480,41 +477,72 @@ export function Button({
   disabled  = false,
   fullWidth = false,
   type      = 'button',
+  active    = false,
 }: ButtonProps) {
   const colours            = useColours()
+  const mode               = useThemeMode()
   const [hovered, setHov] = useState(false)
 
   function variantStyles(): React.CSSProperties {
     switch (variant) {
       case 'primary':
         return {
+          padding:    '8px 20px',
           background: colours.cta,
           color:      colours.ctaText,
           border:     'none',
+          fontWeight: fontWeight.semibold,
           boxShadow:  hovered ? `0 6px 24px ${colours.ctaGlow}` : 'none',
           transform:  hovered && !disabled ? 'translateY(-1px)' : 'none',
         }
       case 'secondary':
         return {
-          background:  hovered
-            ? colours.accentSoft
-            : colours.simpleBg,
-          color:       hovered ? colours.textPrimary : colours.textSecondary,
-          border:      hovered
-            ? 'none'
-            : `1px solid ${colours.borderHairline}`,
+          padding:    '8px 16px',
+          background: hovered ? colours.accentSoft : colours.simpleBg,
+          color:      hovered ? colours.textPrimary : colours.textSecondary,
+          border:     hovered ? 'none' : `1px solid ${colours.borderHairline}`,
+          fontWeight: fontWeight.regular,
         }
       case 'ghost':
         return {
-          background: hovered ? colours.hoverBg : 'transparent',
-          color:      hovered ? colours.textPrimary : colours.textMuted,
-          border:     'none',
+          padding:    '8px 16px',
+          background: hovered
+            ? (mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(15,23,42,0.04)')
+            : 'transparent',
+          color: hovered
+            ? (mode === 'dark' ? 'rgba(255,255,255,0.70)' : 'rgba(15,23,42,0.80)')
+            : (mode === 'dark' ? 'rgba(255,255,255,0.45)' : 'rgba(15,23,42,0.55)'),
+          border: hovered
+            ? (mode === 'dark' ? '1px solid rgba(255,255,255,0.14)' : '1px solid rgba(15,23,42,0.18)')
+            : (mode === 'dark' ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(15,23,42,0.12)'),
+          fontWeight: fontWeight.regular,
+        }
+      case 'tint':
+        if (active) {
+          return {
+            padding:    '8px 16px',
+            background: mode === 'dark' ? 'rgba(255,255,255,0.10)' : 'rgba(30,64,175,0.08)',
+            border:     mode === 'dark' ? '1px solid rgba(255,255,255,0.14)' : '1px solid rgba(30,64,175,0.20)',
+            color:      mode === 'dark' ? 'rgba(255,255,255,0.85)' : '#1e40af',
+            fontWeight: fontWeight.medium,
+          }
+        }
+        return {
+          padding:    '8px 16px',
+          background: hovered
+            ? (mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)')
+            : (mode === 'dark' ? 'rgba(255,255,255,0.06)' : 'rgba(15,23,42,0.05)'),
+          border: mode === 'dark' ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(15,23,42,0.08)',
+          color:  mode === 'dark' ? 'rgba(255,255,255,0.40)' : 'rgba(15,23,42,0.45)',
+          fontWeight: fontWeight.regular,
         }
       case 'danger':
         return {
+          padding:    '8px 16px',
           background: colours.dangerLight,
           color:      colours.danger,
           border:     'none',
+          fontWeight: fontWeight.regular,
         }
     }
   }
@@ -529,9 +557,8 @@ export function Button({
       onMouseLeave={() => setHov(false)}
       style={{
         ...variantStyles(),
-        ...BUTTON_SIZES[size],
-        borderRadius:  radius.pill,
-        fontWeight:    fontWeight.medium,
+        borderRadius:  radius.md,
+        fontSize:      '13.5px',
         fontFamily:    fonts.sans,
         cursor:        disabled ? 'not-allowed' : 'pointer',
         opacity:       disabled ? 0.5 : 1,
@@ -597,11 +624,10 @@ export function Input({
         onKeyDown={e => e.key === 'Enter' && onEnter?.()}
         style={{
           width:        '100%',
-          height:       '40px',
-          padding:      '0 13px',
+          padding:      '9px 13px',
           border:       `1px solid ${colours.inputBorder}`,
           borderRadius: radius.md,
-          fontSize:     fontSize.base,
+          fontSize:     '13.5px',
           color:        colours.textPrimary,
           outline:      'none',
           fontFamily:   fonts.sans,
@@ -662,11 +688,10 @@ export function Select({ value, onChange, options, label, disabled = false }: Se
         onChange={e => onChange(e.target.value)}
         style={{
           width:        '100%',
-          height:       '40px',
-          padding:      '0 32px 0 13px',
+          padding:      '9px 32px 9px 13px',
           border:       `1px solid ${colours.inputBorder}`,
           borderRadius: radius.md,
-          fontSize:     fontSize.base,
+          fontSize:     '13.5px',
           color:        colours.textPrimary,
           outline:      'none',
           fontFamily:   fonts.sans,

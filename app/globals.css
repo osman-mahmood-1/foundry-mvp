@@ -3,6 +3,11 @@
 /* ── Font variables (set by next/font in layout.tsx) ──────────────────────── */
 :root {
   --font-display: var(--font-outfit, 'Outfit', sans-serif);
+
+  /* ── Radius scale — 3-tier system ─────────────────────────────────────── */
+  --radius-sm: 6px;   /* badges, tags, chips, tooltips, small labels */
+  --radius-md: 10px;  /* buttons, inputs, selects, dropdowns, toggle controls */
+  --radius-lg: 14px;  /* cards, panels, modals, drawers, slide panels, toasts */
 }
 
 /* ── Base reset ────────────────────────────────────────────────────────────── */
@@ -88,7 +93,7 @@ input, select, textarea, button {
   content: '';
   position: absolute;
   inset: -2px;
-  border-radius: 102px; /* pill (100px) + 2px */
+  border-radius: 12px; /* --radius-md (10px) + 2px */
   background: conic-gradient(
     from var(--cta-angle),
     transparent 0deg,
@@ -115,8 +120,8 @@ input, select, textarea, button {
   content: '';
   position: absolute;
   inset: 0;
-  border-radius: 100px;
-  background: linear-gradient(135deg, #3b82f6, #14b8a6);
+  border-radius: 10px; /* --radius-md */
+  background: linear-gradient(150deg, #112260 0%, #183590 45%, #1e45b0 100%);
   z-index: -1;
 }
 

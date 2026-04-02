@@ -23,7 +23,7 @@ function LoginErrorBanner({ error }: { error: AppError }) {
       background:   'rgba(255,183,0,0.08)',
       border:       '1px solid rgba(255,183,0,0.25)',
       borderLeft:   '3px solid rgba(255,183,0,0.6)',
-      borderRadius: '8px',
+      borderRadius: '10px',
       padding:      '12px 14px',
       marginBottom: '20px',
       display:      'flex',
@@ -51,7 +51,7 @@ function LoginErrorBanner({ error }: { error: AppError }) {
           color:         copied ? '#4CAF50' : 'rgba(255,183,0,0.5)',
           background:    'transparent',
           border:        `1px solid ${copied ? '#4CAF50' : 'rgba(255,183,0,0.25)'}`,
-          borderRadius:  '4px',
+          borderRadius:  '6px',
           padding:       '3px 8px',
           cursor:        'pointer',
           flexShrink:    0,
@@ -116,12 +116,12 @@ function LoginInner() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
-          style={{ width: '100%', padding: '12px 16px', backgroundColor: '#0D2035', border: '1px solid #1B3A52', borderRadius: '8px', color: 'white', fontSize: '16px', marginBottom: '16px', boxSizing: 'border-box' }}
+          style={{ width: '100%', padding: '12px 16px', backgroundColor: '#0D2035', border: '1px solid #1B3A52', borderRadius: '10px', color: 'white', fontSize: '16px', marginBottom: '16px', boxSizing: 'border-box' }}
         />
         <button
           onClick={handleLogin}
           disabled={loading || !email}
-          style={{ width: '100%', padding: '12px', backgroundColor: '#0D5EAF', color: 'white', border: 'none', borderRadius: '8px', fontSize: '16px', cursor: loading || !email ? 'not-allowed' : 'pointer', opacity: loading || !email ? 0.6 : 1 }}
+          style={{ width: '100%', padding: '12px', backgroundColor: '#0D5EAF', color: 'white', border: 'none', borderRadius: '10px', fontSize: '16px', cursor: loading || !email ? 'not-allowed' : 'pointer', opacity: loading || !email ? 0.6 : 1 }}
         >
           {loading ? 'Sending...' : 'Send magic link'}
         </button>

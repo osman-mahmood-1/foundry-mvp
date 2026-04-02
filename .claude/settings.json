@@ -22,7 +22,15 @@
       "Bash(git fsck:*)",
       "Bash(pkill -f \"next build\")",
       "Bash(git add:*)",
-      "Bash(git commit -m ':*)"
+      "Bash(git commit -m ':*)",
+      "mcp__claude_ai_Vercel__list_projects",
+      "mcp__claude_ai_Vercel__list_teams",
+      "mcp__claude_ai_Vercel__list_deployments",
+      "Bash(find /Users/osman/Desktop/foundry-mvp -type f \\\\\\( -name \"*.ts\" -o -name \"*.tsx\" \\\\\\) ! -path \"*/node_modules/*\" ! -path \"*/.claude/worktrees/*\" -exec grep -l \"from.*colours\\\\|from.*tokens/colours\" {} \\\\;)",
+      "Bash(grep -n \"^export const radius\\\\|const radius\" /Users/osman/Desktop/foundry-mvp/styles/tokens/*.ts)"
+    ],
+    "additionalDirectories": [
+      "/Users/osman/Claude/projects/-Users-osman-Desktop-foundry-mvp/memory"
     ]
   }
 }

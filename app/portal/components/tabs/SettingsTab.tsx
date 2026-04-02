@@ -18,7 +18,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import type { Client, ClientType } from '@/types'
-import { useColours } from '@/styles/ThemeContext'
+import { useColours, useThemeMode } from '@/styles/ThemeContext'
 import { useThemePreference } from '../PortalThemeProvider'
 import type { ThemeMode } from '../PortalThemeProvider'
 import { fonts, fontSize, fontWeight, letterSpacing } from '@/styles/tokens/typography'
@@ -638,28 +638,41 @@ function ThemePill({ label, icon, active, onClick }: {
   active:  boolean
   onClick: () => void
 }) {
-  const colours  = useColours()
+  const mode = useThemeMode()
   const [hov, setHov] = useState(false)
+
+  const bg = active
+    ? (mode === 'dark' ? 'rgba(255,255,255,0.10)' : 'rgba(30,64,175,0.08)')
+    : hov
+      ? (mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)')
+      : (mode === 'dark' ? 'rgba(255,255,255,0.06)' : 'rgba(15,23,42,0.05)')
+  const border = active
+    ? (mode === 'dark' ? '1px solid rgba(255,255,255,0.14)' : '1px solid rgba(30,64,175,0.20)')
+    : (mode === 'dark' ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(15,23,42,0.08)')
+  const color = active
+    ? (mode === 'dark' ? 'rgba(255,255,255,0.85)' : '#1e40af')
+    : (mode === 'dark' ? 'rgba(255,255,255,0.40)' : 'rgba(15,23,42,0.45)')
+
   return (
     <button
       onClick={onClick}
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
       style={{
-        display:    'flex',
-        alignItems: 'center',
-        gap:        '8px',
-        padding:    '10px 18px',
-        borderRadius: radius.lg,
-        border:     active ? `1.5px solid ${colours.accent}` : `1px solid ${colours.borderMedium}`,
-        background: active ? colours.accentLight : hov ? colours.hoverBg : 'transparent',
-        color:      active ? colours.accent : colours.textSecondary,
-        fontSize:   fontSize.base,
-        fontWeight: active ? fontWeight.medium : fontWeight.regular,
-        fontFamily: fonts.sans,
-        cursor:     'pointer',
-        transition: 'all 0.15s ease',
-        flexShrink: 0,
+        display:      'flex',
+        alignItems:   'center',
+        gap:          '8px',
+        padding:      '8px 16px',
+        borderRadius: radius.md,
+        border,
+        background:   bg,
+        color,
+        fontSize:     '13.5px',
+        fontWeight:   active ? fontWeight.medium : fontWeight.regular,
+        fontFamily:   fonts.sans,
+        cursor:       'pointer',
+        transition:   'all 0.15s ease',
+        flexShrink:   0,
       }}
     >
       <span style={{ fontSize: '14px' }}>{icon}</span>
@@ -1241,7 +1254,7 @@ export default function SettingsTab({ client }: { client: Client }) {
           <span style={{
             fontSize:     fontSize.xs,
             padding:      '4px 10px',
-            borderRadius: radius.pill,
+            borderRadius: radius.md,
             background:   colours.accentLight,
             color:        colours.accent,
             fontWeight:   fontWeight.medium,
@@ -1258,7 +1271,7 @@ export default function SettingsTab({ client }: { client: Client }) {
             onClick={() => alert('Upgrade — contact support@taxfoundry.co.uk.')}
             style={{
               padding:      '10px 22px',
-              borderRadius: radius.pill,
+              borderRadius: radius.md,
               border:       'none',
               background:   colours.cta,
               color:        colours.ctaText,
@@ -1275,7 +1288,7 @@ export default function SettingsTab({ client }: { client: Client }) {
             onClick={() => alert('Plan comparison — coming soon.')}
             style={{
               padding:      '10px 20px',
-              borderRadius: radius.pill,
+              borderRadius: radius.md,
               border:       `1px solid ${colours.borderMedium}`,
               background:   'transparent',
               color:        colours.textSecondary,
@@ -1336,7 +1349,7 @@ export default function SettingsTab({ client }: { client: Client }) {
             onClick={() => setShowDelete(true)}
             style={{
               padding:      '9px 16px',
-              borderRadius: radius.pill,
+              borderRadius: radius.md,
               border:       `1px solid ${colours.danger}`,
               background:   'transparent',
               color:        colours.danger,

@@ -13,17 +13,17 @@
 
 export const radius = {
   none:      '0px',
-  xs:        '6px',    // inline badges, tiny chips
-  sm:        '8px',    // small buttons
-  md:        '10px',   // --radius-sm: form inputs, nav items
-  lg:        '12px',   // medium panels
-  xl:        '14px',   // --radius: stat cards, standard panels
-  container: '18px',   // inner container (the glass shell)
+  xs:        '6px',    // alias → --radius-sm
+  sm:        '6px',    // --radius-sm: badges, tags, chips, tooltips, small labels
+  md:        '10px',   // --radius-md: buttons, inputs, selects, dropdowns, toggle controls
+  lg:        '14px',   // --radius-lg: cards, panels, modals, drawers, slide panels, toasts
+  xl:        '14px',   // alias → --radius-lg
+  container: '18px',   // inner glass shell (outside the 3-tier system)
   sidebar:   '18px',   // alias: sidebar panel radius
-  panel:     '14px',   // standard glassmorphic panels (alias for xl)
-  card:      '14px',   // --radius: cards
-  modal:     '18px',   // large modals / overlays
-  pill:      '100px',  // fully-rounded buttons, category badges
+  panel:     '14px',   // alias → --radius-lg
+  card:      '14px',   // alias → --radius-lg
+  modal:     '14px',   // --radius-lg (modals use lg per spec)
+  pill:      '100px',  // fully-rounded — use sparingly (avatars, tags only)
   circle:    '50%',    // avatar, spinner, status dots
 } as const
 

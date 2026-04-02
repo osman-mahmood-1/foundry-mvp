@@ -52,10 +52,10 @@ export const dark = {
   accentBorder:    'rgba(59,130,246,0.30)',
   accentText:      '#3b82f6',
 
-  // ── CTA — sapphire→teal gradient (one primary action per screen)
-  cta:             'linear-gradient(135deg, #3b82f6, #14b8a6)',
-  ctaGlow:         'rgba(59,130,246,0.35)',
-  ctaText:         '#ffffff',
+  // ── CTA — deep navy gradient (one primary action per screen)
+  cta:             'linear-gradient(150deg, #112260 0%, #183590 45%, #1e45b0 100%)',
+  ctaGlow:         'rgba(24,53,144,0.45)',
+  ctaText:         'rgba(255,255,255,0.93)',
 
   // ── Teal / extra palette
   orange:          '#14b8a6',   // teal — replaces copper as CTA secondary alias
@@ -197,9 +197,9 @@ export const light = {
   accentBorder:    'rgba(29,78,216,0.18)',
   accentText:      '#1d4ed8',
 
-  // ── CTA — sapphire→teal gradient
-  cta:             'linear-gradient(135deg, #2563eb, #0d9488)',
-  ctaGlow:         'rgba(37,99,235,0.28)',
+  // ── CTA — deep navy gradient
+  cta:             'linear-gradient(150deg, #1a3fa0 0%, #2255cc 50%, #2d6ae0 100%)',
+  ctaGlow:         'rgba(34,85,204,0.35)',
   ctaText:         '#ffffff',
 
   // ── Teal / extra palette
