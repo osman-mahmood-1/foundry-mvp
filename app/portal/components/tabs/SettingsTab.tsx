@@ -1345,24 +1345,9 @@ export default function SettingsTab({ client }: { client: Client }) {
               Account deletion removes your portal access but data is archived per HMRC regulations.
             </div>
           </div>
-          <button
-            onClick={() => setShowDelete(true)}
-            style={{
-              padding:      '8px 16px',
-              borderRadius: radius.md,
-              border:       'none',
-              background:   colours.dangerLight,
-              color:        colours.danger,
-              fontSize:     '13.5px',
-              fontWeight:   fontWeight.regular,
-              fontFamily:   fonts.sans,
-              cursor:       'pointer',
-              flexShrink:   0,
-              whiteSpace:   'nowrap' as const,
-            }}
-          >
+          <Button variant="danger" size="sm" onClick={() => setShowDelete(true)}>
             Delete account
-          </button>
+          </Button>
         </div>
       </Panel>
 

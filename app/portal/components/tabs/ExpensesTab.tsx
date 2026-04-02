@@ -336,7 +336,7 @@ export default function ExpensesTab({ client, readOnly = false, onExpenseSelect 
           }}>
             <Label>Expenses · {client.tax_year}</Label>
             {!readOnly && !panelOpen && (
-              <Button size="sm" onClick={openNewPanel}>
+              <Button size="sm" shimmer onClick={openNewPanel}>
                 + Add entry
               </Button>
             )}

@@ -488,7 +488,7 @@ export default function SubmissionTab({ client }: { client: Client }) {
               </div>
               <div style={{ marginTop: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Button variant="secondary" size="sm" onClick={() => setStep(3)}>← Back</Button>
-                <Button onClick={() => { clearDraft(); setSubmitted(true) }}>
+                <Button shimmer onClick={() => { clearDraft(); setSubmitted(true) }}>
                   Submit to HMRC ⬡
                 </Button>
               </div>

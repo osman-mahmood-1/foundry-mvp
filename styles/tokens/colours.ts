@@ -52,9 +52,10 @@ export const dark = {
   accentBorder:    'rgba(59,130,246,0.30)',
   accentText:      '#3b82f6',
 
-  // ── CTA — pure sapphire gradient (one primary action per screen)
-  cta:             'linear-gradient(150deg, #0a1440 0%, #122060 28%, #1a30a0 58%, #1e48c8 100%)',
-  ctaGlow:         'rgba(30,72,200,0.40)',
+  // ── CTA — sapphire gradient (lighter, more approachable in dark mode)
+  cta:             'linear-gradient(150deg, #1e3a8a 0%, #2563eb 60%, #3b82f6 100%)',
+  ctaHover:        'linear-gradient(150deg, #2563eb 0%, #3b82f6 60%, #60a5fa 100%)',
+  ctaGlow:         'rgba(59,130,246,0.35)',
   ctaText:         'rgba(255,255,255,0.93)',
 
   // ── Teal / extra palette
@@ -197,10 +198,11 @@ export const light = {
   accentBorder:    'rgba(29,78,216,0.18)',
   accentText:      '#1d4ed8',
 
-  // ── CTA — deep navy gradient
-  cta:             'linear-gradient(150deg, #1a3fa0 0%, #2255cc 50%, #2d6ae0 100%)',
-  ctaGlow:         'rgba(34,85,204,0.35)',
-  ctaText:         '#ffffff',
+  // ── CTA — light mode: very subtle sapphire tint, no gradient fill
+  cta:             'rgba(59,130,246,0.08)',
+  ctaHover:        'rgba(59,130,246,0.14)',
+  ctaGlow:         'rgba(59,130,246,0.20)',
+  ctaText:         '#1d4ed8',
 
   // ── Teal / extra palette
   orange:          '#0d9488',   // teal — replaces copper

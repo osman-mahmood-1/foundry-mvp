@@ -288,6 +288,7 @@ interface EmptyStateProps {
 
 export function EmptyState({ icon, headline, sub, action, onAction }: EmptyStateProps) {
   const colours = useColours()
+  const mode    = useThemeMode()
   return (
     <div style={{
       display:        'flex',
@@ -331,7 +332,7 @@ export function EmptyState({ icon, headline, sub, action, onAction }: EmptyState
             padding:      '8px 20px',
             background:   colours.cta,
             color:        colours.ctaText,
-            border:       'none',
+            border:       mode === 'light' ? '1px solid rgba(59,130,246,0.18)' : 'none',
             borderRadius: radius.md,
             fontSize:     '13.5px',
             fontWeight:   fontWeight.semibold,
@@ -459,15 +460,22 @@ interface ButtonProps {
   type?:      'button' | 'submit'
   /** Used by tint variant — marks the button as the active/selected state */
   active?:    boolean
+  /**
+   * shimmer — applies the spinning sapphire+white border shimmer on hover.
+   * Use ONLY for the most important single CTA on a screen:
+   * + Add entry, Log first entry, Submit to HMRC.
+   * Do NOT set on Save changes, Cancel, Edit, modal confirms, etc.
+   */
+  shimmer?:   boolean
 }
 
 /**
  * Button variants:
- *   primary   = btn-cta: deep navy gradient, white text, radius-md, semibold
- *   secondary = btn-ghost with subtle tint bg
- *   ghost     = btn-ghost: transparent, hairline border at rest
- *   danger    = danger tint background
- *   tint      = btn-tint: toggle groups and tertiary controls (active/inactive)
+ *   primary   = filled CTA: mode-aware sapphire fill, no shimmer by default
+ *   secondary = subtle tint background
+ *   ghost     = transparent, hairline border at rest
+ *   danger    = danger tint; bright red fill on hover
+ *   tint      = toggle groups (active/inactive states)
  */
 export function Button({
   children,
@@ -478,6 +486,7 @@ export function Button({
   fullWidth = false,
   type      = 'button',
   active    = false,
+  shimmer   = false,
 }: ButtonProps) {
   const colours            = useColours()
   const mode               = useThemeMode()
@@ -486,14 +495,27 @@ export function Button({
   function variantStyles(): React.CSSProperties {
     switch (variant) {
       case 'primary':
+        // Dark: sapphire gradient, brightens on hover
+        // Light: very subtle sapphire tint — low contrast, unobtrusive; brightens on hover
+        if (mode === 'dark') {
+          return {
+            padding:    '8px 20px',
+            background: hovered
+              ? 'linear-gradient(150deg, #2563eb 0%, #3b82f6 60%, #60a5fa 100%)'
+              : colours.cta,
+            color:      colours.ctaText,
+            border:     'none',
+            fontWeight: fontWeight.semibold,
+            boxShadow:  hovered ? `0 6px 24px ${colours.ctaGlow}` : 'none',
+          }
+        }
+        // Light mode: very subtle fill, sapphire text
         return {
           padding:    '8px 20px',
-          background: colours.cta,
+          background: hovered ? 'rgba(59,130,246,0.14)' : colours.cta,
           color:      colours.ctaText,
-          border:     'none',
+          border:     hovered ? '1px solid rgba(59,130,246,0.25)' : '1px solid rgba(59,130,246,0.18)',
           fontWeight: fontWeight.semibold,
-          boxShadow:  hovered ? `0 6px 24px ${colours.ctaGlow}` : 'none',
-          transform:  hovered && !disabled ? 'translateY(-1px)' : 'none',
         }
       case 'secondary':
         return {
@@ -539,8 +561,9 @@ export function Button({
       case 'danger':
         return {
           padding:    '8px 16px',
-          background: colours.dangerLight,
-          color:      colours.danger,
+          // Resting: soft tint. Hover: bright red fill.
+          background: hovered ? '#ef4444' : colours.dangerLight,
+          color:      hovered ? '#ffffff' : colours.danger,
           border:     'none',
           fontWeight: fontWeight.regular,
         }
@@ -552,7 +575,7 @@ export function Button({
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={variant === 'primary' ? 'cta-btn' : undefined}
+      className={shimmer && variant === 'primary' ? 'cta-btn' : undefined}
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
       style={{

@@ -270,7 +270,7 @@ export default function IncomeTab({ client, readOnly = false }: Props) {
           }}>
             <Label>Income · {client.tax_year}</Label>
             {!readOnly && !panelOpen && (
-              <Button size="sm" onClick={openNewPanel}>
+              <Button size="sm" shimmer onClick={openNewPanel}>
                 + Add entry
               </Button>
             )}
