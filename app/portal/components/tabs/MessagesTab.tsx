@@ -69,7 +69,8 @@ export default function MessagesTab({ client, readOnly = false }: Props) {
     <div style={{
       display:       'flex',
       flexDirection: 'column',
-      height:        'calc(100vh - 120px)',
+      flex:          1,
+      minHeight:     0,
       gap:           spacing.tab.gap,
     }}>
 
@@ -160,8 +161,8 @@ export default function MessagesTab({ client, readOnly = false }: Props) {
             background:   colours.accent,
             color:        colours.textInverse,
             border:       'none',
-            borderRadius: radius.pill,
-            fontSize:     fontSize.sm,
+            borderRadius: radius.md,
+            fontSize:     '13.5px',
             fontWeight:   fontWeight.medium,
             fontFamily:   fonts.sans,
             cursor:       sending || !draft.trim() ? 'not-allowed' : 'pointer',

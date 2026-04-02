@@ -52,9 +52,9 @@ export const dark = {
   accentBorder:    'rgba(59,130,246,0.30)',
   accentText:      '#3b82f6',
 
-  // ── CTA — deep navy gradient (one primary action per screen)
-  cta:             'linear-gradient(150deg, #112260 0%, #183590 45%, #1e45b0 100%)',
-  ctaGlow:         'rgba(24,53,144,0.45)',
+  // ── CTA — pure sapphire gradient (one primary action per screen)
+  cta:             'linear-gradient(150deg, #0a1440 0%, #122060 28%, #1a30a0 58%, #1e48c8 100%)',
+  ctaGlow:         'rgba(30,72,200,0.40)',
   ctaText:         'rgba(255,255,255,0.93)',
 
   // ── Teal / extra palette
@@ -82,7 +82,7 @@ export const dark = {
   // ── Nav
   hoverBg:         'rgba(255,255,255,0.05)',
   navActive:       '#ffffff',                                    // text on sapphire/teal gradient
-  navActiveBg:     'linear-gradient(135deg, #3b82f6, #14b8a6)', // sapphire→teal gradient
+  navActiveBg:     'linear-gradient(150deg, #1a30a0, #1e48c8)', // sapphire gradient (matches CTA)
   navActiveShadow: '0 4px 20px rgba(59,130,246,0.30)',
   navInactive:     'rgba(255,255,255,0.55)',
   navGroupLabel:   'rgba(255,255,255,0.28)',
@@ -227,7 +227,7 @@ export const light = {
   // ── Nav
   hoverBg:         'rgba(15,23,42,0.04)',
   navActive:       '#ffffff',
-  navActiveBg:     'linear-gradient(135deg, #2563eb, #0d9488)',
+  navActiveBg:     'linear-gradient(150deg, #1a3fa0, #2d6ae0)',
   navActiveShadow: '0 4px 20px rgba(37,99,235,0.22)',
   navInactive:     '#2d4257',
   navGroupLabel:   '#4a5f78',

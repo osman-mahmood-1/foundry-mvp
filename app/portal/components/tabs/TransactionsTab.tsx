@@ -28,12 +28,16 @@ function FilterPill({ label, active, onClick }: { label: string; active: boolean
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
-        padding:      '6px 14px',
-        borderRadius: radius.pill,
-        border:       `1px solid ${active ? colours.accent : colours.borderMedium}`,
-        background:   active ? colours.navActiveBg : (hovered ? colours.hoverBg : 'transparent'),
-        color:        active ? colours.navActive : colours.textSecondary,
-        fontSize:     fontSize.sm,
+        padding:      '8px 16px',
+        borderRadius: radius.md,
+        border:       active
+          ? '1px solid rgba(255,255,255,0.14)'
+          : '1px solid rgba(255,255,255,0.06)',
+        background:   active
+          ? 'rgba(255,255,255,0.10)'
+          : (hovered ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.06)'),
+        color:        active ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.40)',
+        fontSize:     '13.5px',
         fontWeight:   active ? fontWeight.medium : fontWeight.regular,
         cursor:       'pointer',
         fontFamily:   fonts.sans,

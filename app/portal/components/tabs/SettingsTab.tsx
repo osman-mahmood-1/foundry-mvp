@@ -65,19 +65,19 @@ const STATUS_LABELS: Record<string, string> = {
   past_due:  'Past due',
 }
 
-// HMRC tooltip content
+// Tooltip content
 const TOOLTIPS: Record<string, { title: string; body: string }> = {
   utr: {
     title: 'Unique Taxpayer Reference (UTR)',
-    body:  'Your 10-digit UTR is on your SA302 tax calculation, previous Self Assessment returns, or any HMRC letter headed "Your tax reference". If you\'ve never filed, call HMRC on 0300 200 3310 to request one. It can take up to 10 working days to arrive.',
+    body:  'Your 10-digit UTR appears on your SA302, previous Self Assessment returns, or any HMRC correspondence. Not sure where to find yours? Message us in the app and we\'ll help.',
   },
   ni: {
     title: 'National Insurance Number',
-    body:  'Format: AA 12 34 56 C. Find it on your payslip, P60, P45, or your personal tax account at gov.uk/personal-tax-account. If you\'ve lost it, contact HMRC on 0300 200 3500 — they can confirm it over the phone after security checks.',
+    body:  'Format: AA 12 34 56 C. Find it on your payslip, P60, P45, or at gov.uk/personal-tax-account. Can\'t locate it? Message us in the app and we\'ll assist.',
   },
   client_type: {
     title: 'Client type',
-    body:  'This tells HMRC how you earn your income, which determines which supplementary pages go with your SA100 return. Sole traders file an SA103; landlords file an SA105. Choosing the wrong type can delay your filing or trigger HMRC queries — check with your accountant if unsure.',
+    body:  'This determines which supplementary pages accompany your SA100 return. Not sure which applies to you? Message us in the app and we\'ll confirm.',
   },
   tax_year: {
     title: 'Tax year',
@@ -93,11 +93,11 @@ const TOOLTIPS: Record<string, { title: string; body: string }> = {
 const LOCKED_REASON: Record<string, { title: string; body: string }> = {
   email: {
     title: 'Why is this field locked?',
-    body:  'Your email address is your login credential and is managed by our secure authentication system. Changing it here would break your sign-in. To update your email, contact support@taxfoundry.co.uk from your current address — we\'ll verify your identity and update it securely.',
+    body:  'Your email is your login credential. To change it, message us in the app from your current account and we\'ll update it securely.',
   },
   accounting_year_end: {
     title: 'Why is this field locked?',
-    body:  'For most UK individuals, the accounting year end is 5 April — the end of the HMRC tax year. This is determined by HMRC rules for your filing type. If your circumstances require a different year end (e.g. a specific trade), your accountant can update it. Contact us via Messages.',
+    body:  'For most individuals this is 5 April — the end of the UK tax year. If your circumstances require a different year end, message us in the app and your accountant can update it.',
   },
 }
 
@@ -1348,13 +1348,13 @@ export default function SettingsTab({ client }: { client: Client }) {
           <button
             onClick={() => setShowDelete(true)}
             style={{
-              padding:      '9px 16px',
+              padding:      '8px 16px',
               borderRadius: radius.md,
-              border:       `1px solid ${colours.danger}`,
-              background:   'transparent',
+              border:       'none',
+              background:   colours.dangerLight,
               color:        colours.danger,
-              fontSize:     fontSize.sm,
-              fontWeight:   fontWeight.medium,
+              fontSize:     '13.5px',
+              fontWeight:   fontWeight.regular,
               fontFamily:   fonts.sans,
               cursor:       'pointer',
               flexShrink:   0,

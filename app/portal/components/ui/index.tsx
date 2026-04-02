@@ -380,7 +380,7 @@ export function StatCard({ label, value, sub, colour }: StatCardProps) {
       <div style={{
         fontFamily:   fonts.sans,
         fontSize:     '28px',
-        fontWeight:   fontWeight.black,
+        fontWeight:   fontWeight.medium,
         color:        colour ?? colours.textPrimary,
         lineHeight:   1,
         letterSpacing: letterSpacing.tight,
@@ -500,7 +500,7 @@ export function Button({
           padding:    '8px 16px',
           background: hovered ? colours.accentSoft : colours.simpleBg,
           color:      hovered ? colours.textPrimary : colours.textSecondary,
-          border:     hovered ? 'none' : `1px solid ${colours.borderHairline}`,
+          border:     hovered ? '1px solid transparent' : `1px solid ${colours.borderHairline}`,
           fontWeight: fontWeight.regular,
         }
       case 'ghost':

@@ -88,7 +88,7 @@ input, select, textarea, button {
   overflow: visible;
 }
 
-/* Shimmer ring — teal → sapphire → white rotating border, only on hover */
+/* Shimmer ring — sapphire → white rotating border, only on hover */
 .cta-btn::before {
   content: '';
   position: absolute;
@@ -96,19 +96,17 @@ input, select, textarea, button {
   border-radius: 12px; /* --radius-md (10px) + 2px */
   background: conic-gradient(
     from var(--cta-angle),
-    transparent 0deg,
-    #14b8a6 60deg,
-    #ffffff 110deg,
-    #3b82f6 160deg,
-    #ffffff 200deg,
-    #14b8a6 240deg,
-    transparent 280deg,
-    transparent 360deg
+    #1e3a8a   0deg,
+    #3b82f6  70deg,
+    #ffffff  130deg,
+    #60a5fa  190deg,
+    #1d4ed8  270deg,
+    #1e3a8a  360deg
   );
   z-index: -1;
   opacity: 0;
   transition: opacity 0.35s ease;
-  animation: cta-border-spin 4s linear infinite paused;
+  animation: cta-border-spin 2.8s linear infinite paused;
   /* Mask to show only the border strip */
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
@@ -121,7 +119,7 @@ input, select, textarea, button {
   position: absolute;
   inset: 0;
   border-radius: 10px; /* --radius-md */
-  background: linear-gradient(150deg, #112260 0%, #183590 45%, #1e45b0 100%);
+  background: linear-gradient(150deg, #0a1440 0%, #122060 28%, #1a30a0 58%, #1e48c8 100%);
   z-index: -1;
 }
 
