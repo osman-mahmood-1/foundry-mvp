@@ -22,6 +22,8 @@ export default function RootLayout({
   return (
     <html lang="en" data-theme="light" className={outfit.variable}>
       <head>
+        {/* Tell Safari the supported color schemes before it creates the canvas — prevents white FOUC */}
+        <meta name="color-scheme" content="dark light" />
         {/* Blocking theme-color injection — must be first in <head>, before any CSS */}
         <script dangerouslySetInnerHTML={{ __html: `(function(){
   try {
