@@ -32,25 +32,27 @@ export default function RootLayout({
         ──────────────────────────────────────────────────────────────────────── */}
         <script dangerouslySetInnerHTML={{ __html: `(function(){
   try {
+    var d = document.documentElement;
     var e = localStorage.getItem('foundry-theme');
     var isDark = e === 'dark' || (!e && window.matchMedia('(prefers-color-scheme: dark)').matches);
-    var color = isDark ? '#000000' : '#ffffff';
+    var c = isDark ? '#000000' : '#ffffff';
 
-    // FOUC SHIELD: inject a <style> into the CSSOM immediately — faster than d.style
-    // because the browser owns it internally without waiting for any .css download.
-    // transition:none kills the sub-frame white→black animation that looks like a flash.
+    // 1. Set attribute immediately so all CSS selectors resolve correctly
+    d.setAttribute('data-theme', isDark ? 'dark' : 'light');
+
+    // 2. Inject a single style tag covering both html and body —
+    //    handles the black footer in light mode because the rule is ready before paint.
+    //    color-scheme per-element tells the browser which UA styles to apply.
     var s = document.createElement('style');
-    s.id = 'fouc-shield';
-    s.innerHTML = 'html,body{background-color:' + color + '!important;transition:none!important;}';
+    s.id = 'theme-shield';
+    s.innerHTML = 'html,body{background-color:' + c + '!important;color-scheme:' + (isDark ? 'dark' : 'light') + ';}';
     document.head.appendChild(s);
 
-    document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
-
-    // Update theme-color meta
+    // 3. Update theme-color meta
     document.querySelectorAll('meta[name="theme-color"]').forEach(function(el){ el.remove(); });
     var m = document.createElement('meta');
     m.name = 'theme-color';
-    m.content = color;
+    m.content = c;
     document.head.appendChild(m);
   } catch(e) {}
 })();`}} />
