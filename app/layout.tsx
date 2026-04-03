@@ -20,7 +20,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" data-theme="light" className={outfit.variable}>
+    <html lang="en" className={outfit.variable}>
       <head>
         {/* color-scheme MUST be first — Safari resolves its internal canvas color at hardware
             level before executing any script or parsing any CSS. Without this at the top,
