@@ -51,6 +51,14 @@ html, body {
   background-color: #ffffff !important;
 }
 
+/* ── Responsive shell visibility — CSS-first, no JS flash ─────────────────── */
+@media (min-width: 769px) {
+  .mobile-only { display: none !important; }
+}
+@media (max-width: 768px) {
+  .desktop-only { display: none !important; }
+}
+
 /* ── Input / form element font inheritance ─────────────────────────────────── */
 input, select, textarea, button {
   font-family: inherit;
