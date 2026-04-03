@@ -61,8 +61,6 @@ export default function RootLayout({
         `}} />
         {/* Static fallback theme-color — browser reads this before the script can inject a dynamic one */}
         <meta name="theme-color" content="#000000" />
-        {/* Static fallback theme-color — browser reads this before the script can inject a dynamic one */}
-        <meta name="theme-color" content="#000000" />
         {/* Viewport — viewport-fit=cover lets background bleed into safe areas for bottom bar sampling */}
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         {/* PWA / home screen */}
@@ -74,6 +72,12 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/icon-192.png" />
       </head>
       <body>
+        {/* Body shield — SSR content never sits on a white canvas.
+            Runs before any component renders; theme selector overrides once data-theme is set. */}
+        <style dangerouslySetInnerHTML={{ __html: `
+          body { background-color: #000000; }
+          html[data-theme='light'] body { background-color: #ffffff; }
+        `}} />
         {children}
       </body>
     </html>
