@@ -75,8 +75,8 @@ export default function RootLayout({
         {/* Body shield — SSR content never sits on a white canvas.
             Runs before any component renders; theme selector overrides once data-theme is set. */}
         <style dangerouslySetInnerHTML={{ __html: `
-          body { background-color: #000000; }
-          html[data-theme='light'] body { background-color: #ffffff; }
+          body { background-color: #000000 !important; }
+          [data-theme='light'] body { background-color: #ffffff !important; }
         `}} />
         {children}
       </body>
