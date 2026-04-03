@@ -19,12 +19,12 @@ export const duration = {
   slow:       '0.4s',
   reveal:     '0.5s',
   lazy:       '0.6s',
-  appleOpen:  '0.7s',
-  appleClose: '0.45s',
+  appleOpen:  '0.5s',
+  appleClose: '0.28s',
 } as const
 
 /** Stagger delay between cascading items (seconds, use as a multiplier). */
-export const stagger = 0.06
+export const stagger = 0.04
 
 /**
  * Easing curves.

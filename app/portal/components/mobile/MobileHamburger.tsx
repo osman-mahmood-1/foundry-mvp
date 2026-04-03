@@ -70,7 +70,7 @@ export default function MobileHamburger({ isOpen, activeTab, onSelect, onSetting
         opacity:       isOpen ? 1 : 0,
         transition:    isOpen
           ? `transform ${duration.appleOpen} ${easing.appleExpand}, opacity 0.5s ease-out`
-          : `transform ${duration.appleClose} ${easing.appleCollapse} 0.1s, opacity 0.4s ease-in 0.1s`,
+          : `transform ${duration.appleClose} ${easing.appleCollapse} 0.06s, opacity 0.25s ease-in 0.06s`,
         pointerEvents: isOpen ? 'auto' : 'none',
         willChange:    'transform',
         overflow:      'hidden',
@@ -119,7 +119,7 @@ export default function MobileHamburger({ isOpen, activeTab, onSelect, onSetting
                 filter:     isOpen ? 'blur(0px)' : 'blur(20px)',
                 transition: isOpen
                   ? `all 0.6s ${easing.appleExpand} ${idx * stagger}s`
-                  : `all 0.25s ease-in`,
+                  : `all 0.15s ease-in`,
                 willChange: 'transform, opacity, filter',
               }}
             >
