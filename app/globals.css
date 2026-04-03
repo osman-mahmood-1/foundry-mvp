@@ -43,17 +43,16 @@ html, body {
   -moz-osx-font-smoothing: grayscale;
   overflow: hidden;
   overscroll-behavior: none;
-  /* Canvas resolves at GPU/OS level before any script or hex lookup —
-     the fastest possible background Safari can read for the launch canvas */
-  background-color: Canvas !important;
 }
 
-/* Override with exact hex once theme is known */
-[data-theme='dark'] {
+/* Default canvas is black — dark mode flash is invisible in light mode,
+   so we optimise for the dark mode pain point */
+html {
   background-color: #000000 !important;
 }
 
-[data-theme='light'] {
+/* Only flip to white once the blocking script has confirmed light mode */
+html[data-theme='light'] {
   background-color: #ffffff !important;
 }
 

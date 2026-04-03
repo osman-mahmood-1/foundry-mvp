@@ -50,7 +50,7 @@ export default function RootLayout({
         {/* CSS pre-paint fallback — browser CSS parser catches any gap before script runs */}
         <style dangerouslySetInnerHTML={{ __html: `
           html { background-color: #000000; }
-          [data-theme='light'] { background-color: #ffffff; }
+          html[data-theme='light'] { background-color: #ffffff; }
         `}} />
         {/* Viewport — viewport-fit=cover lets background bleed into safe areas for bottom bar sampling */}
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
