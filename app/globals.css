@@ -45,18 +45,14 @@ html, body {
   overscroll-behavior: none;
 }
 
-/* Let the browser use system colors as fallback until the theme script kicks in */
+/* Canvas = OS system background color — resolves at GPU level before any script */
 html {
-  color-scheme: dark light;
+  background-color: Canvas;
+  color-scheme: light dark;
 }
 
-[data-theme='dark'] {
-  background-color: #000000;
-}
-
-[data-theme='light'] {
-  background-color: #ffffff;
-}
+[data-theme='dark']  { background-color: #000000 !important; }
+[data-theme='light'] { background-color: #ffffff !important; }
 
 /* ── Responsive shell visibility — CSS-first, no JS flash ─────────────────── */
 @media (min-width: 769px) {

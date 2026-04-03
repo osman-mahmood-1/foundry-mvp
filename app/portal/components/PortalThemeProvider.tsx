@@ -84,11 +84,11 @@ export default function PortalThemeProvider({
   }, [mode])
 
   function updateThemeColorMeta(resolved: ColourMode) {
-    const meta = document.querySelector('meta[name="theme-color"]:not([media])')
-      ?? document.createElement('meta')
-    meta.setAttribute('name', 'theme-color')
-    meta.setAttribute('content', resolved === 'dark' ? '#000000' : '#ffffff')
-    if (!meta.parentNode) document.head.appendChild(meta)
+    const color = resolved === 'dark' ? '#000000' : '#ffffff'
+    // Hot-swap all theme-color meta tags (both media-scoped and unscoped)
+    document.querySelectorAll('meta[name="theme-color"]').forEach(el => {
+      el.setAttribute('content', color)
+    })
   }
 
   function setMode(m: ThemeMode) {
