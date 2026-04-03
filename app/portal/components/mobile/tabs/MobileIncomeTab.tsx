@@ -12,9 +12,10 @@ import { useIncome }          from '@/app/portal/components/tabs/useIncome'
 import { useColours }         from '@/styles/ThemeContext'
 import { fonts, fontWeight, fontSize } from '@/styles/tokens/typography'
 import { radius }             from '@/styles/tokens'
-import MobileFormSheet        from '../MobileFormSheet'
-import MobileTransactionRow   from '../MobileTransactionRow'
-import type { TxRowData }     from '../MobileTransactionRow'
+import MobileFormSheet          from '../MobileFormSheet'
+import MobileTransactionRow    from '../MobileTransactionRow'
+import MobileTransactionDetail from '../MobileTransactionDetail'
+import type { TxRowData }      from '../MobileTransactionRow'
 
 interface Props { client: Client }
 
@@ -23,7 +24,7 @@ const PTR_THRESHOLD = 60
 export default function MobileIncomeTab({ client }: Props) {
   const colours = useColours()
   const [formOpen,   setFormOpen]   = useState(false)
-  const [expandedId, setExpandedId] = useState<string | null>(null)
+  const [selectedId, setSelectedId] = useState<string | null>(null)
   const [refreshing, setRefreshing] = useState(false)
   const [ptrDelta,   setPtrDelta]   = useState(0)
   const scrollRef  = useRef<HTMLDivElement>(null)
@@ -191,8 +192,8 @@ export default function MobileIncomeTab({ client }: Props) {
                 key={tx.id}
                 tx={tx}
                 isLast={idx === rows.length - 1}
-                expandedId={expandedId}
-                onExpand={setExpandedId}
+                isSelected={selectedId === tx.id}
+                onSelect={setSelectedId}
               />
             ))}
           </div>
@@ -206,6 +207,10 @@ export default function MobileIncomeTab({ client }: Props) {
           onClose={() => setFormOpen(false)}
         />
       )}
+      <MobileTransactionDetail
+        tx={rows.find(t => t.id === selectedId) ?? null}
+        onClose={() => setSelectedId(null)}
+      />
     </>
   )
 }
