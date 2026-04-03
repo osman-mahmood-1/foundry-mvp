@@ -24,6 +24,11 @@ export default function RootLayout({
       <head>
         {/* Tell Safari the supported color schemes before it creates the canvas — prevents white FOUC */}
         <meta name="color-scheme" content="dark light" />
+        {/* CSS pre-paint: browser CSS parser runs before JS engine — pins dark canvas before script fires */}
+        <style dangerouslySetInnerHTML={{ __html: `
+          html { background-color: #000000; }
+          [data-theme='light'] { background-color: #ffffff; }
+        `}} />
         {/* Blocking theme-color injection — must be first in <head>, before any CSS */}
         <script dangerouslySetInnerHTML={{ __html: `(function(){
   try {
