@@ -12,7 +12,8 @@
 import { useState, useEffect }     from 'react'
 import { createPortal }            from 'react-dom'
 import type { Client, PortalTab }  from '@/types'
-import { useColours, useThemeMode } from '@/styles/ThemeContext'
+import { useColours }               from '@/styles/ThemeContext'
+import { useThemePreference }       from './PortalThemeProvider'
 import { fonts, fontWeight, fontSize } from '@/styles/tokens/typography'
 import { radius }                  from '@/styles/tokens'
 import { useOfflineQueue }         from '@/hooks/useOfflineQueue'
@@ -58,8 +59,10 @@ function TabContent({
 }
 
 export default function MobilePortalShell({ client }: Props) {
-  const colours = useColours()
-  const mode    = useThemeMode()
+  const colours  = useColours()
+  const { mode } = useThemePreference()
+  const isDark   = mode === 'dark' ||
+    (mode === 'system' && typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches)
   const [activeTab,      setActiveTab]      = useState<PortalTab>('overview')
   const [hamburgerOpen,  setHamburgerOpen]  = useState(false)
   const [profileOpen,    setProfileOpen]    = useState(false)
@@ -81,7 +84,7 @@ export default function MobilePortalShell({ client }: Props) {
           inset:         0,
           zIndex:        -1,
           pointerEvents: 'none',
-          background:    mode === 'dark' ? '#000000' : '#fdf5ec',
+          background:    isDark ? '#000000' : '#fdf5ec',
         }} />,
         document.body
       )}
