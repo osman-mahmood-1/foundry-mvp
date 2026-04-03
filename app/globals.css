@@ -38,11 +38,15 @@ html, body {
   -webkit-font-smoothing:  antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow: hidden;
-  /* Solid fallback for Safari bar sampling — prevents white flash on rubber-band scroll */
-  background-color: #000000 !important;
   overscroll-behavior: none;
 }
 
+/* Dark mode / unset: pure black for seamless Safari bar sampling */
+[data-theme='dark'], :root:not([data-theme='light']) {
+  background-color: #000000 !important;
+}
+
+/* Light mode: warm white token */
 [data-theme='light'] {
   background-color: #fdf5ec !important;
 }
