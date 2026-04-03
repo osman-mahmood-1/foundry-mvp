@@ -2,6 +2,10 @@
 
 /* ── Font variables (set by next/font in layout.tsx) ──────────────────────── */
 :root {
+  /* Tells the browser's CSS engine to use OS-level dark/light canvas resolution —
+     Canvas keyword resolves at GPU level, faster than any hex lookup */
+  color-scheme: dark light;
+
   --font-display: var(--font-outfit, 'Outfit', sans-serif);
 
   /* ── Radius scale — 3-tier system ─────────────────────────────────────── */
@@ -39,14 +43,16 @@ html, body {
   -moz-osx-font-smoothing: grayscale;
   overflow: hidden;
   overscroll-behavior: none;
+  /* Canvas resolves at GPU/OS level before any script or hex lookup —
+     the fastest possible background Safari can read for the launch canvas */
+  background-color: Canvas !important;
 }
 
-/* Dark mode / unset: pure black for seamless Safari bar sampling */
-[data-theme='dark'], :root:not([data-theme='light']) {
+/* Override with exact hex once theme is known */
+[data-theme='dark'] {
   background-color: #000000 !important;
 }
 
-/* Light mode: pure white for seamless Safari bar sampling */
 [data-theme='light'] {
   background-color: #ffffff !important;
 }

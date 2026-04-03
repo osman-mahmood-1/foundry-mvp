@@ -22,11 +22,13 @@ export default function RootLayout({
   return (
     <html lang="en" data-theme="light" className={outfit.variable}>
       <head>
+        {/* color-scheme MUST be first — Safari resolves its internal canvas color at hardware
+            level before executing any script or parsing any CSS. Without this at the top,
+            the canvas defaults to white for the microseconds before our script runs. */}
+        <meta name="color-scheme" content="dark light" />
         {/* ── FOUC Nuclear Option ────────────────────────────────────────────────
-            Absolute first thing in <head>. Blocking (no async/defer).
-            Sets backgroundColor directly on documentElement before the browser
-            can paint a single pixel — overrides the server-rendered data-theme="light".
-            Also injects theme-color meta and removes any stale duplicates.
+            Blocking script (no async/defer): sets backgroundColor on documentElement
+            before browser paints a pixel, overriding server-rendered data-theme="light".
         ──────────────────────────────────────────────────────────────────────── */}
         <script dangerouslySetInnerHTML={{ __html: `(function(){
   try {
@@ -50,8 +52,6 @@ export default function RootLayout({
           html { background-color: #000000; }
           [data-theme='light'] { background-color: #ffffff; }
         `}} />
-        {/* Signals to Safari to use dark canvas defaults, not white */}
-        <meta name="color-scheme" content="dark light" />
         {/* Viewport — viewport-fit=cover lets background bleed into safe areas for bottom bar sampling */}
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         {/* PWA / home screen */}
