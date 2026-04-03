@@ -57,7 +57,7 @@ export default async function PassportPage({ params }: Props) {
 
   return (
     <div style={{
-      position: 'relative', background: '#08080f', minHeight: '100vh',
+      position: 'relative', background: '#08080f', minHeight: '100dvh',
       display: 'flex', flexDirection: 'column', alignItems: 'center',
       justifyContent: 'center', padding: '48px 28px 52px', overflow: 'hidden',
       fontFamily: "var(--font-outfit, 'Outfit', sans-serif)",

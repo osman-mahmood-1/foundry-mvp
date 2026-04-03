@@ -36,6 +36,7 @@ html, body {
   -webkit-font-smoothing:  antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow: hidden;
+  overscroll-behavior: none;
 }
 
 /* ── Input / form element font inheritance ─────────────────────────────────── */
@@ -179,6 +180,8 @@ input, select, textarea, button {
   --color-bg-surface:   rgba(255,255,255,0.72);
   --color-text-primary: #0a0f1a;
   --color-accent:       #1d4ed8;
+  /* Solid colour read by JS for theme-color meta (must match pageBg gradient start) */
+  --color-theme-bar:    #fdf5ec;
 }
 
 [data-theme="dark"] {
@@ -186,6 +189,13 @@ input, select, textarea, button {
   --color-bg-surface:   rgba(8,12,22,0.65);
   --color-text-primary: #ffffff;
   --color-accent:       #3b82f6;
+  /* Solid colour read by JS for theme-color meta (must match pageBg gradient start) */
+  --color-theme-bar:    #07101e;
+}
+
+/* Safari overscroll bounce area + safe-area zones use the html element's background */
+html {
+  background: var(--color-bg-base);
 }
 
 /* ── Scrollbar styling ─────────────────────────────────────────────────────── */

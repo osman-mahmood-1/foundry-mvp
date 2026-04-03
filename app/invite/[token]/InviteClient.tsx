@@ -162,7 +162,7 @@ export default function InviteClient({ token, tokenData, tokenError, currentUser
 
 function Shell({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ minHeight: '100vh', background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px', fontFamily: "'Inter', sans-serif" }}>
+    <div style={{ minHeight: '100dvh', background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px', fontFamily: "'Inter', sans-serif" }}>
       <div style={{ width: '100%', maxWidth: '440px', background: card, border: `1px solid ${border}`, borderRadius: '16px', padding: '40px 36px' }}>
         <div style={{ marginBottom: '24px', fontSize: '13px', fontWeight: 600, letterSpacing: '0.12em', color: gold, textTransform: 'uppercase' }}>
           Tax Foundry

@@ -73,7 +73,7 @@ export default function MobilePortalShell({ client }: Props) {
       display:        'flex',
       flexDirection:  'column',
       height:         '100dvh',
-      minHeight:      '100vh',
+      minHeight:      '100dvh',
       background:     colours.pageBg,
       overflow:       'hidden',
     }}>

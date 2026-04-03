@@ -214,7 +214,7 @@ export default function SplitPanel({ client, accountantId, accountantUserId, ini
     <div style={{
       display:       'flex',
       flexDirection: 'column',
-      height:        'calc(100vh - 24px)',
+      height:        'calc(100dvh - 24px)',
       overflow:      'hidden',
     }}>
 

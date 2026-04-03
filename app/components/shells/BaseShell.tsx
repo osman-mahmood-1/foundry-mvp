@@ -488,7 +488,7 @@ export default function BaseShell({
     }}>
     <div style={{
       display:    'flex',
-      height:     '100vh',
+      height:     '100dvh',
       background: colours.pageBg,
       fontFamily: fonts.sans,
       overflow:   'hidden',

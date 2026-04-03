@@ -59,6 +59,7 @@ export default function PortalThemeProvider({
     const r = resolveTheme(initial)
     setResolved(r)
     document.documentElement.setAttribute('data-theme', r)
+    updateThemeColorMeta()
   }, [])
 
   // Track system preference changes when mode = 'system'
@@ -74,11 +75,13 @@ export default function PortalThemeProvider({
     return () => mq.removeEventListener('change', handler)
   }, [mode])
 
-  function updateThemeColorMeta(resolved: ColourMode) {
+  function updateThemeColorMeta() {
     const meta = document.querySelector('meta[name="theme-color"]:not([media])')
       ?? document.createElement('meta')
     meta.setAttribute('name', 'theme-color')
-    meta.setAttribute('content', resolved === 'dark' ? '#07101e' : '#fdf5ec')
+    const colour = getComputedStyle(document.documentElement)
+      .getPropertyValue('--color-theme-bar').trim()
+    meta.setAttribute('content', colour)
     if (!meta.parentNode) document.head.appendChild(meta)
   }
 
@@ -88,7 +91,7 @@ export default function PortalThemeProvider({
     const r = resolveTheme(m)
     setResolved(r)
     document.documentElement.setAttribute('data-theme', r)
-    updateThemeColorMeta(r)
+    updateThemeColorMeta()
   }
 
   return (

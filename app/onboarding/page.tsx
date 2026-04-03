@@ -256,7 +256,7 @@ export default function OnboardingPage() {
   // ─── Render ───────────────────────────────────────────
   return (
     <div style={{
-      minHeight: '100vh',
+      minHeight: '100dvh',
       background: bg,
       fontFamily: "var(--font-outfit, 'Outfit', sans-serif)",
       display: 'flex',

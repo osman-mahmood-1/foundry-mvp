@@ -93,7 +93,7 @@ function LoginInner() {
 
   if (submitted) {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#051C2C', fontFamily: 'Arial, sans-serif' }}>
+      <div style={{ minHeight: '100dvh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#051C2C', fontFamily: 'Arial, sans-serif' }}>
         <div style={{ textAlign: 'center', color: 'white' }}>
           <h1 style={{ fontSize: '24px', marginBottom: '12px' }}>Check your email</h1>
           <p style={{ color: '#8A9BB0' }}>We sent a magic link to <strong>{email}</strong></p>
@@ -103,7 +103,7 @@ function LoginInner() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#051C2C', fontFamily: 'Arial, sans-serif' }}>
+    <div style={{ minHeight: '100dvh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#051C2C', fontFamily: 'Arial, sans-serif' }}>
       <div style={{ width: '100%', maxWidth: '400px', padding: '0 24px' }}>
         <h1 style={{ color: 'white', fontSize: '32px', fontFamily: 'Georgia, serif', marginBottom: '8px' }}>Sign in</h1>
         <p style={{ color: '#8A9BB0', marginBottom: '32px' }}>Enter your email and we will send you a magic link</p>
