@@ -14,6 +14,7 @@ import type { PortalTab }             from '@/types'
 import { useColours }                 from '@/styles/ThemeContext'
 import { useThemePreference }         from '../PortalThemeProvider'
 import { fonts, fontSize, fontWeight } from '@/styles/tokens/typography'
+import { easing, duration, stagger }  from '@/styles/tokens/motion'
 import { NAV_ITEMS }                  from '@/lib/nav'
 
 interface Props {
@@ -65,7 +66,9 @@ export default function MobileHamburger({ isOpen, activeTab, onSelect, onSetting
         background:    isDark ? '#000000' : '#ffffff',
         transform:     isOpen ? 'translateY(0)' : 'translateY(-100%)',
         opacity:       isOpen ? 1 : 0,
-        transition:    'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease',
+        transition:    isOpen
+          ? `transform ${duration.appleOpen} ${easing.appleExpand}, opacity 0.4s ease-out`
+          : `transform ${duration.appleClose} ${easing.appleCollapse}, opacity 0.2s ease-in`,
         pointerEvents: isOpen ? 'auto' : 'none',
         overflow:      'hidden',
         paddingTop:    'env(safe-area-inset-top, 0px)',
@@ -121,10 +124,12 @@ export default function MobileHamburger({ isOpen, activeTab, onSelect, onSetting
                 fontWeight:    isActive ? fontWeight.medium : fontWeight.regular,
                 color:         isActive ? colours.teal : colours.textPrimary,
                 letterSpacing: '-0.02em',
-                animation:     isOpen
-                  ? `navItemIn 0.25s ease ${80 + idx * 40}ms both`
-                  : 'none',
-                opacity:       isOpen ? undefined : 0,
+                opacity:       isOpen ? 1 : 0,
+                transform:     isOpen ? 'translateY(0)' : 'translateY(-12px)',
+                filter:        isOpen ? 'blur(0px)' : 'blur(6px)',
+                transition:    isOpen
+                  ? `opacity ${duration.appleOpen} ${easing.appleExpand} ${idx * stagger}s, transform ${duration.appleOpen} ${easing.appleExpand} ${idx * stagger}s, filter ${duration.appleOpen} ${easing.appleExpand} ${idx * stagger}s`
+                  : `opacity ${duration.appleClose} ${easing.appleCollapse}, transform ${duration.appleClose} ${easing.appleCollapse}, filter ${duration.appleClose} ${easing.appleCollapse}`,
               }}
             >
               {item.label}
@@ -152,10 +157,12 @@ export default function MobileHamburger({ isOpen, activeTab, onSelect, onSetting
           background: 'transparent',
           border:     'none',
           cursor:     'pointer',
-          animation:  isOpen
-            ? `navItemIn 0.25s ease ${80 + MOBILE_NAV.length * 40 + 40}ms both`
-            : 'none',
-          opacity:    isOpen ? undefined : 0,
+          opacity:   isOpen ? 1 : 0,
+          transform: isOpen ? 'translateY(0)' : 'translateY(-12px)',
+          filter:    isOpen ? 'blur(0px)' : 'blur(6px)',
+          transition: isOpen
+            ? `opacity ${duration.appleOpen} ${easing.appleExpand} ${MOBILE_NAV.length * stagger}s, transform ${duration.appleOpen} ${easing.appleExpand} ${MOBILE_NAV.length * stagger}s, filter ${duration.appleOpen} ${easing.appleExpand} ${MOBILE_NAV.length * stagger}s`
+            : `opacity ${duration.appleClose} ${easing.appleCollapse}, transform ${duration.appleClose} ${easing.appleCollapse}, filter ${duration.appleClose} ${easing.appleCollapse}`,
         }}
       >
         <div style={{

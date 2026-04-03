@@ -12,14 +12,19 @@
  */
 
 export const duration = {
-  instant:  '0.1s',
-  snap:     '0.15s',
-  fast:     '0.2s',
-  normal:   '0.3s',
-  slow:     '0.4s',
-  reveal:   '0.5s',
-  lazy:     '0.6s',
+  instant:    '0.1s',
+  snap:       '0.15s',
+  fast:       '0.2s',
+  normal:     '0.3s',
+  slow:       '0.4s',
+  reveal:     '0.5s',
+  lazy:       '0.6s',
+  appleOpen:  '0.55s',
+  appleClose: '0.3s',
 } as const
+
+/** Stagger delay between cascading items (seconds, use as a multiplier). */
+export const stagger = 0.04
 
 /**
  * Easing curves.
@@ -29,11 +34,15 @@ export const duration = {
  * accelerate — elements leaving the screen (dismissals)
  */
 export const easing = {
-  standard:   'ease',
-  spring:     'cubic-bezier(0.16, 1, 0.3, 1)',
-  decelerate: 'cubic-bezier(0.0, 0.0, 0.2, 1)',
-  accelerate: 'cubic-bezier(0.4, 0.0, 1, 1)',
-  linear:     'linear',
+  standard:      'ease',
+  spring:        'cubic-bezier(0.16, 1, 0.3, 1)',
+  decelerate:    'cubic-bezier(0.0, 0.0, 0.2, 1)',
+  accelerate:    'cubic-bezier(0.4, 0.0, 1, 1)',
+  linear:        'linear',
+  /** Apple-style quartic burst: fast start, long graceful deceleration (easeOutQuart) */
+  appleExpand:   'cubic-bezier(0.22, 1, 0.36, 1)',
+  /** Apple-style quartic retract: heavy start, accelerating exit (easeInQuart) */
+  appleCollapse: 'cubic-bezier(0.64, 0, 0.78, 0)',
 } as const
 
 /**
