@@ -79,7 +79,7 @@ export default function PortalThemeProvider({
     const meta = document.querySelector('meta[name="theme-color"]:not([media])')
       ?? document.createElement('meta')
     meta.setAttribute('name', 'theme-color')
-    meta.setAttribute('content', resolved === 'dark' ? '#0c1826' : '#fdf5ec')
+    meta.setAttribute('content', resolved === 'dark' ? '#000000' : '#ffffff')
     if (!meta.parentNode) document.head.appendChild(meta)
   }
 

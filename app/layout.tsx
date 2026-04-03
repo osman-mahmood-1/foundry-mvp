@@ -23,17 +23,22 @@ export default function RootLayout({
     <html lang="en" data-theme="light" className={outfit.variable}>
       <head>
         {/* Blocking theme-color injection — must be first in <head>, before any CSS */}
-        <script dangerouslySetInnerHTML={{ __html: `
-(function(){
-  var stored = null;
-  try { stored = localStorage.getItem('foundry-theme'); } catch(e){}
-  var dark = stored === 'dark' || (!stored && window.matchMedia('(prefers-color-scheme: dark)').matches);
-  var m = document.createElement('meta');
-  m.name = 'theme-color';
-  m.content = dark ? '#000000' : '#fdf5ec';
-  document.head.appendChild(m);
-})();
-        `}} />
+        <script dangerouslySetInnerHTML={{ __html: `(function(){
+  try {
+    var key = 'foundry-theme';
+    var stored = localStorage.getItem(key);
+    var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    var isDark = stored === 'dark' || (stored !== 'light' && prefersDark);
+    var theme = isDark ? 'dark' : 'light';
+    var color = isDark ? '#000000' : '#ffffff';
+    document.documentElement.setAttribute('data-theme', theme);
+    document.querySelectorAll('meta[name="theme-color"]').forEach(function(el){ el.remove(); });
+    var m = document.createElement('meta');
+    m.name = 'theme-color';
+    m.content = color;
+    document.head.appendChild(m);
+  } catch(e) {}
+})();`}} />
         {/* Viewport — viewport-fit=cover lets background bleed into safe areas for bottom bar sampling */}
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         {/* PWA / home screen */}

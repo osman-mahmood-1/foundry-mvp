@@ -46,9 +46,9 @@ html, body {
   background-color: #000000 !important;
 }
 
-/* Light mode: warm white token */
+/* Light mode: pure white for seamless Safari bar sampling */
 [data-theme='light'] {
-  background-color: #fdf5ec !important;
+  background-color: #ffffff !important;
 }
 
 /* ── Input / form element font inheritance ─────────────────────────────────── */
