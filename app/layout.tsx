@@ -22,23 +22,22 @@ export default function RootLayout({
   return (
     <html lang="en" data-theme="light" className={outfit.variable}>
       <head>
-        {/* Tell Safari the supported color schemes before it creates the canvas — prevents white FOUC */}
-        <meta name="color-scheme" content="dark light" />
-        {/* CSS pre-paint: browser CSS parser runs before JS engine — pins dark canvas before script fires */}
-        <style dangerouslySetInnerHTML={{ __html: `
-          html { background-color: #000000; }
-          [data-theme='light'] { background-color: #ffffff; }
-        `}} />
-        {/* Blocking theme-color injection — must be first in <head>, before any CSS */}
+        {/* ── FOUC Nuclear Option ────────────────────────────────────────────────
+            Absolute first thing in <head>. Blocking (no async/defer).
+            Sets backgroundColor directly on documentElement before the browser
+            can paint a single pixel — overrides the server-rendered data-theme="light".
+            Also injects theme-color meta and removes any stale duplicates.
+        ──────────────────────────────────────────────────────────────────────── */}
         <script dangerouslySetInnerHTML={{ __html: `(function(){
   try {
-    var key = 'foundry-theme';
-    var stored = localStorage.getItem(key);
+    var d = document.documentElement;
+    var stored = localStorage.getItem('foundry-theme');
     var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     var isDark = stored === 'dark' || (stored !== 'light' && prefersDark);
     var theme = isDark ? 'dark' : 'light';
     var color = isDark ? '#000000' : '#ffffff';
-    document.documentElement.setAttribute('data-theme', theme);
+    d.setAttribute('data-theme', theme);
+    d.style.backgroundColor = color;
     document.querySelectorAll('meta[name="theme-color"]').forEach(function(el){ el.remove(); });
     var m = document.createElement('meta');
     m.name = 'theme-color';
@@ -46,6 +45,13 @@ export default function RootLayout({
     document.head.appendChild(m);
   } catch(e) {}
 })();`}} />
+        {/* CSS pre-paint fallback — browser CSS parser catches any gap before script runs */}
+        <style dangerouslySetInnerHTML={{ __html: `
+          html { background-color: #000000; }
+          [data-theme='light'] { background-color: #ffffff; }
+        `}} />
+        {/* Signals to Safari to use dark canvas defaults, not white */}
+        <meta name="color-scheme" content="dark light" />
         {/* Viewport — viewport-fit=cover lets background bleed into safe areas for bottom bar sampling */}
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         {/* PWA / home screen */}
