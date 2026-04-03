@@ -9,7 +9,8 @@
  * - Offline sync toast (from useOfflineQueue)
  */
 
-import { useState }                from 'react'
+import { useState, useEffect }     from 'react'
+import { createPortal }            from 'react-dom'
 import type { Client, PortalTab }  from '@/types'
 import { useColours }              from '@/styles/ThemeContext'
 import { fonts, fontWeight, fontSize } from '@/styles/tokens/typography'
@@ -61,6 +62,9 @@ export default function MobilePortalShell({ client }: Props) {
   const [activeTab,      setActiveTab]      = useState<PortalTab>('overview')
   const [hamburgerOpen,  setHamburgerOpen]  = useState(false)
   const [profileOpen,    setProfileOpen]    = useState(false)
+  const [mounted,        setMounted]        = useState(false)
+
+  useEffect(() => { setMounted(true) }, [])
 
   const { syncToast, dismissToast } = useOfflineQueue()
 
@@ -69,7 +73,18 @@ export default function MobilePortalShell({ client }: Props) {
   const showStrip = activeTab === 'overview' || activeTab === 'intelligence'
 
   return (
-    <div style={{
+    <>
+      {mounted && createPortal(
+        <div style={{
+          position:      'fixed',
+          inset:         0,
+          zIndex:        -1,
+          pointerEvents: 'none',
+          background:    '#0c1826',
+        }} />,
+        document.body
+      )}
+      <div style={{
       display:        'flex',
       flexDirection:  'column',
       height:         '100dvh',
@@ -139,5 +154,6 @@ export default function MobilePortalShell({ client }: Props) {
         </div>
       )}
     </div>
+    </>
   )
 }
