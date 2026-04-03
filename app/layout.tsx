@@ -52,6 +52,10 @@ export default function RootLayout({
           html { background-color: #000000; }
           html[data-theme='light'] { background-color: #ffffff; }
         `}} />
+        {/* Static fallback theme-color — browser reads this before the script can inject a dynamic one */}
+        <meta name="theme-color" content="#000000" />
+        {/* Static fallback theme-color — browser reads this before the script can inject a dynamic one */}
+        <meta name="theme-color" content="#000000" />
         {/* Viewport — viewport-fit=cover lets background bleed into safe areas for bottom bar sampling */}
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         {/* PWA / home screen */}
