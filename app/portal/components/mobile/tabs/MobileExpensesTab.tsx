@@ -12,7 +12,6 @@ import { fonts, fontWeight, fontSize } from '@/styles/tokens/typography'
 import { radius }             from '@/styles/tokens'
 import MobileFormSheet          from '../MobileFormSheet'
 import MobileTransactionRow    from '../MobileTransactionRow'
-import MobileTransactionDetail from '../MobileTransactionDetail'
 import type { TxRowData }      from '../MobileTransactionRow'
 
 interface Props { client: Client }
@@ -22,7 +21,7 @@ const PTR_THRESHOLD = 60
 export default function MobileExpensesTab({ client }: Props) {
   const colours = useColours()
   const [formOpen,   setFormOpen]   = useState(false)
-  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [expandedId, setExpandedId] = useState<string | null>(null)
   const [refreshing, setRefreshing] = useState(false)
   const [ptrDelta,   setPtrDelta]   = useState(0)
   const scrollRef = useRef<HTMLDivElement>(null)
@@ -131,7 +130,11 @@ export default function MobileExpensesTab({ client }: Props) {
         ) : (
           <div style={{ margin: '0 16px', borderRadius: radius.lg, border: `1px solid ${colours.cardBorder}`, overflow: 'hidden', background: colours.cardBg }}>
             {rows.map((tx, idx) => (
-              <MobileTransactionRow key={tx.id} tx={tx} isLast={idx === rows.length - 1} isSelected={selectedId === tx.id} onSelect={setSelectedId} />
+              <MobileTransactionRow
+                key={tx.id} tx={tx} isLast={idx === rows.length - 1}
+                isExpanded={expandedId === tx.id}
+                onExpand={setExpandedId}
+              />
             ))}
           </div>
         )}
@@ -140,10 +143,6 @@ export default function MobileExpensesTab({ client }: Props) {
       {formOpen && (
         <MobileFormSheet type="expense" client={client} onClose={() => setFormOpen(false)} />
       )}
-      <MobileTransactionDetail
-        tx={rows.find(t => t.id === selectedId) ?? null}
-        onClose={() => setSelectedId(null)}
-      />
     </>
   )
 }

@@ -14,7 +14,6 @@ import { fonts, fontWeight, fontSize } from '@/styles/tokens/typography'
 import { radius }             from '@/styles/tokens'
 import MobileFormSheet          from '../MobileFormSheet'
 import MobileTransactionRow    from '../MobileTransactionRow'
-import MobileTransactionDetail from '../MobileTransactionDetail'
 import type { TxRowData }      from '../MobileTransactionRow'
 
 interface Props { client: Client }
@@ -23,10 +22,10 @@ const PTR_THRESHOLD = 60
 
 export default function MobileIncomeTab({ client }: Props) {
   const colours = useColours()
-  const [formOpen,   setFormOpen]   = useState(false)
-  const [selectedId, setSelectedId] = useState<string | null>(null)
-  const [refreshing, setRefreshing] = useState(false)
-  const [ptrDelta,   setPtrDelta]   = useState(0)
+  const [formOpen,    setFormOpen]    = useState(false)
+  const [expandedId,  setExpandedId]  = useState<string | null>(null)
+  const [refreshing,  setRefreshing]  = useState(false)
+  const [ptrDelta,    setPtrDelta]    = useState(0)
   const scrollRef  = useRef<HTMLDivElement>(null)
   const startYRef  = useRef(0)
   const triggered  = useRef(false)
@@ -52,7 +51,6 @@ export default function MobileIncomeTab({ client }: Props) {
     setPtrDelta(0)
     if (triggered.current) {
       setRefreshing(true)
-      // hooks re-fetch on mount; simulate a brief delay
       await new Promise(r => setTimeout(r, 800))
       setRefreshing(false)
     }
@@ -192,8 +190,8 @@ export default function MobileIncomeTab({ client }: Props) {
                 key={tx.id}
                 tx={tx}
                 isLast={idx === rows.length - 1}
-                isSelected={selectedId === tx.id}
-                onSelect={setSelectedId}
+                isExpanded={expandedId === tx.id}
+                onExpand={setExpandedId}
               />
             ))}
           </div>
@@ -207,10 +205,6 @@ export default function MobileIncomeTab({ client }: Props) {
           onClose={() => setFormOpen(false)}
         />
       )}
-      <MobileTransactionDetail
-        tx={rows.find(t => t.id === selectedId) ?? null}
-        onClose={() => setSelectedId(null)}
-      />
     </>
   )
 }

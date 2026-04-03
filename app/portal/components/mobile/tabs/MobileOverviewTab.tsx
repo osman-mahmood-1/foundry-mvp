@@ -13,7 +13,6 @@ import { fonts, fontWeight, fontSize } from '@/styles/tokens/typography'
 import { radius }                 from '@/styles/tokens'
 import MobileScrollCards          from '../MobileScrollCards'
 import MobileTransactionRow    from '../MobileTransactionRow'
-import MobileTransactionDetail from '../MobileTransactionDetail'
 import type { TxRowData }      from '../MobileTransactionRow'
 import { useState }            from 'react'
 
@@ -24,7 +23,7 @@ interface Props {
 
 export default function MobileOverviewTab({ client, onTabChange }: Props) {
   const colours = useColours()
-  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [expandedId, setExpandedId] = useState<string | null>(null)
   const { stats, recent, loading } = useOverview(client.id)
 
   const hour      = new Date().getHours()
@@ -48,7 +47,6 @@ export default function MobileOverviewTab({ client, onTabChange }: Props) {
   }))
 
   return (
-    <>
     <div style={{ paddingBottom: '24px' }}>
       {/* Greeting */}
       <div style={{ padding: '20px 16px 8px' }}>
@@ -181,18 +179,13 @@ export default function MobileOverviewTab({ client, onTabChange }: Props) {
                 key={tx.id}
                 tx={tx}
                 isLast={idx === txRows.length - 1}
-                isSelected={selectedId === tx.id}
-                onSelect={setSelectedId}
+                isExpanded={expandedId === tx.id}
+                onExpand={setExpandedId}
               />
             ))}
           </div>
         )}
       </div>
     </div>
-      <MobileTransactionDetail
-        tx={txRows.find(t => t.id === selectedId) ?? null}
-        onClose={() => setSelectedId(null)}
-      />
-    </>
   )
 }

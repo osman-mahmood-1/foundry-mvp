@@ -14,7 +14,6 @@ import { useColours }    from '@/styles/ThemeContext'
 import { fonts, fontWeight, fontSize } from '@/styles/tokens/typography'
 import { radius }        from '@/styles/tokens'
 import MobileTransactionRow    from '../MobileTransactionRow'
-import MobileTransactionDetail from '../MobileTransactionDetail'
 import type { TxRowData }      from '../MobileTransactionRow'
 
 type Filter = 'all' | 'income' | 'expense'
@@ -24,7 +23,7 @@ interface Props { client: Client }
 export default function MobileTransactionsTab({ client }: Props) {
   const colours    = useColours()
   const [filter,     setFilter]     = useState<Filter>('all')
-  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [expandedId, setExpandedId] = useState<string | null>(null)
 
   const { income,   loading: loadingI } = useIncome(client.id, client.tax_year, client.user_id)
   const { expenses, loading: loadingE } = useExpenses(client.id, client.tax_year, client.user_id)
@@ -131,17 +130,13 @@ export default function MobileTransactionsTab({ client }: Props) {
             {filtered.map((tx, idx) => (
               <MobileTransactionRow
                 key={tx.id} tx={tx} isLast={idx === filtered.length - 1}
-                isSelected={selectedId === tx.id}
-                onSelect={setSelectedId}
+                isExpanded={expandedId === tx.id}
+                onExpand={setExpandedId}
               />
             ))}
           </div>
         )}
       </div>
-      <MobileTransactionDetail
-        tx={filtered.find(t => t.id === selectedId) ?? null}
-        onClose={() => setSelectedId(null)}
-      />
     </div>
   )
 }
