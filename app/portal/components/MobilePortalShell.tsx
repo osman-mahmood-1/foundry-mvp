@@ -9,7 +9,8 @@
  * - Offline sync toast (from useOfflineQueue)
  */
 
-import { useState }                from 'react'
+import { useState, useEffect }     from 'react'
+import { createPortal }            from 'react-dom'
 import type { Client, PortalTab }  from '@/types'
 import { useColours }              from '@/styles/ThemeContext'
 import { fonts, fontWeight, fontSize } from '@/styles/tokens/typography'
@@ -61,6 +62,9 @@ export default function MobilePortalShell({ client }: Props) {
   const [activeTab,      setActiveTab]      = useState<PortalTab>('overview')
   const [hamburgerOpen,  setHamburgerOpen]  = useState(false)
   const [profileOpen,    setProfileOpen]    = useState(false)
+  const [mounted,        setMounted]        = useState(false)
+
+  useEffect(() => { setMounted(true) }, [])
 
   const { syncToast, dismissToast } = useOfflineQueue()
 
@@ -77,6 +81,24 @@ export default function MobilePortalShell({ client }: Props) {
       background:     colours.pageBg,
       overflow:       'hidden',
     }}>
+      {/* Persistent full-screen background portal — real DOM node with
+          position:fixed; inset:0 covers safe-area zones (Dynamic Island +
+          home indicator). Identical technique to MobileHamburger overlay
+          which already works. z-index:-1 keeps it behind all content. */}
+      {mounted && createPortal(
+        <div
+          aria-hidden="true"
+          style={{
+            position:      'fixed',
+            inset:         0,
+            zIndex:        -1,
+            background:    'var(--color-bg-base)',
+            pointerEvents: 'none',
+          }}
+        />,
+        document.body
+      )}
+
       {/* Header */}
       <MobileHeader
         onIntelligence={() => setActiveTab('intelligence')}

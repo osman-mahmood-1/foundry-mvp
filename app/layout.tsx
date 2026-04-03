@@ -30,16 +30,28 @@ export default function RootLayout({
       <head>
         {/*
           Blocking script — runs synchronously before first CSS paint.
-          Reads localStorage + system preference and sets data-theme on <html>
-          so CSS variables (background, theme-bar colour) resolve correctly
-          from the very first pixel. Without this, SSR always emits data-theme="light"
-          and Safari paints the safe-area zones white before JS hydrates.
+          Sets data-theme on <html> AND writes a dynamic theme-color meta.
+          Static theme-color metas are read from cached HTML at navigation time,
+          so a user with OS-light + app-dark always gets the wrong colour.
+          A dynamically-appended meta written before first paint is read correctly.
         */}
-        <script dangerouslySetInnerHTML={{ __html: `(function(){try{var t=localStorage.getItem('foundry-theme');var d=t==='dark'||(t!=='light'&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.setAttribute('data-theme',d?'dark':'light')}catch(e){}})();` }} />
-
-        {/* Theme colour — matches pageBg per mode for Dynamic Island / status bar */}
-        <meta name="theme-color" content="#07101e" media="(prefers-color-scheme: dark)" />
-        <meta name="theme-color" content="#fdf5ec" media="(prefers-color-scheme: light)" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){
+  try {
+    var stored = localStorage.getItem('foundry-theme');
+    var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    var isDark = stored === 'dark' || (!stored && prefersDark);
+    var theme = isDark ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', theme);
+    var meta = document.createElement('meta');
+    meta.name = 'theme-color';
+    meta.content = isDark ? '#07101e' : '#fdf5ec';
+    document.head.appendChild(meta);
+  } catch(e) {}
+})();`,
+          }}
+        />
 
         {/* PWA / home screen */}
         <meta name="apple-mobile-web-app-capable" content="yes" />

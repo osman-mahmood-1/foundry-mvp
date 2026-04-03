@@ -180,8 +180,6 @@ input, select, textarea, button {
   --color-bg-surface:   rgba(255,255,255,0.72);
   --color-text-primary: #0a0f1a;
   --color-accent:       #1d4ed8;
-  /* Solid colour read by JS for theme-color meta (must match pageBg gradient start) */
-  --color-theme-bar:    #fdf5ec;
 }
 
 [data-theme="dark"] {
@@ -189,8 +187,6 @@ input, select, textarea, button {
   --color-bg-surface:   rgba(8,12,22,0.65);
   --color-text-primary: #ffffff;
   --color-accent:       #3b82f6;
-  /* Solid colour read by JS for theme-color meta (must match pageBg gradient start) */
-  --color-theme-bar:    #07101e;
 }
 
 /* Safari overscroll bounce area + safe-area zones use the html element's background */
@@ -198,20 +194,6 @@ html {
   background: var(--color-bg-base);
 }
 
-/*
-  Full-screen background layer — same technique as .hamburger-overlay.
-  position: fixed + inset: 0 is what reliably paints into safe-area zones
-  on Safari iOS. html/body background alone does not cover those regions.
-  z-index: -1 keeps it behind all content.
-*/
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background: var(--color-bg-base);
-  z-index: -1;
-  pointer-events: none;
-}
 
 /* ── Scrollbar styling ─────────────────────────────────────────────────────── */
 [data-theme="dark"] * {

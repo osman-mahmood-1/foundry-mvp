@@ -59,7 +59,7 @@ export default function PortalThemeProvider({
     const r = resolveTheme(initial)
     setResolved(r)
     document.documentElement.setAttribute('data-theme', r)
-    updateThemeColorMeta()
+    updateThemeColorMeta(r === 'dark')
   }, [])
 
   // Track system preference changes when mode = 'system'
@@ -75,15 +75,15 @@ export default function PortalThemeProvider({
     return () => mq.removeEventListener('change', handler)
   }, [mode])
 
-  function updateThemeColorMeta() {
-    const meta = document.querySelector('meta[name="theme-color"]:not([media])')
-      ?? document.createElement('meta')
-    meta.setAttribute('name', 'theme-color')
-    // Read data-theme attribute directly — more reliable than getComputedStyle
-    // at hydration time (CSS variable timing edge cases can return empty string)
-    const isDark = document.documentElement.getAttribute('data-theme') === 'dark'
-    meta.setAttribute('content', isDark ? '#07101e' : '#fdf5ec')
-    if (!meta.parentNode) document.head.appendChild(meta)
+  function updateThemeColorMeta(isDark: boolean): void {
+    if (typeof document === 'undefined') return
+    let meta = document.querySelector('meta[name="theme-color"]') as HTMLMetaElement | null
+    if (!meta) {
+      meta = document.createElement('meta')
+      meta.name = 'theme-color'
+      document.head.appendChild(meta)
+    }
+    meta.content = isDark ? '#07101e' : '#fdf5ec'
   }
 
   function setMode(m: ThemeMode) {
@@ -92,7 +92,7 @@ export default function PortalThemeProvider({
     const r = resolveTheme(m)
     setResolved(r)
     document.documentElement.setAttribute('data-theme', r)
-    updateThemeColorMeta()
+    updateThemeColorMeta(r === 'dark')
   }
 
   return (
