@@ -63,11 +63,14 @@ export default function MobileHamburger({ isOpen, activeTab, onSelect, onSetting
         zIndex:         200,
         display:       'flex',
         flexDirection: 'column',
-        background:    isDark ? '#000000' : '#ffffff',
+        background:           isDark ? 'rgba(0,0,0,0.88)' : 'rgba(255,255,255,0.88)',
+        backdropFilter:       'blur(30px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(30px) saturate(180%)',
         transform:     isOpen ? 'translateY(0)' : 'translateY(-100%)',
+        opacity:       isOpen ? 1 : 0,
         transition:    isOpen
-          ? `transform ${duration.appleOpen} ${easing.appleExpand}`
-          : `transform ${duration.appleClose} ${easing.appleCollapse}`,
+          ? `transform ${duration.appleOpen} ${easing.appleExpand}, opacity 0.5s ease-out`
+          : `transform ${duration.appleClose} ${easing.appleCollapse}, opacity 0.4s ease-in`,
         pointerEvents: isOpen ? 'auto' : 'none',
         willChange:    'transform',
         overflow:      'hidden',
@@ -112,8 +115,8 @@ export default function MobileHamburger({ isOpen, activeTab, onSelect, onSetting
               key={tabId}
               style={{
                 opacity:    isOpen ? 1 : 0,
-                transform:  isOpen ? 'translateY(0)' : 'translateY(20px)',
-                filter:     isOpen ? 'blur(0px)' : 'blur(12px)',
+                transform:  isOpen ? 'translateY(0)' : 'translateY(30px)',
+                filter:     isOpen ? 'blur(0px)' : 'blur(20px)',
                 transition: isOpen
                   ? `all 0.6s ${easing.appleExpand} ${idx * stagger}s`
                   : `all ${duration.appleClose} ${easing.appleCollapse}`,
@@ -154,8 +157,8 @@ export default function MobileHamburger({ isOpen, activeTab, onSelect, onSetting
       <div
         style={{
           opacity:    isOpen ? 1 : 0,
-          transform:  isOpen ? 'translateY(0)' : 'translateY(20px)',
-          filter:     isOpen ? 'blur(0px)' : 'blur(12px)',
+          transform:  isOpen ? 'translateY(0)' : 'translateY(30px)',
+          filter:     isOpen ? 'blur(0px)' : 'blur(20px)',
           transition: isOpen
             ? `all 0.6s ${easing.appleExpand} ${MOBILE_NAV.length * stagger}s`
             : `all ${duration.appleClose} ${easing.appleCollapse}`,
