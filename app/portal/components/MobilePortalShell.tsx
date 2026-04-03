@@ -124,16 +124,15 @@ export default function MobilePortalShell({ client }: Props) {
         />
       </div>
 
-      {/* Hamburger nav */}
-      {hamburgerOpen && (
-        <MobileHamburger
-          activeTab={activeTab}
-          onSelect={(tab) => setActiveTab(tab)}
-          onSettings={() => setProfileOpen(true)}
-          onClose={() => setHamburgerOpen(false)}
-          clientName={firstName}
-        />
-      )}
+      {/* Hamburger nav — always mounted so exit animation plays */}
+      <MobileHamburger
+        isOpen={hamburgerOpen}
+        activeTab={activeTab}
+        onSelect={(tab) => setActiveTab(tab)}
+        onSettings={() => setProfileOpen(true)}
+        onClose={() => setHamburgerOpen(false)}
+        clientName={firstName}
+      />
 
       {/* Profile / settings sheet */}
       {profileOpen && (
