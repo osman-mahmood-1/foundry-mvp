@@ -9,14 +9,13 @@
  * - Offline sync toast (from useOfflineQueue)
  */
 
-import { useState, useEffect }     from 'react'
-import { createPortal }            from 'react-dom'
+import { useState }                from 'react'
 import type { Client, PortalTab }  from '@/types'
 import { useColours }               from '@/styles/ThemeContext'
-import { useThemePreference }       from './PortalThemeProvider'
 import { fonts, fontWeight, fontSize } from '@/styles/tokens/typography'
 import { radius }                  from '@/styles/tokens'
 import { useOfflineQueue }         from '@/hooks/useOfflineQueue'
+import SafariChromeFix             from './mobile/SafariChromeFix'
 
 import MobileHeader            from './mobile/MobileHeader'
 import MobileHamburger         from './mobile/MobileHamburger'
@@ -60,15 +59,9 @@ function TabContent({
 
 export default function MobilePortalShell({ client }: Props) {
   const colours  = useColours()
-  const { mode } = useThemePreference()
-  const isDark   = mode === 'dark' ||
-    (mode === 'system' && typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches)
   const [activeTab,      setActiveTab]      = useState<PortalTab>('overview')
   const [hamburgerOpen,  setHamburgerOpen]  = useState(false)
   const [profileOpen,    setProfileOpen]    = useState(false)
-  const [mounted,        setMounted]        = useState(false)
-
-  useEffect(() => { setMounted(true) }, [])
 
   const { syncToast, dismissToast } = useOfflineQueue()
 
@@ -78,16 +71,7 @@ export default function MobilePortalShell({ client }: Props) {
 
   return (
     <>
-      {mounted && createPortal(
-        <div style={{
-          position:      'fixed',
-          inset:         0,
-          zIndex:        -1,
-          pointerEvents: 'none',
-          background:    isDark ? '#000000' : '#ffffff',
-        }} />,
-        document.body
-      )}
+      <SafariChromeFix />
       <div style={{
       display:        'flex',
       flexDirection:  'column',

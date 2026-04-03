@@ -4,18 +4,17 @@
  * app/portal/components/mobile/MobileHamburger.tsx
  *
  * Full-screen nav drawer. Always mounted; controlled by `isOpen` so exit
- * animations play. A single fixed div slides in from the top — no separate
- * backdrop overlay, no conditional unmount, no dark-navy flash.
+ * animations play. Delegates shell/backdrop to MobileNavigationLayer.
  */
 
-import { useState, useEffect }        from 'react'
-import { createPortal }               from 'react-dom'
-import type { PortalTab }             from '@/types'
-import { useColours }                 from '@/styles/ThemeContext'
-import { useThemePreference }         from '../PortalThemeProvider'
-import { fonts, fontSize, fontWeight } from '@/styles/tokens/typography'
-import { easing, duration, stagger }  from '@/styles/tokens/motion'
-import { NAV_ITEMS }                  from '@/lib/nav'
+import { useState, useEffect }          from 'react'
+import { createPortal }                 from 'react-dom'
+import type { PortalTab }               from '@/types'
+import { useColours }                   from '@/styles/ThemeContext'
+import { fonts, fontSize, fontWeight }  from '@/styles/tokens/typography'
+import { mobileMotion, mobileBlur }     from '@/styles/tokens/mobile-physics'
+import { NAV_ITEMS }                    from '@/lib/nav'
+import MobileNavigationLayer            from './MobileNavigationLayer'
 
 interface Props {
   isOpen:     boolean
@@ -38,45 +37,18 @@ const MOBILE_NAV: PortalTab[] = [
 ]
 
 export default function MobileHamburger({ isOpen, activeTab, onSelect, onSettings, onClose, clientName }: Props) {
-  const colours      = useColours()
-  const { mode }     = useThemePreference()
-  const [mounted, setMounted]   = useState(false)
-  const [isDark,  setIsDark]    = useState(true)
+  const colours               = useColours()
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => { setMounted(true) }, [])
-
-  useEffect(() => {
-    const dark = mode === 'dark' ||
-      (mode === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
-    setIsDark(dark)
-  }, [mode])
 
   if (!mounted) return null
 
   const initial = (clientName ?? 'U').charAt(0).toUpperCase()
 
   const menu = (
-    <div
-      style={{
-        position:      'fixed',
-        inset:          0,
-        zIndex:         200,
-        display:       'flex',
-        flexDirection: 'column',
-        background:           isDark ? 'rgba(0,0,0,0.92)' : 'rgba(255,255,255,0.92)',
-        backdropFilter:       'blur(30px) saturate(180%)',
-        WebkitBackdropFilter: 'blur(30px) saturate(180%)',
-        transform:     isOpen ? 'translateY(0)' : 'translateY(-100%)',
-        opacity:       isOpen ? 1 : 0,
-        transition:    isOpen
-          ? `transform ${duration.appleOpen} ${easing.appleExpand}, opacity 0.5s ease-out`
-          : `transform ${duration.appleClose} ${easing.appleCollapse} 0.06s, opacity 0.25s ease-in 0.06s`,
-        pointerEvents: isOpen ? 'auto' : 'none',
-        willChange:    'transform',
-        overflow:      'hidden',
-        paddingTop:    'env(safe-area-inset-top, 0px)',
-      }}
-    >
+    <MobileNavigationLayer isOpen={isOpen}>
+
       {/* Close row */}
       <div style={{
         display:        'flex',
@@ -103,7 +75,7 @@ export default function MobileHamburger({ isOpen, activeTab, onSelect, onSetting
         </button>
       </div>
 
-      {/* Nav items */}
+      {/* Nav items — staggered cascade */}
       <nav style={{ padding: '4px 0 0' }}>
         {MOBILE_NAV.map((tabId, idx) => {
           const item     = NAV_ITEMS.find(n => n.id === tabId)
@@ -116,9 +88,9 @@ export default function MobileHamburger({ isOpen, activeTab, onSelect, onSetting
               style={{
                 opacity:    isOpen ? 1 : 0,
                 transform:  isOpen ? 'translateY(0)' : 'translateY(30px)',
-                filter:     isOpen ? 'blur(0px)' : 'blur(20px)',
+                filter:     isOpen ? 'blur(0px)' : mobileBlur.item,
                 transition: isOpen
-                  ? `all 0.6s ${easing.appleExpand} ${idx * stagger}s`
+                  ? `all 0.6s ${mobileMotion.expand} ${idx * mobileMotion.duration.stagger}s`
                   : `all 0.15s ease-in`,
                 willChange: 'transform, opacity, filter',
               }}
@@ -158,62 +130,63 @@ export default function MobileHamburger({ isOpen, activeTab, onSelect, onSetting
         style={{
           opacity:    isOpen ? 1 : 0,
           transform:  isOpen ? 'translateY(0)' : 'translateY(30px)',
-          filter:     isOpen ? 'blur(0px)' : 'blur(20px)',
+          filter:     isOpen ? 'blur(0px)' : mobileBlur.item,
           transition: isOpen
-            ? `all 0.6s ${easing.appleExpand} ${MOBILE_NAV.length * stagger}s`
-            : `all 0.25s ease-in`,
+            ? `all 0.6s ${mobileMotion.expand} ${MOBILE_NAV.length * mobileMotion.duration.stagger}s`
+            : `all 0.15s ease-in`,
           willChange: 'transform, opacity, filter',
         }}
       >
-      <button
-        onClick={() => { onSettings(); onClose() }}
-        style={{
-          display:    'flex',
-          alignItems: 'center',
-          gap:        '12px',
-          width:      '100%',
-          padding:    '14px 24px',
-          background: 'transparent',
-          border:     'none',
-          cursor:     'pointer',
-        }}
-      >
-        <div style={{
-          width:          '32px',
-          height:         '32px',
-          borderRadius:   '50%',
-          background:     colours.accentSoft,
-          border:         `1px solid ${colours.accentBorder}`,
-          display:        'flex',
-          alignItems:     'center',
-          justifyContent: 'center',
-          fontSize:       '14px',
-          fontWeight:     fontWeight.semibold,
-          color:          colours.accent,
-          fontFamily:     fonts.sans,
-          flexShrink:     0,
-        }}>
-          {initial}
-        </div>
-        <span style={{
-          fontFamily: fonts.sans,
-          fontSize:   '16px',
-          fontWeight: fontWeight.medium,
-          color:      colours.textPrimary,
-        }}>
-          {clientName}
-        </span>
-        <span style={{
-          marginLeft: 'auto',
-          fontFamily: fonts.sans,
-          fontSize:   fontSize.sm,
-          color:      colours.textMuted,
-        }}>
-          Settings →
-        </span>
-      </button>
+        <button
+          onClick={() => { onSettings(); onClose() }}
+          style={{
+            display:    'flex',
+            alignItems: 'center',
+            gap:        '12px',
+            width:      '100%',
+            padding:    '14px 24px',
+            background: 'transparent',
+            border:     'none',
+            cursor:     'pointer',
+          }}
+        >
+          <div style={{
+            width:          '32px',
+            height:         '32px',
+            borderRadius:   '50%',
+            background:     colours.accentSoft,
+            border:         `1px solid ${colours.accentBorder}`,
+            display:        'flex',
+            alignItems:     'center',
+            justifyContent: 'center',
+            fontSize:       '14px',
+            fontWeight:     fontWeight.semibold,
+            color:          colours.accent,
+            fontFamily:     fonts.sans,
+            flexShrink:     0,
+          }}>
+            {initial}
+          </div>
+          <span style={{
+            fontFamily: fonts.sans,
+            fontSize:   '16px',
+            fontWeight: fontWeight.medium,
+            color:      colours.textPrimary,
+          }}>
+            {clientName}
+          </span>
+          <span style={{
+            marginLeft: 'auto',
+            fontFamily: fonts.sans,
+            fontSize:   fontSize.sm,
+            color:      colours.textMuted,
+          }}>
+            Settings →
+          </span>
+        </button>
       </div>
-    </div>
+
+    </MobileNavigationLayer>
   )
 
   return createPortal(menu, document.body)
