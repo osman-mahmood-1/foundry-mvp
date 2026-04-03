@@ -65,11 +65,11 @@ export default function MobileHamburger({ isOpen, activeTab, onSelect, onSetting
         flexDirection: 'column',
         background:    isDark ? '#000000' : '#ffffff',
         transform:     isOpen ? 'translateY(0)' : 'translateY(-100%)',
-        opacity:       isOpen ? 1 : 0,
         transition:    isOpen
-          ? `transform ${duration.appleOpen} ${easing.appleExpand}, opacity 0.4s ease-out`
-          : `transform ${duration.appleClose} ${easing.appleCollapse}, opacity 0.2s ease-in`,
+          ? `transform ${duration.appleOpen} ${easing.appleExpand}`
+          : `transform ${duration.appleClose} ${easing.appleCollapse}`,
         pointerEvents: isOpen ? 'auto' : 'none',
+        willChange:    'transform',
         overflow:      'hidden',
         paddingTop:    'env(safe-area-inset-top, 0px)',
       }}
@@ -100,40 +100,46 @@ export default function MobileHamburger({ isOpen, activeTab, onSelect, onSetting
         </button>
       </div>
 
-      {/* Nav items — key on isOpen so animation replays each open */}
-      <nav key={String(isOpen)} style={{ padding: '4px 0 0' }}>
+      {/* Nav items */}
+      <nav style={{ padding: '4px 0 0' }}>
         {MOBILE_NAV.map((tabId, idx) => {
           const item     = NAV_ITEMS.find(n => n.id === tabId)
           if (!item) return null
           const isActive = activeTab === tabId
 
           return (
-            <button
+            <div
               key={tabId}
-              onClick={() => { onSelect(tabId); onClose() }}
               style={{
-                display:       'block',
-                width:         '100%',
-                textAlign:     'left' as const,
-                padding:       '14px 24px',
-                background:    'transparent',
-                border:        'none',
-                cursor:        'pointer',
-                fontFamily:    fonts.sans,
-                fontSize:      '22px',
-                fontWeight:    isActive ? fontWeight.medium : fontWeight.regular,
-                color:         isActive ? colours.teal : colours.textPrimary,
-                letterSpacing: '-0.02em',
-                opacity:       isOpen ? 1 : 0,
-                transform:     isOpen ? 'translateY(0)' : 'translateY(-12px)',
-                filter:        isOpen ? 'blur(0px)' : 'blur(6px)',
-                transition:    isOpen
-                  ? `opacity ${duration.appleOpen} ${easing.appleExpand} ${idx * stagger}s, transform ${duration.appleOpen} ${easing.appleExpand} ${idx * stagger}s, filter ${duration.appleOpen} ${easing.appleExpand} ${idx * stagger}s`
-                  : `opacity ${duration.appleClose} ${easing.appleCollapse}, transform ${duration.appleClose} ${easing.appleCollapse}, filter ${duration.appleClose} ${easing.appleCollapse}`,
+                opacity:    isOpen ? 1 : 0,
+                transform:  isOpen ? 'translateY(0)' : 'translateY(20px)',
+                filter:     isOpen ? 'blur(0px)' : 'blur(12px)',
+                transition: isOpen
+                  ? `all 0.6s ${easing.appleExpand} ${idx * stagger}s`
+                  : `all ${duration.appleClose} ${easing.appleCollapse}`,
+                willChange: 'transform, opacity, filter',
               }}
             >
-              {item.label}
-            </button>
+              <button
+                onClick={() => { onSelect(tabId); onClose() }}
+                style={{
+                  display:       'block',
+                  width:         '100%',
+                  textAlign:     'left' as const,
+                  padding:       '14px 24px',
+                  background:    'transparent',
+                  border:        'none',
+                  cursor:        'pointer',
+                  fontFamily:    fonts.sans,
+                  fontSize:      '22px',
+                  fontWeight:    isActive ? fontWeight.medium : fontWeight.regular,
+                  color:         isActive ? colours.teal : colours.textPrimary,
+                  letterSpacing: '-0.02em',
+                }}
+              >
+                {item.label}
+              </button>
+            </div>
           )
         })}
       </nav>
@@ -145,8 +151,18 @@ export default function MobileHamburger({ isOpen, activeTab, onSelect, onSetting
       }} />
 
       {/* Settings row */}
+      <div
+        style={{
+          opacity:    isOpen ? 1 : 0,
+          transform:  isOpen ? 'translateY(0)' : 'translateY(20px)',
+          filter:     isOpen ? 'blur(0px)' : 'blur(12px)',
+          transition: isOpen
+            ? `all 0.6s ${easing.appleExpand} ${MOBILE_NAV.length * stagger}s`
+            : `all ${duration.appleClose} ${easing.appleCollapse}`,
+          willChange: 'transform, opacity, filter',
+        }}
+      >
       <button
-        key={`settings-${String(isOpen)}`}
         onClick={() => { onSettings(); onClose() }}
         style={{
           display:    'flex',
@@ -157,12 +173,6 @@ export default function MobileHamburger({ isOpen, activeTab, onSelect, onSetting
           background: 'transparent',
           border:     'none',
           cursor:     'pointer',
-          opacity:   isOpen ? 1 : 0,
-          transform: isOpen ? 'translateY(0)' : 'translateY(-12px)',
-          filter:    isOpen ? 'blur(0px)' : 'blur(6px)',
-          transition: isOpen
-            ? `opacity ${duration.appleOpen} ${easing.appleExpand} ${MOBILE_NAV.length * stagger}s, transform ${duration.appleOpen} ${easing.appleExpand} ${MOBILE_NAV.length * stagger}s, filter ${duration.appleOpen} ${easing.appleExpand} ${MOBILE_NAV.length * stagger}s`
-            : `opacity ${duration.appleClose} ${easing.appleCollapse}, transform ${duration.appleClose} ${easing.appleCollapse}, filter ${duration.appleClose} ${easing.appleCollapse}`,
         }}
       >
         <div style={{
@@ -199,6 +209,7 @@ export default function MobileHamburger({ isOpen, activeTab, onSelect, onSetting
           Settings →
         </span>
       </button>
+      </div>
     </div>
   )
 
