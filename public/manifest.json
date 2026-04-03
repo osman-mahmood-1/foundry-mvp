@@ -4,8 +4,8 @@
   "description": "Your tax, handled.",
   "start_url": "/portal",
   "display": "standalone",
-  "background_color": "#07101e",
-  "theme_color": "#07101e",
+  "background_color": "#000000",
+  "theme_color": "#000000",
   "orientation": "portrait",
   "icons": [
     {
