@@ -30,12 +30,21 @@
 
 html, body {
   height: 100%;
+  margin: 0;
+  padding: 0;
   font-family: var(--font-display);
   font-size: 13px;
   line-height: 1.6;
   -webkit-font-smoothing:  antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow: hidden;
+  /* Solid fallback for Safari bar sampling — prevents white flash on rubber-band scroll */
+  background-color: #0c1826 !important;
+  overscroll-behavior: none;
+}
+
+[data-theme='light'] {
+  background-color: #fdf5ec !important;
 }
 
 /* ── Input / form element font inheritance ─────────────────────────────────── */

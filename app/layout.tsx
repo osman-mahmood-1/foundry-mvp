@@ -22,7 +22,7 @@ export default function RootLayout({
   return (
     <html lang="en" data-theme="light" className={outfit.variable}>
       <head>
-        {/* Blocking theme-color injection — runs before paint to avoid Safari caching stale static meta */}
+        {/* Blocking theme-color injection — must be first in <head>, before any CSS */}
         <script dangerouslySetInnerHTML={{ __html: `
 (function(){
   var stored = null;
@@ -34,9 +34,12 @@ export default function RootLayout({
   document.head.appendChild(m);
 })();
         `}} />
+        {/* Viewport — viewport-fit=cover lets background bleed into safe areas for bottom bar sampling */}
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         {/* PWA / home screen */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        {/* "default" = Automatic in modern iOS — follows theme-color meta reliably */}
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="Tax Foundry" />
         <link rel="manifest" href="/manifest.json" />
         <link rel="apple-touch-icon" href="/icon-192.png" />
