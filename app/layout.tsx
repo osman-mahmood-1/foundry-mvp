@@ -32,14 +32,21 @@ export default function RootLayout({
         ──────────────────────────────────────────────────────────────────────── */}
         <script dangerouslySetInnerHTML={{ __html: `(function(){
   try {
-    var d = document.documentElement;
-    var stored = localStorage.getItem('foundry-theme');
-    var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    var isDark = stored === 'dark' || (stored !== 'light' && prefersDark);
-    var theme = isDark ? 'dark' : 'light';
+    var e = localStorage.getItem('foundry-theme');
+    var isDark = e === 'dark' || (!e && window.matchMedia('(prefers-color-scheme: dark)').matches);
     var color = isDark ? '#000000' : '#ffffff';
-    d.setAttribute('data-theme', theme);
-    d.style.backgroundColor = color;
+
+    // FOUC SHIELD: inject a <style> into the CSSOM immediately — faster than d.style
+    // because the browser owns it internally without waiting for any .css download.
+    // transition:none kills the sub-frame white→black animation that looks like a flash.
+    var s = document.createElement('style');
+    s.id = 'fouc-shield';
+    s.innerHTML = 'html,body{background-color:' + color + '!important;transition:none!important;}';
+    document.head.appendChild(s);
+
+    document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+
+    // Update theme-color meta
     document.querySelectorAll('meta[name="theme-color"]').forEach(function(el){ el.remove(); });
     var m = document.createElement('meta');
     m.name = 'theme-color';
