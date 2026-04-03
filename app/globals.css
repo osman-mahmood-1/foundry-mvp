@@ -198,6 +198,21 @@ html {
   background: var(--color-bg-base);
 }
 
+/*
+  Full-screen background layer — same technique as .hamburger-overlay.
+  position: fixed + inset: 0 is what reliably paints into safe-area zones
+  on Safari iOS. html/body background alone does not cover those regions.
+  z-index: -1 keeps it behind all content.
+*/
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: var(--color-bg-base);
+  z-index: -1;
+  pointer-events: none;
+}
+
 /* ── Scrollbar styling ─────────────────────────────────────────────────────── */
 [data-theme="dark"] * {
   scrollbar-width: thin;
