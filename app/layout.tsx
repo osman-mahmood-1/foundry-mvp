@@ -30,7 +30,7 @@ export default function RootLayout({
   var dark = stored === 'dark' || (!stored && window.matchMedia('(prefers-color-scheme: dark)').matches);
   var m = document.createElement('meta');
   m.name = 'theme-color';
-  m.content = dark ? '#0c1826' : '#fdf5ec';
+  m.content = dark ? '#000000' : '#fdf5ec';
   document.head.appendChild(m);
 })();
         `}} />
