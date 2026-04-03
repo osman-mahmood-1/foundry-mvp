@@ -79,9 +79,10 @@ export default function PortalThemeProvider({
     const meta = document.querySelector('meta[name="theme-color"]:not([media])')
       ?? document.createElement('meta')
     meta.setAttribute('name', 'theme-color')
-    const colour = getComputedStyle(document.documentElement)
-      .getPropertyValue('--color-theme-bar').trim()
-    meta.setAttribute('content', colour)
+    // Read data-theme attribute directly — more reliable than getComputedStyle
+    // at hydration time (CSS variable timing edge cases can return empty string)
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark'
+    meta.setAttribute('content', isDark ? '#07101e' : '#fdf5ec')
     if (!meta.parentNode) document.head.appendChild(meta)
   }
 
