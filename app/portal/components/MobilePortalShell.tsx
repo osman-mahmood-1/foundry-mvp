@@ -80,7 +80,7 @@ export default function MobilePortalShell({ client }: Props) {
           inset:         0,
           zIndex:        -1,
           pointerEvents: 'none',
-          background:    '#0c1826',
+          background:    colours.pageBg,
         }} />,
         document.body
       )}
