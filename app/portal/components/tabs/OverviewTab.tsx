@@ -3,7 +3,7 @@ import React from 'react'
 import { useOverview } from './useOverview'
 import { ErrorBanner } from '../ui'
 import { useColours, useThemeMode } from '@/styles/ThemeContext'
-import { fonts, fontSize, fontWeight } from '@/styles/tokens/typography'
+import { fonts, fontSize, fontWeight, letterSpacing } from '@/styles/tokens/typography'
 import { radius } from '@/styles/tokens'
 import { glass } from '@/styles/tokens/effects'
 
@@ -269,7 +269,7 @@ export default function OverviewTab({ clientId, readOnly = false, onTabChange }:
             fontSize:      fontSize.label,
             color:         colours.textMuted,
             fontFamily:    fonts.mono,
-            letterSpacing: '0.08em',
+            letterSpacing: letterSpacing.wider,
             textTransform: 'uppercase' as const,
             marginBottom:  '2px',
           }}>
@@ -277,7 +277,7 @@ export default function OverviewTab({ clientId, readOnly = false, onTabChange }:
           </div>
           <h1 style={{
             fontFamily: fonts.sans,
-            fontSize:   '28px',
+            fontSize:   fontSize['4xl'],
             fontWeight: fontWeight.medium,
             color:      colours.textPrimary,
             lineHeight: 1.2,
@@ -289,7 +289,7 @@ export default function OverviewTab({ clientId, readOnly = false, onTabChange }:
             fontSize:      fontSize.xs,
             color:         colours.textMuted,
             fontFamily:    fonts.mono,
-            letterSpacing: '0.04em',
+            letterSpacing: letterSpacing.wide,
           }}>
             {dateStr} · {timeStr}
           </div>
