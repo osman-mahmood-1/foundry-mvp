@@ -71,6 +71,7 @@ export const glass = {
       : '0 2px 16px rgba(15,23,42,0.08), inset 0 1px 0 rgba(255,255,255,0.95)',
     animation:            tabTransition.animation,
     willChange:           'opacity, filter',
+    transform:            'translateZ(0)',  // Forces GPU compositing layer in Chrome before animation starts
   }),
 
   /** Right-side slide panel (near-opaque). No backdrop-filter in light to avoid seam. */
