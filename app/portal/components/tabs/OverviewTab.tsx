@@ -250,12 +250,50 @@ export default function OverviewTab({ clientId, readOnly = false, onTabChange }:
 
   const profit = stats.incomePence - stats.expensesPence
 
+  const hour     = new Date().getHours()
+  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening'
+  const now      = new Date()
+  const dateStr  = now.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })
+  const timeStr  = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
+
   return (
     /* Outer container — full width */
     <div style={{ padding: '4px 0 40px', minHeight: '100%' }}>
 
       {/* Content */}
       <div>
+
+        {/* Greeting — overview tab only */}
+        <div style={{ marginBottom: '24px' }}>
+          <div style={{
+            fontSize:      fontSize.label,
+            color:         colours.textMuted,
+            fontFamily:    fonts.mono,
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase' as const,
+            marginBottom:  '2px',
+          }}>
+            {greeting}
+          </div>
+          <h1 style={{
+            fontFamily: fonts.sans,
+            fontSize:   '28px',
+            fontWeight: fontWeight.medium,
+            color:      colours.textPrimary,
+            lineHeight: 1.2,
+            margin:     '0 0 6px',
+          }}>
+            {clientName ? clientName.split(' ')[0] : 'Overview'}.
+          </h1>
+          <div style={{
+            fontSize:      fontSize.xs,
+            color:         colours.textMuted,
+            fontFamily:    fonts.mono,
+            letterSpacing: '0.04em',
+          }}>
+            {dateStr} · {timeStr}
+          </div>
+        </div>
 
         {/* Stat cards */}
         <div style={{
