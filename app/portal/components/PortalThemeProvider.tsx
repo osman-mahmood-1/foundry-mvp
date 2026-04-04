@@ -8,14 +8,19 @@
  * Provides useThemePreference() for the SettingsTab to read/set the mode.
  *
  * forceMode: when set, bypasses localStorage entirely and locks the theme.
- * Used by desktop layouts to pin to light mode while mobile remains free.
+ *
+ * SSR safety:
+ *   useState initialisers run on the server with window=undefined, returning
+ *   defaultMode. On client hydration, React reuses server state — so we MUST
+ *   re-read localStorage in a useLayoutEffect (not just the initialiser) to
+ *   apply the correct stored theme before the first paint.
  */
 
 import { createContext, useContext, useState, useEffect, useLayoutEffect } from 'react'
-
-const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect
 import { ThemeProvider } from '@/styles/ThemeContext'
 import type { ColourMode } from '@/styles/tokens/colours'
+
+const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect
 
 export type ThemeMode = 'light' | 'dark' | 'system'
 
@@ -46,39 +51,43 @@ interface PortalThemeProviderProps {
   children:     React.ReactNode
   storageKey?:  string
   defaultMode?: ThemeMode
-  /** When set, ignores localStorage and locks to this mode. Desktop uses 'light'. */
+  /** When set, ignores localStorage and locks to this mode. */
   forceMode?:   ColourMode
 }
 
 export default function PortalThemeProvider({
   children,
   storageKey  = 'foundry-theme',
-  defaultMode = 'system',
+  defaultMode = 'light',
   forceMode,
 }: PortalThemeProviderProps) {
 
-  // If forceMode is set, skip localStorage entirely
-  const [mode, setModeState] = useState<ThemeMode>(() => {
-    if (forceMode) return forceMode
-    if (typeof window === 'undefined') return defaultMode
-    const stored = localStorage.getItem(storageKey) as ThemeMode | null
-    return (stored === 'light' || stored === 'dark' || stored === 'system') ? stored : defaultMode
-  })
+  const [mode, setModeState] = useState<ThemeMode>(forceMode ?? defaultMode)
+  const [resolved, setResolved] = useState<ColourMode>(forceMode ?? resolveTheme(defaultMode))
 
-  const [resolved, setResolved] = useState<ColourMode>(() => {
-    if (forceMode) return forceMode
-    if (typeof window === 'undefined') return resolveTheme(defaultMode)
-    const stored = localStorage.getItem(storageKey) as ThemeMode | null
-    const initial = (stored === 'light' || stored === 'dark' || stored === 'system') ? stored : defaultMode
-    return resolveTheme(initial)
-  })
-
+  // This effect runs after hydration on the client.
+  // It re-reads localStorage to get the correct stored preference —
+  // overriding the SSR-initialised state which had no access to localStorage.
+  // useLayoutEffect ensures it runs before the browser paints, preventing flash.
   useIsomorphicLayoutEffect(() => {
-    document.documentElement.setAttribute('data-theme', resolved)
-    updateThemeColorMeta(resolved)
-  }, [])
+    if (forceMode) {
+      document.documentElement.setAttribute('data-theme', forceMode)
+      updateThemeColorMeta(forceMode)
+      return
+    }
+    const stored = localStorage.getItem(storageKey) as ThemeMode | null
+    const effective = (stored === 'light' || stored === 'dark' || stored === 'system')
+      ? stored
+      : defaultMode
+    const r = resolveTheme(effective)
+    setModeState(effective)
+    setResolved(r)
+    document.documentElement.setAttribute('data-theme', r)
+    updateThemeColorMeta(r)
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  // ^ intentionally empty — runs once after hydration only
 
-  // Track system preference changes — only when not forced and mode = 'system'
+  // Track system preference changes
   useEffect(() => {
     if (forceMode || mode !== 'system') return
     const mq = window.matchMedia('(prefers-color-scheme: dark)')
@@ -91,15 +100,14 @@ export default function PortalThemeProvider({
     return () => mq.removeEventListener('change', handler)
   }, [mode, forceMode])
 
-  function updateThemeColorMeta(resolved: ColourMode) {
-    const color = resolved === 'dark' ? '#000000' : '#ffffff'
+  function updateThemeColorMeta(r: ColourMode) {
+    const color = r === 'dark' ? '#000000' : '#ffffff'
     document.querySelectorAll('meta[name="theme-color"]').forEach(el => {
       el.setAttribute('content', color)
     })
   }
 
   function setMode(m: ThemeMode) {
-    // No-op when forced — UI controls should be hidden in this state
     if (forceMode) return
     setModeState(m)
     localStorage.setItem(storageKey, m)
