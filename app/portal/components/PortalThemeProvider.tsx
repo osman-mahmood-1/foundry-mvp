@@ -8,7 +8,12 @@
  * Provides useThemePreference() for the SettingsTab to read/set the mode.
  */
 
-import { createContext, useContext, useState, useEffect } from 'react'
+import { createContext, useContext, useState, useEffect, useLayoutEffect } from 'react'
+
+// useLayoutEffect fires synchronously before the browser paints — eliminates
+// the light→dark flash on first load. Falls back to useEffect on SSR where
+// window is unavailable (Next.js server components).
+const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect
 import { ThemeProvider } from '@/styles/ThemeContext'
 import type { ColourMode } from '@/styles/tokens/colours'
 
@@ -51,11 +56,9 @@ export default function PortalThemeProvider({
   const [mode, setModeState] = useState<ThemeMode>(defaultMode)
   const [resolved, setResolved] = useState<ColourMode>(resolveTheme(defaultMode))
 
-  // Hydrate from localStorage on mount.
-  // Lazy initialisers don't survive SSR hydration — this useEffect is the
-  // authoritative source. The blocking script in layout.tsx handles the CSS
-  // background pre-paint; this corrects the React context for inline styles.
-  useEffect(() => {
+  // useLayoutEffect fires before the browser paints, so the React context
+  // is updated to the correct theme before the first visual frame — no flash.
+  useIsomorphicLayoutEffect(() => {
     const stored = localStorage.getItem(storageKey) as ThemeMode | null
     const initial = (stored === 'light' || stored === 'dark' || stored === 'system') ? stored : defaultMode
     setModeState(initial)

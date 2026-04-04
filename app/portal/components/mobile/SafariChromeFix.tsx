@@ -6,25 +6,33 @@
  * Hardware layer — portals a fixed full-screen div into document.body at
  * z-index -1 so Safari's edge-sampling compositor thread reads solid
  * pixels at the screen boundary for status bar / URL bar colouring.
- *
- * Hardcoded hex strings are intentional: CSS variables and React state
- * cause a micro-delay through the CSSOM that produces a white flicker.
- * Raw hex bypasses that pipeline entirely.
  */
 
-import { useState, useEffect }    from 'react'
+import { useState, useEffect, useLayoutEffect } from 'react'
 import { createPortal }           from 'react-dom'
 import { useThemePreference }     from '../PortalThemeProvider'
+
+// Read the data-theme attribute the blocking script already set — this is
+// synchronous and correct before React context settles.
+function readDOMTheme(): boolean {
+  if (typeof window === 'undefined') return false
+  return document.documentElement.getAttribute('data-theme') === 'dark'
+}
 
 export default function SafariChromeFix() {
   const { mode }              = useThemePreference()
   const [mounted, setMounted] = useState(false)
+  const [isDark,  setIsDark]  = useState(readDOMTheme)
 
-  useEffect(() => { setMounted(true) }, [])
+  // Mount before paint so the portal exists on the first visual frame.
+  useLayoutEffect(() => { setMounted(true) }, [])
 
-  const isDark = mode === 'dark' ||
-    (mode === 'system' && typeof window !== 'undefined' &&
-      window.matchMedia('(prefers-color-scheme: dark)').matches)
+  // Keep in sync when the user toggles the theme at runtime.
+  useEffect(() => {
+    const dark = mode === 'dark' ||
+      (mode === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
+    setIsDark(dark)
+  }, [mode])
 
   if (!mounted) return null
 

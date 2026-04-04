@@ -22,7 +22,13 @@ interface Props {
 
 export default function MobileNavigationLayer({ isOpen, children }: Props) {
   const { mode }           = useThemePreference()
-  const [isDark, setIsDark] = useState(true)
+  // Initialise from the data-theme attribute the blocking script set — avoids
+  // a wrong-colour flash on first open regardless of React context timing.
+  const [isDark, setIsDark] = useState(() =>
+    typeof window !== 'undefined'
+      ? document.documentElement.getAttribute('data-theme') === 'dark'
+      : true
+  )
 
   useEffect(() => {
     const dark = mode === 'dark' ||
