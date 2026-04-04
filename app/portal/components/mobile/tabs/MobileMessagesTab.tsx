@@ -4,9 +4,10 @@
  * app/portal/components/mobile/tabs/MobileMessagesTab.tsx
  *
  * Thread-style message view. Stays within mobile scroll container.
+ * Auto-scrolls to the latest message on load and whenever messages update.
  */
 
-import { useState }      from 'react'
+import { useEffect, useRef } from 'react'
 import type { Client }   from '@/types'
 import { useMessages }   from '@/app/portal/components/tabs/useMessages'
 import { useColours }    from '@/styles/ThemeContext'
@@ -23,8 +24,17 @@ function formatDay(iso: string): string {
 }
 
 export default function MobileMessagesTab({ client }: Props) {
-  const colours = useColours()
+  const colours  = useColours()
+  const scrollRef = useRef<HTMLDivElement>(null)
   const { messages, loading, sendMessage, sending, draft, setDraft } = useMessages(client.id, client.user_id)
+
+  // Scroll to bottom whenever messages change — covers initial load,
+  // incoming realtime events, and optimistic sends.
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight
+    }
+  }, [messages])
 
   async function handleSend() {
     if (!draft.trim() || sending) return
@@ -45,7 +55,7 @@ export default function MobileMessagesTab({ client }: Props) {
       </div>
 
       {/* Message list */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+      <div ref={scrollRef} style={{ flex: 1, overflowY: 'auto', padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
         {loading ? (
           <div style={{ textAlign: 'center' as const, padding: '48px 0', color: colours.textMuted, fontFamily: fonts.sans }}>Loading…</div>
         ) : messages.length === 0 ? (
