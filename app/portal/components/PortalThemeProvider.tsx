@@ -51,7 +51,7 @@ interface PortalThemeProviderProps {
 export default function PortalThemeProvider({
   children,
   storageKey  = 'foundry-theme',
-  defaultMode = 'light',
+  defaultMode = 'system',
 }: PortalThemeProviderProps) {
   // Lazy initialisers read localStorage synchronously on first render —
   // before React commits to the DOM. This means the colour token context

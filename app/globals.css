@@ -45,14 +45,28 @@ html, body {
   overscroll-behavior: none;
 }
 
-/* Canvas = OS system background color — resolves at GPU level before any script */
-html {
-  background-color: Canvas;
-  color-scheme: light dark;
+/* ── Zero-flash baseline — processed by CSS engine before any JS executes ──── */
+/* Layer 1: Hardware baseline via media query — no JS dependency whatsoever.   */
+/* If the user has no stored preference, this matches their OS for frame zero. */
+@media (prefers-color-scheme: dark) {
+  html, body { background-color: #000000; }
+}
+@media (prefers-color-scheme: light) {
+  html, body { background-color: #ffffff; }
 }
 
+/* Layer 2: Once the inline script sets data-theme, it takes full control.     */
+/* !important ensures this overrides the media query baseline above.           */
 [data-theme='dark']  { background-color: #000000 !important; }
 [data-theme='light'] { background-color: #ffffff !important; }
+
+/* Layer 3: Login / auth pages — navy background scoped to auth routes.        */
+/* Applied as a CSS class so the background is present before hydration,       */
+/* without waiting for any inline style or component to mount.                 */
+.page-login {
+  min-height: 100vh;
+  background-color: #051C2C !important;
+}
 
 /* ── Responsive shell visibility — CSS-first, no JS flash ─────────────────── */
 @media (min-width: 769px) {
