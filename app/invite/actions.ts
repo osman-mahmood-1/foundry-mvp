@@ -354,3 +354,91 @@ export async function withdrawInvite(tokenId: string): Promise<WithdrawInviteRes
 
   return { success: true }
 }
+
+// ─── resendInvite ─────────────────────────────────────────────────────────────
+
+export interface ResendInviteResult {
+  success: boolean
+  error?:  string
+}
+
+/**
+ * Resend an invite by expiring the old token and generating a fresh one.
+ * Works on both pending (not yet expired) and expired tokens.
+ * Cannot be used on accepted (used_at set) invites.
+ *
+ * Flow:
+ *   1. Fetch the original token to get email + role
+ *   2. Expire the old token immediately
+ *   3. Insert a new token with a fresh 48h expiry
+ *   4. Dispatch the invite email with the new link
+ */
+export async function resendInvite(tokenId: string): Promise<ResendInviteResult> {
+  if (!tokenId || typeof tokenId !== 'string') {
+    return { success: false, error: 'Invalid token ID.' }
+  }
+
+  const supabase = await createClient()
+  const { data: { user }, error: userError } = await supabase.auth.getUser()
+  if (userError || !user?.email) {
+    return { success: false, error: 'You must be signed in.' }
+  }
+
+  const admin  = createAdminClient()
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://taxfoundry.co.uk'
+
+  // Fetch the original token
+  const { data: original, error: fetchError } = await admin
+    .from('invite_tokens')
+    .select('id, email, role, used_at')
+    .eq('id', tokenId)
+    .single()
+
+  if (fetchError || !original) {
+    return { success: false, error: 'Invite not found.' }
+  }
+
+  if (original.used_at) {
+    return { success: false, error: 'This invite has already been accepted and cannot be resent.' }
+  }
+
+  // Expire the old token
+  await admin
+    .from('invite_tokens')
+    .update({ expires_at: new Date().toISOString() })
+    .eq('id', tokenId)
+
+  // Generate a fresh token
+  const { randomUUID } = await import('crypto')
+  const newToken   = randomUUID()
+  const expiresAt  = new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString()
+
+  const { error: insertError } = await admin
+    .from('invite_tokens')
+    .insert({
+      token:      newToken,
+      role:       original.role,
+      email:      original.email,
+      invited_by: user.id,
+      expires_at: expiresAt,
+    })
+
+  if (insertError) {
+    console.error('INVITE_RESEND_001', insertError)
+    return { success: false, error: 'Failed to create new invite token. Please try again.' }
+  }
+
+  try {
+    await sendInviteEmail({
+      to:             original.email,
+      role:           original.role as 'accountant' | 'platform_editor',
+      inviteUrl:      `${appUrl}/invite/${newToken}`,
+      invitedByEmail: user.email,
+    })
+  } catch (emailError) {
+    console.error('INVITE_RESEND_002_EMAIL', emailError)
+    return { success: false, error: 'New invite created but email failed to send. Check Resend logs.' }
+  }
+
+  return { success: true }
+}
