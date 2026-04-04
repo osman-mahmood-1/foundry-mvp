@@ -296,3 +296,61 @@ export async function createInviteToken(
 
   return { success: true }
 }
+
+// ─── withdrawInvite ───────────────────────────────────────────────────────────
+
+export interface WithdrawInviteResult {
+  success: boolean
+  error?:  string
+}
+
+/**
+ * Withdraw a pending invite by expiring the token immediately.
+ * The row is retained for audit purposes — only expires_at is updated.
+ * Only callable by platform_editors (middleware guards /admin/*).
+ *
+ * Security:
+ *   - Caller's session verified via getUser().
+ *   - Token must not already be used — withdrawing an accepted invite
+ *     is a different operation (revokeAccountantAccess).
+ */
+export async function withdrawInvite(tokenId: string): Promise<WithdrawInviteResult> {
+  if (!tokenId || typeof tokenId !== 'string') {
+    return { success: false, error: 'Invalid token ID.' }
+  }
+
+  const supabase = await createClient()
+  const { data: { user }, error: userError } = await supabase.auth.getUser()
+  if (userError || !user) {
+    return { success: false, error: 'You must be signed in.' }
+  }
+
+  const admin = createAdminClient()
+
+  // Confirm the token exists and is not already used
+  const { data: token, error: fetchError } = await admin
+    .from('invite_tokens')
+    .select('id, used_at')
+    .eq('id', tokenId)
+    .single()
+
+  if (fetchError || !token) {
+    return { success: false, error: 'Invite not found.' }
+  }
+
+  if (token.used_at) {
+    return { success: false, error: 'This invite has already been accepted. Use Revoke Access to remove the accountant.' }
+  }
+
+  const { error: updateError } = await admin
+    .from('invite_tokens')
+    .update({ expires_at: new Date().toISOString() })
+    .eq('id', tokenId)
+
+  if (updateError) {
+    console.error('INVITE_WITHDRAW_001', updateError)
+    return { success: false, error: 'Failed to withdraw invite. Please try again.' }
+  }
+
+  return { success: true }
+}
