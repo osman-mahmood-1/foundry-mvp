@@ -247,8 +247,8 @@ function MessageBubble({ message, isClient }: MessageBubbleProps) {
         lineHeight:   1.6,
         fontFamily:   fonts.sans,
         boxShadow:    isClient
-          ? '0 2px 8px rgba(0,122,255,0.20)'
-          : '0 2px 8px rgba(0,0,0,0.05)',
+          ? `0 2px 8px ${colours.ctaGlow}`
+          : `0 2px 8px ${colours.accentSoft}`,
       }}>
         {message.body}
       </div>

@@ -7,7 +7,7 @@
  *
  * Task 8 changes:
  * - Upload button/select are intrinsic width (not full-width)
- * - AI reviewing placeholder: after upload, show shimmer → mock OCR card
+ * - After upload: shimmer reviewing state → honest confirmation banner (no fake OCR)
  * - Row click opens right panel with doc details, category, extracted fields, Delete
  */
 
@@ -42,15 +42,6 @@ const DOCUMENT_CATEGORIES: { value: DocumentCategory; label: string }[] = [
   { value: 'other',                   label: 'Other document' },
 ]
 
-// Mock OCR fields per category (AI reading stub)
-const MOCK_OCR: Record<string, { label: string; value: string }[]> = {
-  bank_statement:    [{ label: 'Account', value: '•••• 1234' }, { label: 'Period', value: 'Jun 2025' }, { label: 'Closing balance', value: '£4,820.00' }],
-  receipt:           [{ label: 'Merchant', value: 'Amazon UK' }, { label: 'Date', value: '14 Jun 2025' }, { label: 'Total', value: '£89.99' }],
-  invoice:           [{ label: 'Supplier', value: 'Adobe Systems' }, { label: 'Invoice no.', value: 'INV-8823' }, { label: 'Amount', value: '£71.99' }],
-  p60:               [{ label: 'Employer', value: 'Acme Ltd' }, { label: 'Tax year', value: '2024-25' }, { label: 'Tax paid', value: '£3,400.00' }],
-  mortgage_statement:[{ label: 'Lender', value: 'Nationwide' }, { label: 'Interest paid', value: '£4,200.00' }, { label: 'Outstanding', value: '£210,000' }],
-}
-
 const ACCEPTED_TYPES = '.pdf,.jpg,.jpeg,.png,.heic'
 const MAX_SIZE_BYTES = 10 * 1024 * 1024 // 10MB
 
@@ -64,17 +55,12 @@ interface Props {
   readOnly?: boolean
 }
 
-// ─── AI Mock OCR card ─────────────────────────────────────────────────────────
+// ─── Upload confirmed banner ──────────────────────────────────────────────────
+// Shown after a successful upload. No fake OCR fields — your accountant
+// will review the document and follow up if anything is needed.
 
-function OcrResultCard({
-  category, onAccept, onRetake,
-}: {
-  category: DocumentCategory
-  onAccept: () => void
-  onRetake: () => void
-}) {
+function UploadedBanner({ onDismiss }: { onDismiss: () => void }) {
   const colours = useColours()
-  const fields = MOCK_OCR[category] ?? [{ label: 'Document type', value: category.replace(/_/g, ' ') }]
   return (
     <div style={{
       padding:      '14px',
@@ -82,58 +68,25 @@ function OcrResultCard({
       border:       `1px solid ${colours.accentBorder}`,
       borderRadius: radius.md,
       marginTop:    '8px',
+      display:      'flex',
+      alignItems:   'flex-start',
+      gap:          '10px',
     }}>
-      <div style={{
-        fontSize:     fontSize.xs,
-        fontWeight:   fontWeight.medium,
-        color:        colours.accent,
-        marginBottom: '10px',
-        textTransform: 'uppercase' as const,
-        letterSpacing: '0.05em',
-      }}>
-        ✦ Foundry Intelligence — extracted fields
+      <span style={{ color: colours.accent, fontSize: '14px', flexShrink: 0 }}>✓</span>
+      <div style={{ flex: 1 }}>
+        <div style={{ fontSize: fontSize.xs, fontWeight: fontWeight.medium, color: colours.accent, marginBottom: '4px' }}>
+          Document uploaded
+        </div>
+        <p style={{ fontSize: fontSize.xs, color: colours.textMuted, margin: 0, lineHeight: 1.5 }}>
+          Your accountant will review this document. No further action needed from you.
+        </p>
       </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '12px' }}>
-        {fields.map(f => (
-          <div key={f.label} style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <span style={{ fontSize: fontSize.xs, color: colours.textMuted }}>{f.label}</span>
-            <span style={{ fontSize: fontSize.xs, fontWeight: fontWeight.medium, color: colours.textPrimary, fontFamily: fonts.mono }}>{f.value}</span>
-          </div>
-        ))}
-      </div>
-      <div style={{ display: 'flex', gap: '8px' }}>
-        <button
-          onClick={onAccept}
-          style={{
-            padding:      '5px 12px',
-            borderRadius: radius.sm,
-            background:   colours.accent,
-            border:       'none',
-            color:        colours.ctaText,
-            fontSize:     fontSize.xs,
-            fontWeight:   fontWeight.medium,
-            cursor:       'pointer',
-            fontFamily:   fonts.sans,
-          }}
-        >
-          Accept
-        </button>
-        <button
-          onClick={onRetake}
-          style={{
-            padding:      '5px 12px',
-            borderRadius: radius.sm,
-            background:   'transparent',
-            border:       `1px solid ${colours.borderMedium}`,
-            color:        colours.textSecondary,
-            fontSize:     fontSize.xs,
-            cursor:       'pointer',
-            fontFamily:   fonts.sans,
-          }}
-        >
-          Retake
-        </button>
-      </div>
+      <button
+        onClick={onDismiss}
+        style={{ background: 'transparent', border: 'none', color: colours.textMuted, cursor: 'pointer', fontSize: '14px', padding: 0, flexShrink: 0 }}
+      >
+        ×
+      </button>
     </div>
   )
 }
@@ -298,7 +251,7 @@ export default function DocumentsTab({ client, readOnly = false }: Props) {
   const selectedDocCategory = selectedDoc
     ? DOCUMENT_CATEGORIES.find(c => c.value === selectedDoc.category)?.label ?? selectedDoc.category
     : ''
-  const ocrFields = selectedDoc ? (MOCK_OCR[selectedDoc.category] ?? []) : []
+
 
   return (
     <div style={{ display: 'flex', gap: spacing.tab.gap, minHeight: 0, flex: 1 }}>
@@ -390,11 +343,7 @@ export default function DocumentsTab({ client, readOnly = false }: Props) {
               {/* AI reviewing state */}
               {reviewState === 'reviewing' && <ReviewingBanner />}
               {reviewState === 'complete' && (
-                <OcrResultCard
-                  category={selectedCategory}
-                  onAccept={handleOcrAccept}
-                  onRetake={handleOcrRetake}
-                />
+                <UploadedBanner onDismiss={handleOcrAccept} />
               )}
             </div>
           </Panel>
@@ -490,22 +439,7 @@ export default function DocumentsTab({ client, readOnly = false }: Props) {
               </div>
             </div>
 
-            {/* AI extracted fields (stub) */}
-            {ocrFields.length > 0 && (
-              <div style={{ background: colours.accentSoft, border: `1px solid ${colours.accentBorder}`, borderRadius: radius.md, padding: '14px' }}>
-                <div style={{ fontSize: fontSize.xs, color: colours.accent, fontWeight: fontWeight.medium, marginBottom: '8px', textTransform: 'uppercase' as const, letterSpacing: '0.05em' }}>
-                  ✦ Extracted fields
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                  {ocrFields.map(f => (
-                    <div key={f.label} style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ fontSize: fontSize.xs, color: colours.textMuted }}>{f.label}</span>
-                      <span style={{ fontSize: fontSize.xs, fontWeight: fontWeight.medium, color: colours.textPrimary, fontFamily: fonts.mono }}>{f.value}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+
 
             {/* Actions */}
             {!readOnly && (

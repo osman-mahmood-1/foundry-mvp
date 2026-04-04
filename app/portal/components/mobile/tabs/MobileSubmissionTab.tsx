@@ -29,20 +29,14 @@ const PRIOR_RETURNS = [
   { year: '2021-22', status: 'filed',       date: '2022-01-28', refund: 0 },
 ]
 
-const STATUS_COLOURS: Record<string, { bg: string; text: string }> = {
-  filed:       { bg: 'rgba(34,211,165,0.14)', text: '#22d3a5' },
-  in_progress: { bg: 'rgba(59,130,246,0.14)', text: '#3b82f6' },
-  overdue:     { bg: 'rgba(248,113,113,0.14)', text: '#f87171' },
+function statusStyle(colours: { income: string; warningDark: string; danger: string; accentLight: string; accent: string; borderHairline: string; textMuted: string }, status: string): { bg: string; text: string } {
+  if (status === 'filed')       return { bg: colours.accentLight,  text: colours.accent }
+  if (status === 'in_progress') return { bg: colours.accentLight,  text: colours.accent }
+  if (status === 'overdue')     return { bg: 'rgba(0,0,0,0.06)',   text: colours.danger }
+  return { bg: colours.accentLight, text: colours.textMuted }
 }
 
-// Tasks checklist (mock)
-const TASKS = [
-  { id: 1, label: 'Confirm all income entries',   done: true  },
-  { id: 2, label: 'Categorise all expenses',       done: true  },
-  { id: 3, label: 'Upload bank statements',        done: false },
-  { id: 4, label: 'Review allowable expenses',     done: false },
-  { id: 5, label: 'Submit to HMRC',                done: false },
-]
+// Tasks are derived from real data — no hardcoded state
 
 export default function MobileSubmissionTab({ client, onTabChange }: Props) {
   const colours = useColours()
@@ -55,8 +49,14 @@ export default function MobileSubmissionTab({ client, onTabChange }: Props) {
   const expensesPence = expenses.reduce((s, e) => s + e.amount_pence, 0)
   const taxablePence  = Math.max(0, incomePence - expensesPence)
 
-  const doneTasks  = TASKS.filter(t => t.done).length
-  const totalTasks = TASKS.length
+  // Derive checklist from real data — each item reflects actual portal state
+  const tasks = [
+    { id: 1, label: 'Add at least one income entry',    done: income.length > 0 },
+    { id: 2, label: 'Add at least one expense',         done: expenses.length > 0 },
+    { id: 3, label: 'Review your tax estimate',         done: incomePence > 0 },
+  ]
+  const doneTasks  = tasks.filter(t => t.done).length
+  const totalTasks = tasks.length
   const progress   = Math.round((doneTasks / totalTasks) * 100)
 
   // SA deadline — Jan 31 following the end year
@@ -157,7 +157,7 @@ export default function MobileSubmissionTab({ client, onTabChange }: Props) {
           background:   colours.cardBg,
           marginBottom: '16px',
         }}>
-          {TASKS.map((task, idx) => (
+          {tasks.map((task, idx) => (
             <div key={task.id} style={{
               display:      'flex',
               alignItems:   'center',
@@ -219,7 +219,7 @@ export default function MobileSubmissionTab({ client, onTabChange }: Props) {
           background:   colours.cardBg,
         }}>
           {PRIOR_RETURNS.map((pr, idx) => {
-            const sc       = STATUS_COLOURS[pr.status] ?? STATUS_COLOURS.filed
+            const sc       = statusStyle(colours, pr.status)
             const expanded = expandedYear === pr.year
             return (
               <div key={pr.year} style={{ borderBottom: idx === PRIOR_RETURNS.length - 1 && !expanded ? 'none' : `1px solid ${colours.borderHairline}` }}>

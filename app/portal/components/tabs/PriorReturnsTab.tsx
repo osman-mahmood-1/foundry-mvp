@@ -35,41 +35,6 @@ interface PriorReturn {
   refund:      number
 }
 
-// ─── Demo data ────────────────────────────────────────────────────────────────
-
-const DEMO_RETURNS: PriorReturn[] = [
-  {
-    taxYear:   '2023-24',
-    status:    'filed',
-    filedDate: '2025-01-15',
-    reference: 'SA-202324-AX7F2K',
-    income:    7450000,
-    expenses:  1230000,
-    taxPaid:   340000,
-    refund:    0,
-  },
-  {
-    taxYear:   '2022-23',
-    status:    'filed',
-    filedDate: '2024-01-20',
-    reference: 'SA-202223-BM9C4L',
-    income:    6200000,
-    expenses:  980000,
-    taxPaid:   290000,
-    refund:    0,
-  },
-  {
-    taxYear:   '2021-22',
-    status:    'amended',
-    filedDate: '2023-03-04',
-    reference: 'SA-202122-TQ1R8X',
-    income:    5100000,
-    expenses:  720000,
-    taxPaid:   180000,
-    refund:    12000,
-  },
-]
-
 const STATUS_CONFIG = {
   filed:   { label: 'Filed',   variant: 'success' as const },
   amended: { label: 'Amended', variant: 'warning' as const },
@@ -187,6 +152,7 @@ function ReturnRow({
 
 export default function PriorReturnsTab({ client }: { client: Client }) {
   const colours  = useColours()
+  const [returns]  = useState<PriorReturn[]>([])
   const [selected, setSelected] = useState<PriorReturn | null>(null)
   const [panelOpen, setPanelOpen] = useState(false)
 
@@ -210,16 +176,16 @@ export default function PriorReturnsTab({ client }: { client: Client }) {
         <Panel padding="0">
           <div style={{
             padding:      `${spacing.panel.paddingTight} ${spacing.panel.padding}`,
-            borderBottom: DEMO_RETURNS.length > 0 ? `1px solid ${colours.borderHairline}` : 'none',
+            borderBottom: returns.length > 0 ? `1px solid ${colours.borderHairline}` : 'none',
           }}>
             <Label>Prior returns · {client.full_name}</Label>
           </div>
 
-          {DEMO_RETURNS.map((ret, idx) => (
+          {returns.map((ret, idx) => (
             <ReturnRow
               key={ret.taxYear}
               ret={ret}
-              isLast={idx === DEMO_RETURNS.length - 1}
+              isLast={idx === returns.length - 1}
               selected={selected?.taxYear === ret.taxYear}
               onSelect={() => openReturn(ret)}
             />
@@ -276,13 +242,14 @@ export default function PriorReturnsTab({ client }: { client: Client }) {
 
             {/* Actions */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '4px' }}>
-              <Button size="sm" onClick={() => alert('PDF download — coming soon')}>
+              <Button size="sm" disabled title="PDF download coming soon">
                 Download SA302
               </Button>
               <Button
                 variant="secondary"
                 size="sm"
-                onClick={() => alert('HMRC portal link — coming soon')}
+                disabled
+                title="HMRC portal link coming soon"
               >
                 View on HMRC portal ↗
               </Button>

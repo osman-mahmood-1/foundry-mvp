@@ -35,41 +35,6 @@ interface Invoice {
   status:      InvoiceStatus
 }
 
-// ─── Demo data ────────────────────────────────────────────────────────────────
-
-const DEMO_INVOICES: Invoice[] = [
-  {
-    id:          '1',
-    number:      'INV-001',
-    recipient:   'Acme Ltd',
-    description: 'Web development — June',
-    amount:      350000,
-    date:        '2025-06-01',
-    dueDate:     '2025-06-30',
-    status:      'paid',
-  },
-  {
-    id:          '2',
-    number:      'INV-002',
-    recipient:   'Blue Sky Media',
-    description: 'Brand strategy consultation',
-    amount:      180000,
-    date:        '2025-07-05',
-    dueDate:     '2025-08-04',
-    status:      'sent',
-  },
-  {
-    id:          '3',
-    number:      'INV-003',
-    recipient:   'Parkside Properties',
-    description: 'Monthly retainer — August',
-    amount:      120000,
-    date:        '2025-08-01',
-    dueDate:     '2025-08-15',
-    status:      'overdue',
-  },
-]
-
 const STATUS_CONFIG: Record<InvoiceStatus, {
   label:   string
   variant: 'success' | 'warning' | 'danger' | 'info' | 'neutral'
@@ -223,7 +188,7 @@ export default function InvoicesTab({ client }: { client: Client }) {
   const [selectedInvoice, setSelected]  = useState<Invoice | null>(null)
   const [form, setForm]                 = useState<InvoiceForm>(EMPTY_FORM)
   const [editForm, setEditForm]         = useState<InvoiceForm>(EMPTY_FORM)
-  const [invoices, setInvoices]         = useState<Invoice[]>(DEMO_INVOICES)
+  const [invoices, setInvoices]         = useState<Invoice[]>([])
   const [saving, setSaving]             = useState(false)
 
   const isNewValid = form.recipient.trim() && form.description.trim() && form.amount && form.dueDate
@@ -359,7 +324,7 @@ export default function InvoicesTab({ client }: { client: Client }) {
           {(selectedInvoice.status === 'sent' || selectedInvoice.status === 'overdue') && (
             <Button size="sm" onClick={markAsPaid}>Mark as paid</Button>
           )}
-          <Button size="sm" onClick={() => alert('PDF download — coming soon')}>Download PDF</Button>
+          <Button size="sm" disabled title="PDF download coming soon">Download PDF</Button>
         </div>
       </div>
     ) : panelMode === 'edit' && selectedInvoice ? (

@@ -545,7 +545,7 @@ export function Button({
             padding:    '8px 16px',
             background: mode === 'dark' ? 'rgba(255,255,255,0.10)' : 'rgba(30,64,175,0.08)',
             border:     mode === 'dark' ? '1px solid rgba(255,255,255,0.14)' : '1px solid rgba(30,64,175,0.20)',
-            color:      mode === 'dark' ? 'rgba(255,255,255,0.85)' : '#1e40af',
+            color:      mode === 'dark' ? 'rgba(255,255,255,0.85)' : colours.accentDark,
             fontWeight: fontWeight.medium,
           }
         }
@@ -562,8 +562,8 @@ export function Button({
         return {
           padding:    '8px 16px',
           // Resting: soft tint. Hover: bright red fill.
-          background: hovered ? '#ef4444' : colours.dangerLight,
-          color:      hovered ? '#ffffff' : colours.danger,
+          background: hovered ? colours.danger : colours.dangerLight,
+          color:      hovered ? colours.white : colours.danger,
           border:     'none',
           fontWeight: fontWeight.regular,
         }

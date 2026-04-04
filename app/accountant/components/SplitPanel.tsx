@@ -80,7 +80,7 @@ function SplitHeader({ client, saDaysRemaining }: { client: Client; saDaysRemain
     : saDaysRemaining <= 14
       ? colours.danger
       : saDaysRemaining <= 30
-        ? '#F59E0B'
+        ? colours.warningDark
         : colours.textMuted
 
   return (

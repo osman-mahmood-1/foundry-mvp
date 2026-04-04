@@ -32,10 +32,10 @@ function getUrgencyColour(item: ClientWithUrgency): UrgencyColour {
   return 'green'
 }
 
-const URGENCY_DOT: Record<UrgencyColour, string> = {
-  red:   '#ef4444',
-  amber: '#F59E0B',
-  green: '#10B981',
+function urgencyDotColour(colour: UrgencyColour, c: { danger: string; warningDark: string; income: string }): string {
+  if (colour === 'red')   return c.danger
+  if (colour === 'amber') return c.warningDark
+  return c.income
 }
 
 // ─── Client card ─────────────────────────────────────────────────────────────
@@ -44,7 +44,7 @@ function ClientCard({ item }: { item: ClientWithUrgency }) {
   const colours    = useColours()
   const mode       = useThemeMode()
   const colour     = getUrgencyColour(item)
-  const dotColour  = URGENCY_DOT[colour]
+  const dotColour  = urgencyDotColour(colour, colours)
   const firstName  = item.client.full_name ?? 'Unknown'
   const plan       = (item.client.plan ?? 'foundation')
 

@@ -25,12 +25,8 @@ interface ContactEntry {
   total:    number   // pence
 }
 
-const INITIAL_CONTACTS: ContactEntry[] = [
-  { id: '1', name: 'Acme Ltd',            type: 'business',   email: 'billing@acme.co.uk',        invoices: 4, total: 840000  },
-  { id: '2', name: 'Blue Sky Media',      type: 'business',   email: 'accounts@bluesky.co.uk',    invoices: 2, total: 360000  },
-  { id: '3', name: 'Parkside Properties', type: 'business',   email: 'admin@parkside.com',         invoices: 6, total: 720000  },
-  { id: '4', name: 'James Thornton',      type: 'individual', email: 'jthornton@email.com',        invoices: 1, total: 75000   },
-]
+// Clients are stored in state — no seed data. New entries are created via the form.
+const INITIAL_CONTACTS: ContactEntry[] = []
 
 const TYPE_OPTIONS = [
   { value: 'business',   label: 'Business' },

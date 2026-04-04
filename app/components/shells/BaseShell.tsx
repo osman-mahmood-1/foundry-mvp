@@ -636,7 +636,7 @@ export default function BaseShell({
               alignItems:     'center',
               justifyContent: 'center',
               fontSize:       fontSize.xs,
-              color:          '#000000',
+              color:          colours.textInverse,
               fontWeight:     fontWeight.bold,
               flexShrink:     0,
             }}>

@@ -141,7 +141,7 @@ export default function PortalShell({ client }: Props) {
         const { error } = await createClient().auth.signOut()
         if (error) {
           console.error('AUTH_003', error)
-          alert('AUTH_003 — Sign-out failed. Clear your browser cookies if needed.')
+console.error('AUTH_003 — Sign-out failed')
           return
         }
         window.location.href = '/login'

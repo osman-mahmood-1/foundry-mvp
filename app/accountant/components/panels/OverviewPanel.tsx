@@ -114,7 +114,7 @@ export default function OverviewPanel({ client, accountantId, initialData }: Pro
     : saDaysRemaining <= 14
       ? colours.danger
       : saDaysRemaining <= 30
-        ? '#F59E0B'
+        ? colours.warningDark
         : colours.income
 
   return (

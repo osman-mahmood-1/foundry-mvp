@@ -305,7 +305,7 @@ export default function ExpensesPanel({
         <div style={{ display: 'flex', gap: '12px' }}>
           {[
             { label: 'Allowable',     count: allowableCount,    colour: colours.income },
-            { label: 'Pending',       count: pendingCount,      colour: '#F59E0B' },
+            { label: 'Pending',       count: pendingCount,      colour: colours.warningDark },
             { label: 'Not allowable', count: notAllowableCount, colour: colours.danger  },
           ].map(s => (
             <div key={s.label} style={{ flex: 1, textAlign: 'center' as const }}>

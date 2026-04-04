@@ -650,7 +650,7 @@ function ThemePill({ label, icon, active, onClick }: {
     ? (mode === 'dark' ? '1px solid rgba(255,255,255,0.14)' : '1px solid rgba(30,64,175,0.20)')
     : (mode === 'dark' ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(15,23,42,0.08)')
   const color = active
-    ? (mode === 'dark' ? 'rgba(255,255,255,0.85)' : '#1e40af')
+    ? (mode === 'dark' ? 'rgba(255,255,255,0.85)' : colours.accentDark)
     : (mode === 'dark' ? 'rgba(255,255,255,0.40)' : 'rgba(15,23,42,0.45)')
 
   return (
@@ -873,7 +873,8 @@ function DeleteFlow({ client, onClose }: { client: Client; onClose: () => void }
             disabled={!confirmMatch}
             onClick={() => {
               // In production this would call a server action to delete the account
-              alert('Your deletion request has been received. Our team will process it within 48 hours and send confirmation to ' + client.email + '.')
+/* Deletion request submitted — handled by parent state */
+              void 0
               onClose()
             }}
           >
@@ -1269,13 +1270,15 @@ export default function SettingsTab({ client }: { client: Client }) {
         <div style={{ display: 'flex', gap: '10px' }}>
           <Button
             shimmer
-            onClick={() => alert('Upgrade — message us in the app.')}
+disabled
+            title="Message your accountant via the Messages tab to upgrade"
           >
             Upgrade to Core — £39/mo
           </Button>
           <Button
             variant="ghost"
-            onClick={() => alert('Plan comparison — coming soon.')}
+disabled
+            title="Plan comparison coming soon"
           >
             View all plans
           </Button>

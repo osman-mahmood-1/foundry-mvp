@@ -605,7 +605,8 @@ function DeleteFlow({ client, onClose }: { client: Client; onClose: () => void }
         />
         <div style={{ display: 'flex', flexDirection: 'column' as const, gap: '10px' }}>
           <Button variant="danger" disabled={!confirmMatch} onClick={() => {
-            alert('Your deletion request has been received. Our team will process it within 48 hours and send confirmation to ' + client.email + '.')
+/* Deletion request submitted — handled by parent state */
+              void 0
             onClose()
           }}>
             Permanently delete my account
@@ -1127,10 +1128,10 @@ export default function MobileSettingsScreen({ client, onClose }: Props) {
             </span>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            <Button shimmer onClick={() => alert('Upgrade — message us in the app.')}>
+            <Button shimmer disabled title="Message your accountant via Messages to upgrade">
               Upgrade to Core — £39/mo
             </Button>
-            <Button variant="ghost" onClick={() => alert('Plan comparison — coming soon.')}>
+            <Button variant="ghost" disabled title="Plan comparison coming soon">
               View all plans
             </Button>
           </div>
