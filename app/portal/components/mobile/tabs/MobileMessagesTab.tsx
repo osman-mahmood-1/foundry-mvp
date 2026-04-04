@@ -25,11 +25,11 @@ function formatDay(iso: string): string {
 
 export default function MobileMessagesTab({ client }: Props) {
   const colours  = useColours()
-  const scrollRef = useRef<HTMLDivElement>(null)
+  const scrollRef   = useRef<HTMLDivElement>(null)
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
   const { messages, loading, sendMessage, sending, draft, setDraft } = useMessages(client.id, client.user_id)
 
-  // Scroll to bottom whenever messages change — covers initial load,
-  // incoming realtime events, and optimistic sends.
+  // Scroll to bottom whenever messages change
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight
@@ -39,6 +39,11 @@ export default function MobileMessagesTab({ client }: Props) {
   async function handleSend() {
     if (!draft.trim() || sending) return
     await sendMessage()
+    // Retain focus on the textarea after send.
+    // On iOS Safari, clearing draft causes a re-render that can detach the
+    // input from the viewport if focus is lost. Keeping focus explicitly
+    // prevents the keyboard from dismissing and anchors the element in place.
+    textareaRef.current?.focus()
   }
 
   return (
@@ -120,6 +125,7 @@ export default function MobileMessagesTab({ client }: Props) {
         flexShrink:     0,
       }}>
         <textarea
+          ref={textareaRef}
           value={draft}
           onChange={e => setDraft(e.target.value)}
           onKeyDown={e => {
@@ -129,7 +135,7 @@ export default function MobileMessagesTab({ client }: Props) {
             }
           }}
           placeholder="Message your accountant…"
-          rows={1}
+          enterKeyHint="send"
           style={{
             flex:         1,
             background:   colours.inputBg,
@@ -142,6 +148,7 @@ export default function MobileMessagesTab({ client }: Props) {
             resize:       'none' as const,
             outline:      'none',
             lineHeight:   1.5,
+            height:       '44px',
             maxHeight:    '96px',
             overflowY:    'auto',
           }}
