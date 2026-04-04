@@ -34,6 +34,8 @@ interface Props {
   isLast:     boolean
   isExpanded: boolean
   onExpand:   (id: string | null) => void
+  onEdit?:    (id: string) => void
+  onDelete?:  (id: string) => void
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -85,14 +87,19 @@ function hmrcHint(category: string, type: 'income' | 'expense'): string {
 
 // ─── Sheet ────────────────────────────────────────────────────────────────────
 
-function TransactionSheet({ tx, onClose }: { tx: TxRowData; onClose: () => void }) {
+function TransactionSheet({
+  tx, onClose, onEdit, onDelete,
+}: {
+  tx: TxRowData; onClose: () => void
+  onEdit?:   (id: string) => void
+  onDelete?: (id: string) => void
+}) {
   const colours   = useColours()
   const isIncome  = tx.type === 'income'
   const amtColour = isIncome ? colours.income : colours.expense
 
   // Entrance / exit animation state
-  const [open,    setOpen]    = useState(false)
-  const [leaving, setLeaving] = useState(false)
+  const [open,     setOpen]     = useState(false)
   const [showMore, setShowMore] = useState(false)
 
   useEffect(() => {
@@ -101,7 +108,6 @@ function TransactionSheet({ tx, onClose }: { tx: TxRowData; onClose: () => void 
   }, [])
 
   function handleClose() {
-    setLeaving(true)
     setOpen(false)
     setTimeout(onClose, 300)
   }
@@ -141,7 +147,7 @@ function TransactionSheet({ tx, onClose }: { tx: TxRowData; onClose: () => void 
     }] : []),
   ]
 
-  // Extended rows — LTD / SA filing relevant
+  // Extended rows — LTD / SA filing relevant (only real data)
   const extendedRows: { label: string; value: string; note?: string }[] = [
     {
       label: 'Transaction type',
@@ -156,35 +162,28 @@ function TransactionSheet({ tx, onClose }: { tx: TxRowData; onClose: () => void 
       value: 'Review with accountant',
       note:  'HMRC rules vary by trade and circumstance',
     }] : []),
-    {
-      label: 'VAT',
-      value: '—',
-      note:  'Set when entering the transaction',
-    },
-    {
+    ...(tx.source ? [{
       label: 'Reference',
-      value: tx.source ?? '—',
-    },
-    {
-      label: 'Notes',
-      value: '—',
-    },
+      value: tx.source,
+    }] : []),
   ]
 
   return createPortal(
     <>
-      {/* Backdrop */}
+      {/* Backdrop — dims + blurs content behind the sheet */}
       <div
         onClick={handleClose}
         style={{
-          position:   'fixed',
-          inset:      0,
-          zIndex:     149,
-          background: 'rgba(0,0,0,0.45)',
-          opacity:    open ? 1 : 0,
-          transition: open
-            ? `opacity 0.35s ease-out`
-            : `opacity 0.28s ${mobileMotion.collapse}`,
+          position:       'fixed',
+          inset:          0,
+          zIndex:         149,
+          background:     'rgba(0,0,0,0.35)',
+          backdropFilter: open ? 'blur(14px) saturate(140%)' : 'blur(0px) saturate(100%)',
+          WebkitBackdropFilter: open ? 'blur(14px) saturate(140%)' : 'blur(0px) saturate(100%)',
+          opacity:        open ? 1 : 0,
+          transition:     open
+            ? `opacity 0.35s ease-out, backdrop-filter 0.45s ${mobileMotion.expand}, -webkit-backdrop-filter 0.45s ${mobileMotion.expand}`
+            : `opacity 0.28s ${mobileMotion.collapse}, backdrop-filter 0.28s ${mobileMotion.collapse}, -webkit-backdrop-filter 0.28s ${mobileMotion.collapse}`,
         }}
       />
 
@@ -324,7 +323,7 @@ function TransactionSheet({ tx, onClose }: { tx: TxRowData; onClose: () => void 
           <div style={{ height: '1px', background: colours.borderHairline, marginBottom: '2px' }} />
 
           {/* Core metadata */}
-          {coreRows.map((row, i) => (
+          {coreRows.map((row) => (
             <div
               key={row.label}
               style={{
@@ -392,7 +391,7 @@ function TransactionSheet({ tx, onClose }: { tx: TxRowData; onClose: () => void 
           </button>
 
           {/* Extended metadata */}
-          {showMore && extendedRows.map((row, i) => (
+          {showMore && extendedRows.map((row) => (
             <div
               key={row.label}
               style={{
@@ -444,57 +443,65 @@ function TransactionSheet({ tx, onClose }: { tx: TxRowData; onClose: () => void 
             </div>
           ))}
 
-          {/* Actions */}
-          <div style={{
-            display:   'flex',
-            gap:       '10px',
-            marginTop: '20px',
-          }}>
-            <button
-              style={{
-                flex:         1,
-                height:       '44px',
-                borderRadius: radius.md,
-                border:       `1px solid ${colours.borderMedium}`,
-                background:   'transparent',
-                color:        colours.textSecondary,
-                fontFamily:   fonts.sans,
-                fontSize:     '13px',
-                fontWeight:   fontWeight.medium,
-                cursor:       'pointer',
-                display:      'flex',
-                alignItems:   'center',
-                justifyContent:'center',
-                gap:          '7px',
-                transition:   transition.snap,
-              }}
-            >
-              <span style={{ fontSize: '13px', lineHeight: 1, opacity: 0.7 }}>✎</span>
-              Edit entry
-            </button>
-            <button
-              style={{
-                flex:         1,
-                height:       '44px',
-                borderRadius: radius.md,
-                border:       `1px solid ${colours.dangerLight}`,
-                background:   colours.dangerLight,
-                color:        colours.danger,
-                fontFamily:   fonts.sans,
-                fontSize:     '13px',
-                fontWeight:   fontWeight.medium,
-                cursor:       'pointer',
-                display:      'flex',
-                alignItems:   'center',
-                justifyContent:'center',
-                gap:          '7px',
-                transition:   transition.snap,
-              }}
-            >
-              <span style={{ fontSize: '12px', lineHeight: 1, opacity: 0.8 }}>✕</span>
-              Delete
-            </button>
-          </div>
+          {/* Actions — only rendered when handlers are wired up */}
+          {(onEdit || onDelete) && (
+            <div style={{
+              display:   'flex',
+              gap:       '10px',
+              marginTop: '20px',
+            }}>
+              {onEdit && (
+                <button
+                  onClick={() => { onEdit(tx.id); handleClose() }}
+                  style={{
+                    flex:           1,
+                    height:         '44px',
+                    borderRadius:   radius.md,
+                    border:         `1px solid ${colours.borderMedium}`,
+                    background:     'transparent',
+                    color:          colours.textSecondary,
+                    fontFamily:     fonts.sans,
+                    fontSize:       '13px',
+                    fontWeight:     fontWeight.medium,
+                    cursor:         'pointer',
+                    display:        'flex',
+                    alignItems:     'center',
+                    justifyContent: 'center',
+                    gap:            '7px',
+                    transition:     transition.snap,
+                  }}
+                >
+                  <span style={{ fontSize: '13px', lineHeight: 1, opacity: 0.7 }}>✎</span>
+                  Edit entry
+                </button>
+              )}
+              {onDelete && (
+                <button
+                  onClick={() => { onDelete(tx.id); handleClose() }}
+                  style={{
+                    flex:           1,
+                    height:         '44px',
+                    borderRadius:   radius.md,
+                    border:         `1px solid ${colours.dangerLight}`,
+                    background:     colours.dangerLight,
+                    color:          colours.danger,
+                    fontFamily:     fonts.sans,
+                    fontSize:       '13px',
+                    fontWeight:     fontWeight.medium,
+                    cursor:         'pointer',
+                    display:        'flex',
+                    alignItems:     'center',
+                    justifyContent: 'center',
+                    gap:            '7px',
+                    transition:     transition.snap,
+                  }}
+                >
+                  <span style={{ fontSize: '12px', lineHeight: 1, opacity: 0.8 }}>✕</span>
+                  Delete
+                </button>
+              )}
+            </div>
+          )}
 
         </div>
       </div>
@@ -505,7 +512,7 @@ function TransactionSheet({ tx, onClose }: { tx: TxRowData; onClose: () => void 
 
 // ─── Row ─────────────────────────────────────────────────────────────────────
 
-export default function MobileTransactionRow({ tx, isLast, isExpanded, onExpand }: Props) {
+export default function MobileTransactionRow({ tx, isLast, isExpanded, onExpand, onEdit, onDelete }: Props) {
   const colours   = useColours()
   const isIncome  = tx.type === 'income'
   const amtColour = isIncome ? colours.income : colours.expense
@@ -585,7 +592,7 @@ export default function MobileTransactionRow({ tx, isLast, isExpanded, onExpand 
       </div>
 
       {isExpanded && mounted && (
-        <TransactionSheet tx={tx} onClose={() => onExpand(null)} />
+        <TransactionSheet tx={tx} onClose={() => onExpand(null)} onEdit={onEdit} onDelete={onDelete} />
       )}
     </>
   )
