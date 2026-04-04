@@ -7,9 +7,11 @@
  * Both shells are rendered; the browser hides the inactive one before
  * the first frame — eliminating the JS-driven flash on mobile refresh.
  *
- * Theme ownership:
- *   Desktop → PortalThemeProvider forceMode="light" (always light, no toggle)
- *   Mobile  → PortalThemeProvider (no forceMode — reads localStorage, user can switch)
+ * Theme:
+ *   A single PortalThemeProvider wraps both shells so only one provider
+ *   writes to document. Desktop shell passes forceLight={true} so its
+ *   UI renders in light mode without overriding the document attribute
+ *   (which mobile reads). Mobile reads and writes localStorage freely.
  */
 
 import type { Client } from '@/types'
@@ -23,17 +25,13 @@ interface Props {
 
 export default function PortalShellRouter({ client }: Props) {
   return (
-    <>
+    <PortalThemeProvider storageKey="foundry-theme-mobile" defaultMode="light">
       <div className="desktop-only">
-        <PortalThemeProvider forceMode="light">
-          <PortalShell client={client} />
-        </PortalThemeProvider>
+        <PortalShell client={client} />
       </div>
       <div className="mobile-only">
-        <PortalThemeProvider storageKey="foundry-theme-mobile" defaultMode="light">
-          <MobilePortalShell client={client} />
-        </PortalThemeProvider>
+        <MobilePortalShell client={client} />
       </div>
-    </>
+    </PortalThemeProvider>
   )
 }
