@@ -14,7 +14,7 @@ import { getUserRole, homeForRole } from '@/lib/roles'
  *   /login (authed)         → redirect to role's home
  *   /invite/*               → always public; token validation is handled at the page level
  */
-export async function proxy(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
 
   const supabase = createServerClient(
