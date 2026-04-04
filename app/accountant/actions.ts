@@ -98,7 +98,7 @@ export async function markDocumentReviewed(
       .single()
 
     if (docWithClient) {
-      const clientRecord = docWithClient.clients as { full_name: string | null; user_id: string } | null
+      const clientRecord = docWithClient.clients as unknown as { full_name: string | null; user_id: string } | null
       if (clientRecord?.user_id) {
         const { data: authUser } = await admin.auth.admin.getUserById(clientRecord.user_id)
         if (authUser?.user?.email) {
