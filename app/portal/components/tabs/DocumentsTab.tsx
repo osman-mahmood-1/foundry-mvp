@@ -255,7 +255,7 @@ export default function DocumentsTab({ client, readOnly = false }: Props) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.tab.gap, minHeight: 0, flex: 1 }}>
-      <TabHeader title="Documents" subtitle={client.tax_year} />
+      <TabHeader title="Documents" />
       <div style={{ display: 'flex', gap: spacing.tab.gap, minHeight: 0, flex: 1 }}>
 
       {/* ── Left: upload + document list ── */}

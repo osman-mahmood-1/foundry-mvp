@@ -540,8 +540,7 @@ export function Button({
 
   function variantStyles(): React.CSSProperties {
     switch (variant) {
-      case 'primary':
-        // Dark: sapphire gradient, brightens on hover
+      case 'primary':\n        // Dark: sapphire gradient, brightens on hover
         // Light: very subtle sapphire tint — low contrast, unobtrusive; brightens on hover
         if (mode === 'dark') {
           return {
@@ -560,7 +559,7 @@ export function Button({
           padding:    '8px 20px',
           background: hovered ? 'rgba(59,130,246,0.14)' : colours.cta,
           color:      colours.ctaText,
-          border:     hovered ? '1px solid rgba(59,130,246,0.25)' : '1px solid rgba(59,130,246,0.18)',
+          border:     hovered ? '1px solid rgba(59,130,246,0.25)' : 'none',
           fontWeight: fontWeight.semibold,
         }
       case 'secondary':
@@ -568,7 +567,7 @@ export function Button({
           padding:    '8px 16px',
           background: hovered ? colours.accentSoft : colours.simpleBg,
           color:      hovered ? colours.textPrimary : colours.textSecondary,
-          border:     hovered ? '1px solid transparent' : `1px solid ${colours.borderHairline}`,
+          border:     'none',
           fontWeight: fontWeight.regular,
         }
       case 'ghost':
@@ -582,7 +581,7 @@ export function Button({
             : (mode === 'dark' ? 'rgba(255,255,255,0.45)' : 'rgba(15,23,42,0.55)'),
           border: hovered
             ? (mode === 'dark' ? '1px solid rgba(255,255,255,0.14)' : '1px solid rgba(15,23,42,0.18)')
-            : (mode === 'dark' ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(15,23,42,0.12)'),
+            : 'none',
           fontWeight: fontWeight.regular,
         }
       case 'tint':
@@ -600,7 +599,7 @@ export function Button({
           background: hovered
             ? (mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)')
             : (mode === 'dark' ? 'rgba(255,255,255,0.06)' : 'rgba(15,23,42,0.05)'),
-          border: mode === 'dark' ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(15,23,42,0.08)',
+          border: 'none',
           color:  mode === 'dark' ? 'rgba(255,255,255,0.40)' : 'rgba(15,23,42,0.45)',
           fontWeight: fontWeight.regular,
         }
