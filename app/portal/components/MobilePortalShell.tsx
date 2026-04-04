@@ -19,7 +19,6 @@ import SafariChromeFix             from './mobile/SafariChromeFix'
 import MobileHeader            from './mobile/MobileHeader'
 import MobileHamburger         from './mobile/MobileHamburger'
 import MobileSettingsScreen    from './mobile/MobileSettingsScreen'
-import MobileIntelligenceStrip from './mobile/MobileIntelligenceStrip'
 
 import MobileOverviewTab     from './mobile/tabs/MobileOverviewTab'
 import MobileIncomeTab       from './mobile/tabs/MobileIncomeTab'
@@ -66,8 +65,6 @@ export default function MobilePortalShell({ client }: Props) {
 
   const firstName = client.full_name?.split(' ')[0] ?? 'You'
 
-  const showStrip = activeTab === 'overview' || activeTab === 'intelligence'
-
   return (
     <>
       <SafariChromeFix />
@@ -84,11 +81,6 @@ export default function MobilePortalShell({ client }: Props) {
         onIntelligence={() => setActiveTab('intelligence')}
         onHamburger={() => setHamburgerOpen(true)}
       />
-
-      {/* Intelligence / offline strip — overview + intelligence tabs only */}
-      {showStrip && (
-        <MobileIntelligenceStrip onNavigate={tab => setActiveTab(tab as PortalTab)} />
-      )}
 
       {/* Tab content */}
       <div
