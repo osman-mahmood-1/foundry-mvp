@@ -215,7 +215,7 @@ function PrimaryButton({
           : hovered ? light.ctaHover : light.cta,
         color:         disabled ? light.textMuted : light.ctaText,
         border:        'none',
-        borderRadius:  radius.full,
+        borderRadius:  radius.pill,
         fontFamily:    fonts.sans,
         fontSize:      fontSize.base,
         fontWeight:    fontWeight.medium,
