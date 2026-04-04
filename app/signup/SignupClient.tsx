@@ -46,7 +46,7 @@ const FIELD_ORDER: FieldId[] = ['name', 'email', 'password', 'businessType']
 
 const FIELD_META: Record<FieldId, { heading: string; sub: string; label: string; placeholder?: string }> = {
   name: {
-    heading:     'Let's start with\nyour name.',
+    heading:     "Let's start with\nyour name.",
     sub:         'So your portal feels like yours from the very first moment.',
     label:       'Full name',
     placeholder: 'e.g. Alex Johnson',
