@@ -650,7 +650,7 @@ function ThemePill({ label, icon, active, onClick }: {
     ? (mode === 'dark' ? '1px solid rgba(255,255,255,0.14)' : '1px solid rgba(30,64,175,0.20)')
     : (mode === 'dark' ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(15,23,42,0.08)')
   const color = active
-    ? (mode === 'dark' ? 'rgba(255,255,255,0.85)' : colours.accentDark)
+    ? (mode === 'dark' ? 'rgba(255,255,255,0.85)' : '#1e40af')
     : (mode === 'dark' ? 'rgba(255,255,255,0.40)' : 'rgba(15,23,42,0.45)')
 
   return (
