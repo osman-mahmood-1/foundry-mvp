@@ -257,30 +257,6 @@ export default function OverviewTab({ clientId, readOnly = false, onTabChange }:
       {/* Content */}
       <div>
 
-        {/* Header */}
-        <div style={{ marginBottom: '24px' }}>
-          <h1 style={{
-            fontSize:   fontSize.xl,
-            fontWeight: fontWeight.semibold,
-            color:      colours.textPrimary,
-            fontFamily: fonts.sans,
-            margin:     0,
-            lineHeight: 1.2,
-          }}>
-            {clientName ? `Good to see you, ${clientName.split(' ')[0]}` : 'Overview'}
-          </h1>
-          <p style={{
-            fontSize:   fontSize.sm,
-            color:      colours.textMuted,
-            fontFamily: fonts.sans,
-            margin:     '4px 0 0',
-          }}>
-            Tax year {taxYear} · {new Date().toLocaleDateString('en-GB', {
-              weekday: 'long', day: 'numeric', month: 'long',
-            })}
-          </p>
-        </div>
-
         {/* Stat cards */}
         <div style={{
           display:      'flex',

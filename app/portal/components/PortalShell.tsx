@@ -1,6 +1,6 @@
 'use client'
 
-import { useState }         from 'react'
+import { useState, useEffect }         from 'react'
 import type { Client, PortalTab } from '@/types'
 import { NAV_ITEMS, NAV_GROUPS, NAV_GROUP_ORDER } from '@/lib/nav'
 import type { ShellNavGroup, ShellFooterItem }    from '@/app/components/shells/BaseShell'
@@ -116,13 +116,108 @@ function PortalTopBar({ client }: { client: Client }) {
 
 interface Props { client: Client }
 
+// ── Rotating status lines — operator / command-centre feel ────────────────────
+const STATUS_LINES = [
+  'All systems active.',
+  'Your numbers are clean.',
+  'Tax year on track.',
+  'Ready to execute.',
+  'Books in order.',
+  'No surprises today.',
+  'Runway looks healthy.',
+  'Figures reconciled.',
+  'Operations nominal.',
+  'You\'re ahead of schedule.',
+]
+
+function GreetingHeader({ firstName, taxYear }: { firstName: string; taxYear: string }) {
+  const colours = useColours()
+  const hour    = new Date().getHours()
+  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening'
+
+  const today = new Date().toLocaleDateString('en-GB', {
+    weekday: 'long', day: 'numeric', month: 'long',
+  })
+
+  const [statusIdx, setStatusIdx] = useState(0)
+  const [visible,   setVisible]   = useState(true)
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      // Fade out, swap text, fade in
+      setVisible(false)
+      setTimeout(() => {
+        setStatusIdx(i => (i + 1) % STATUS_LINES.length)
+        setVisible(true)
+      }, 300)
+    }, 4000)
+    return () => clearInterval(interval)
+  }, [])
+
+  return (
+    <div style={{ padding: '16px 20px 18px', flexShrink: 0 }}>
+      {/* Top row: greeting label + date */}
+      <div style={{
+        display:        'flex',
+        alignItems:     'baseline',
+        justifyContent: 'space-between',
+        marginBottom:   '2px',
+      }}>
+        <div style={{
+          fontSize:      fontSize.label,
+          color:         colours.textMuted,
+          fontFamily:    fonts.mono,
+          letterSpacing: '0.08em',
+          textTransform: 'uppercase' as const,
+        }}>
+          {greeting}
+        </div>
+        <div style={{
+          fontSize:   fontSize.xs,
+          color:      colours.textMuted,
+          fontFamily: fonts.mono,
+          letterSpacing: '0.04em',
+        }}>
+          {today}
+        </div>
+      </div>
+
+      {/* Name — primary weight */}
+      <h1 style={{
+        fontFamily: fonts.sans,
+        fontSize:   '24px',
+        fontWeight: fontWeight.medium,
+        color:      colours.textPrimary,
+        lineHeight: 1.2,
+        margin:     '0 0 6px',
+      }}>
+        {firstName}.
+      </h1>
+
+      {/* Rotating status line */}
+      <div style={{
+        fontSize:      fontSize.xs,
+        color:         colours.accent,
+        fontFamily:    fonts.mono,
+        letterSpacing: '0.06em',
+        opacity:       visible ? 1 : 0,
+        transition:    'opacity 0.3s ease',
+        display:       'flex',
+        alignItems:    'center',
+        gap:           '6px',
+      }}>
+        <span style={{ fontSize: '8px', opacity: 0.7 }}>◆</span>
+        {STATUS_LINES[statusIdx]}
+      </div>
+    </div>
+  )
+}
+
 export default function PortalShell({ client }: Props) {
   const [activeTab, setActiveTab] = useState<PortalTab>('overview')
 
   const firstName  = client.full_name?.split(' ')[0] ?? 'there'
   const initial    = firstName.charAt(0).toUpperCase()
-  const hour       = new Date().getHours()
-  const greeting   = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening'
   const colours    = useColours()
 
   const footerItems: ShellFooterItem[] = [
@@ -169,29 +264,8 @@ console.error('AUTH_003 — Sign-out failed')
     >
       {/* Main content: greeting + tab */}
       <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
-        {/* Greeting header */}
-        <div style={{ padding: '16px 20px 20px', flexShrink: 0 }}>
-          <div style={{
-            fontSize:      fontSize.label,
-            color:         colours.textMuted,
-            fontFamily:    fonts.mono,
-            letterSpacing: '0.08em',
-            textTransform: 'uppercase' as const,
-            marginBottom:  '4px',
-          }}>
-            {greeting}
-          </div>
-          <h1 style={{
-            fontFamily: fonts.sans,
-            fontSize:   '24px',
-            fontWeight: fontWeight.medium,
-            color:      colours.textPrimary,
-            lineHeight: 1.2,
-            margin:     0,
-          }}>
-            {firstName}.
-          </h1>
-        </div>
+        {/* Command centre header */}
+        <GreetingHeader firstName={firstName} taxYear={client.tax_year} />
 
         {/* Tab content */}
         <div key={activeTab} style={{ flex: 1, padding: '0 20px 24px', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
