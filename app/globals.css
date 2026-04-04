@@ -63,10 +63,7 @@ html, body {
 /* Layer 3: Login / auth pages — navy background scoped to auth routes.        */
 /* Applied as a CSS class so the background is present before hydration,       */
 /* without waiting for any inline style or component to mount.                 */
-.page-login {
-  min-height: 100vh;
-  background-color: #051C2C !important;
-}
+/* .page-login background removed — LoginClient owns its background via colours.pageBg token */
 
 /* ── Responsive shell visibility — CSS-first, no JS flash ─────────────────── */
 @media (min-width: 769px) {
