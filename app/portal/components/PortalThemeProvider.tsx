@@ -48,26 +48,21 @@ export default function PortalThemeProvider({
   storageKey  = 'foundry-theme',
   defaultMode = 'light',
 }: PortalThemeProviderProps) {
-  // Lazy initialisers: read localStorage + DOM synchronously on first render so
-  // initial state matches what the blocking script already painted — no useEffect
-  // needed for first-frame correctness, eliminating the light→dark flash.
-  const [mode, setModeState] = useState<ThemeMode>(() => {
-    if (typeof window === 'undefined') return defaultMode
-    const stored = localStorage.getItem(storageKey) as ThemeMode | null
-    return (stored === 'light' || stored === 'dark' || stored === 'system') ? stored : defaultMode
-  })
-  const [resolved, setResolved] = useState<ColourMode>(() => {
-    if (typeof window === 'undefined') return resolveTheme(defaultMode)
-    // Trust the data-theme the blocking script already set on the html element
-    const attr = document.documentElement.getAttribute('data-theme')
-    if (attr === 'dark' || attr === 'light') return attr
-    return resolveTheme(defaultMode)
-  })
+  const [mode, setModeState] = useState<ThemeMode>(defaultMode)
+  const [resolved, setResolved] = useState<ColourMode>(resolveTheme(defaultMode))
 
-  // Sync DOM attribute and meta on mount (covers edge cases where script missed)
+  // Hydrate from localStorage on mount.
+  // Lazy initialisers don't survive SSR hydration — this useEffect is the
+  // authoritative source. The blocking script in layout.tsx handles the CSS
+  // background pre-paint; this corrects the React context for inline styles.
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', resolved)
-    updateThemeColorMeta(resolved)
+    const stored = localStorage.getItem(storageKey) as ThemeMode | null
+    const initial = (stored === 'light' || stored === 'dark' || stored === 'system') ? stored : defaultMode
+    setModeState(initial)
+    const r = resolveTheme(initial)
+    setResolved(r)
+    document.documentElement.setAttribute('data-theme', r)
+    updateThemeColorMeta(r)
   }, [])
 
   // Track system preference changes when mode = 'system'
