@@ -45,9 +45,10 @@ export interface UseIncomeResult {
   setForm:         (updater: (prev: IncomeFormState) => IncomeFormState) => void
   isFormValid:     boolean
   // Actions
-  addIncome:       () => Promise<void>
-  deleteIncome:    (id: string, amountPence: number) => Promise<void>
-  resetForm:       () => void
+  addIncome:           () => Promise<void>
+  addIncomeWithData:   (data: IncomeFormState) => Promise<void>
+  deleteIncome:        (id: string, amountPence: number) => Promise<void>
+  resetForm:           () => void
 }
 
 // ─── Default form ─────────────────────────────────────────────────────────────
@@ -240,6 +241,59 @@ export function useIncome(
     setSaving(false)
   }, [form, clientId, taxYear, userId, availableMonths])
 
+  /**
+   * addIncomeWithData — accepts form values directly.
+   * Use this from components that manage their own local state (e.g. MobileFormSheet)
+   * to avoid the async state race where setForm + addIncome() fires before state settles.
+   */
+  const addIncomeWithData = useCallback(async (data: IncomeFormState) => {
+    if (!isFormValid(data)) return
+    setSaving(true)
+    setError(null)
+
+    const amountPence = Math.round(parseFloat(data.amount) * 100)
+    const newMonth    = data.date.slice(0, 7)
+
+    const { data: inserted, error: err } = await supabase
+      .from('income')
+      .insert({
+        client_id:       clientId,
+        description:     data.description.trim(),
+        amount_pence:    amountPence,
+        date:            data.date,
+        category:        data.category as IncomeCategory,
+        category_source: 'manual',
+        tax_year:        taxYear,
+        source:          'manual',
+        status:          'confirmed',
+      })
+      .select('*')
+      .single()
+
+    if (err) {
+      console.error('INCOME_002', err)
+      setError(APP_ERRORS.INCOME_002)
+    } else {
+      void logAudit({ actorId: userId, clientId, action: 'income.created', targetType: 'income', targetId: inserted.id })
+      setTotalPence(prev => prev + amountPence)
+      setEntryCount(prev => prev + 1)
+      setAvailableMonths(prev => {
+        if (prev.includes(newMonth)) return prev
+        return [...prev, newMonth].sort((a, b) => b.localeCompare(a))
+      })
+      setIncome(prev =>
+        [inserted, ...prev].sort(
+          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+        ),
+      )
+      setLoadedMonths(prev => {
+        if (availableMonths.includes(newMonth) || prev.includes(newMonth)) return prev
+        return [...prev, newMonth]
+      })
+    }
+    setSaving(false)
+  }, [clientId, taxYear, userId, availableMonths])
+
   // ── Delete (soft) ───────────────────────────────────────────────
   const deleteIncome = useCallback(async (id: string, amountPence: number) => {
     setError(null)
@@ -280,6 +334,7 @@ export function useIncome(
     setForm,
     isFormValid: isFormValid(form),
     addIncome,
+    addIncomeWithData,
     deleteIncome,
     resetForm,
   }

@@ -128,7 +128,7 @@ export default function MobileIncomeTab({ client }: Props) {
               marginTop:   '2px',
               fontWeight:  300,
             }}>
-              {entryCount > 0 ? `${entryCount} entr${entryCount === 1 ? 'y' : 'ies'} · ` : ''}{client.tax_year}
+              {entryCount > 0 ? `${entryCount} entr${entryCount === 1 ? 'y' : 'ies'}` : ''}
             </div>
           </div>
           <button

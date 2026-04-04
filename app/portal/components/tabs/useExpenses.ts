@@ -33,9 +33,10 @@ export interface UseExpensesResult {
   form:            ExpenseFormState
   setForm:         (updater: (prev: ExpenseFormState) => ExpenseFormState) => void
   isFormValid:     boolean
-  addExpense:      () => Promise<void>
-  deleteExpense:   (id: string, amountPence: number) => Promise<void>
-  resetForm:       () => void
+  addExpense:          () => Promise<void>
+  addExpenseWithData:  (data: ExpenseFormState) => Promise<void>
+  deleteExpense:       (id: string, amountPence: number) => Promise<void>
+  resetForm:           () => void
 }
 
 // ─── Default form ─────────────────────────────────────────────────────────────
@@ -224,7 +225,60 @@ export function useExpenses(
     setSaving(false)
   }, [form, clientId, taxYear, userId, availableMonths])
 
-  // ── Delete (soft) ───────────────────────────────────────────────
+  /**
+   * addExpenseWithData — accepts form values directly.
+   * Use from components managing their own local state to avoid the async
+   * state race where setForm + addExpense() fires before state settles.
+   */
+  const addExpenseWithData = useCallback(async (data: ExpenseFormState) => {
+    if (!isFormValid(data)) return
+    setSaving(true)
+    setError(null)
+
+    const amountPence = Math.round(parseFloat(data.amount) * 100)
+    const newMonth    = data.date.slice(0, 7)
+
+    const { data: inserted, error: err } = await supabase
+      .from('expenses')
+      .insert({
+        client_id:       clientId,
+        description:     data.description.trim(),
+        amount_pence:    amountPence,
+        date:            data.date,
+        category:        data.category as ExpenseCategory,
+        category_source: 'manual',
+        tax_year:        taxYear,
+        source:          'manual',
+        status:          'confirmed',
+        allowable:       null,
+        is_pending:      false,
+      })
+      .select('*')
+      .single()
+
+    if (err) {
+      console.error('EXPENSE_002', err)
+      setError(APP_ERRORS.EXPENSE_002)
+    } else {
+      void logAudit({ actorId: userId, clientId, action: 'expense.created', targetType: 'expenses', targetId: inserted.id })
+      setTotalPence(prev => prev + amountPence)
+      setEntryCount(prev => prev + 1)
+      setAvailableMonths(prev => {
+        if (prev.includes(newMonth)) return prev
+        return [...prev, newMonth].sort((a, b) => b.localeCompare(a))
+      })
+      setExpenses(prev =>
+        [inserted, ...prev].sort(
+          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+        ),
+      )
+      setLoadedMonths(prev => {
+        if (availableMonths.includes(newMonth) || prev.includes(newMonth)) return prev
+        return [...prev, newMonth]
+      })
+    }
+    setSaving(false)
+  }, [clientId, taxYear, userId, availableMonths])
   const deleteExpense = useCallback(async (id: string, amountPence: number) => {
     setError(null)
     const { error: err } = await supabase
@@ -264,6 +318,7 @@ export function useExpenses(
     setForm,
     isFormValid: isFormValid(form),
     addExpense,
+    addExpenseWithData,
     deleteExpense,
     resetForm,
   }

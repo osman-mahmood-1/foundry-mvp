@@ -24,9 +24,6 @@ export default function MobileInvoicesTab({ client }: Props) {
         <h2 style={{ fontFamily: fonts.sans, fontSize: '22px', fontWeight: fontWeight.semibold, color: colours.textPrimary, letterSpacing: '-0.02em', margin: 0, marginBottom: '4px' }}>
           Invoices
         </h2>
-        <div style={{ fontFamily: fonts.sans, fontSize: '12px', color: colours.textMuted, fontWeight: 300 }}>
-          {client.tax_year}
-        </div>
       </div>
 
       {/* Empty state — invoices not yet connected to data layer */}

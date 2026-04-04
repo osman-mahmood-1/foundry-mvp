@@ -78,7 +78,7 @@ export default function MobileOverviewTab({ client, onTabChange }: Props) {
           marginTop:   '4px',
           fontWeight:  300,
         }}>
-          {client.tax_year} · {new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}
+          {new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}
         </div>
       </div>
 

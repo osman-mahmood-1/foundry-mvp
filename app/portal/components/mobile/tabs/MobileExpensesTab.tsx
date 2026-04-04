@@ -95,7 +95,7 @@ export default function MobileExpensesTab({ client }: Props) {
               Expenses
             </h2>
             <div style={{ fontFamily: fonts.sans, fontSize: '12px', color: colours.textMuted, marginTop: '2px', fontWeight: 300 }}>
-              {entryCount > 0 ? `${entryCount} entr${entryCount === 1 ? 'y' : 'ies'} · ` : ''}{client.tax_year}
+              {entryCount > 0 ? `${entryCount} entr${entryCount === 1 ? 'y' : 'ies'}` : ''}
             </div>
           </div>
           <button

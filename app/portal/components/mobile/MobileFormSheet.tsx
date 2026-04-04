@@ -125,13 +125,12 @@ export default function MobileFormSheet({ type, client, onClose }: Props) {
   const handleSave = useCallback(async () => {
     if (!isValid || saving) return
     setSaving(true)
+    const data = { description, amount, date, category }
     try {
       if (type === 'income') {
-        incomeHook.setForm(() => ({ description, amount, date, category: category as IncomeCategory }))
-        await incomeHook.addIncome()
+        await incomeHook.addIncomeWithData({ ...data, category: category as IncomeCategory })
       } else {
-        expenseHook.setForm(() => ({ description, amount, date, category: category as ExpenseCategory }))
-        await expenseHook.addExpense()
+        await expenseHook.addExpenseWithData({ ...data, category: category as ExpenseCategory })
       }
       setBtnColour(colours.teal)
       setSaved(true)
