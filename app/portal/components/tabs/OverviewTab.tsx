@@ -4,7 +4,7 @@ import { useOverview } from './useOverview'
 import { ErrorBanner } from '../ui'
 import { useColours, useThemeMode } from '@/styles/ThemeContext'
 import { fonts, fontSize, fontWeight, letterSpacing } from '@/styles/tokens/typography'
-import { radius } from '@/styles/tokens'
+import { radius, spacing, space } from '@/styles/tokens'
 import { glass } from '@/styles/tokens/effects'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -264,14 +264,14 @@ export default function OverviewTab({ clientId, readOnly = false, onTabChange }:
       <div>
 
         {/* Greeting — overview tab only */}
-        <div style={{ marginBottom: '24px' }}>
+        <div style={{ marginBottom: spacing.tab.gap }}>
           <div style={{
             fontSize:      fontSize.label,
             color:         colours.textMuted,
             fontFamily:    fonts.mono,
             letterSpacing: letterSpacing.wider,
             textTransform: 'uppercase' as const,
-            marginBottom:  '2px',
+            marginBottom:  space[1],
           }}>
             {greeting}
           </div>
@@ -281,7 +281,7 @@ export default function OverviewTab({ clientId, readOnly = false, onTabChange }:
             fontWeight: fontWeight.medium,
             color:      colours.textPrimary,
             lineHeight: 1.2,
-            margin:     '0 0 6px',
+            margin:     `0 0 ${space[2]}`,
           }}>
             {clientName ? clientName.split(' ')[0] : 'Overview'}.
           </h1>
