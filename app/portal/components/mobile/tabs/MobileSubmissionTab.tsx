@@ -163,7 +163,7 @@ export default function MobileSubmissionTab({ client, onTabChange }: Props) {
               alignItems:   'center',
               gap:          '12px',
               padding:      '12px 16px',
-              borderBottom: idx === TASKS.length - 1 ? 'none' : `1px solid ${colours.borderHairline}`,
+              borderBottom: idx === tasks.length - 1 ? 'none' : `1px solid ${colours.borderHairline}`,
               minHeight:    '48px',
             }}>
               <div style={{
