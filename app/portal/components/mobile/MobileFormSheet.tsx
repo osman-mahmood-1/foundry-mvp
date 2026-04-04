@@ -13,9 +13,6 @@
  */
 
 import { useState, useRef, useCallback } from 'react'
-import type { Client, IncomeCategory, ExpenseCategory } from '@/types'
-import { useIncome }   from '@/app/portal/components/tabs/useIncome'
-import { useExpenses } from '@/app/portal/components/tabs/useExpenses'
 import { useColours }  from '@/styles/ThemeContext'
 import { fonts, fontWeight } from '@/styles/tokens/typography'
 import { radius, spacing }   from '@/styles/tokens'
@@ -23,7 +20,7 @@ import { estimateTax }       from '@/lib/tax'
 
 // ─── Category lists ───────────────────────────────────────────────────────────
 
-const INCOME_CATS: { value: IncomeCategory; label: string }[] = [
+export const INCOME_CATS: { value: string; label: string }[] = [
   { value: 'trading',      label: 'Trading income' },
   { value: 'day_rate',     label: 'Day rate / consultancy' },
   { value: 'fixed_price',  label: 'Fixed price project' },
@@ -39,7 +36,7 @@ const INCOME_CATS: { value: IncomeCategory; label: string }[] = [
   { value: 'other',        label: 'Other income' },
 ]
 
-const EXPENSE_CATS: { value: ExpenseCategory; label: string }[] = [
+export const EXPENSE_CATS: { value: string; label: string }[] = [
   { value: 'software',          label: 'Software & subscriptions' },
   { value: 'hardware',          label: 'Hardware & equipment' },
   { value: 'travel',            label: 'Travel' },
@@ -59,16 +56,31 @@ const EXPENSE_CATS: { value: ExpenseCategory; label: string }[] = [
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type FormType = 'income' | 'expense'
-
 interface Particle {
   id: number; tx: string; ty: string; size: number; colour: string; delay: string
 }
 
+interface FormData {
+  description: string
+  amount:      string
+  date:        string
+  category:    string
+}
+
 interface Props {
-  type:    FormType
-  client:  Client
-  onClose: () => void
+  /** Category options to display in the picker */
+  cats:          { value: string; label: string }[]
+  /** Default category value (first option) */
+  defaultCat:    string
+  /** Tax year string used for the live tax calc (income only) */
+  taxYear:       string
+  /** Show the live tax breakdown panel */
+  showTaxCalc:   boolean
+  /** Form title shown in the save button e.g. 'Save Income' */
+  saveLabel:     string
+  /** Called with form values when the user taps Save. Must handle the DB insert. */
+  onSave:        (data: FormData) => Promise<void>
+  onClose:       () => void
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -83,29 +95,25 @@ function taxCalc(amountStr: string, taxYear: string) {
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-export default function MobileFormSheet({ type, client, onClose }: Props) {
+export default function MobileFormSheet({
+  cats, defaultCat, taxYear, showTaxCalc, saveLabel, onSave, onClose,
+}: Props) {
   const colours = useColours()
 
   const [amount,      setAmount]      = useState('')
-  const [category,    setCategory]    = useState<string>(
-    type === 'income' ? INCOME_CATS[0].value : EXPENSE_CATS[0].value
-  )
+  const [category,    setCategory]    = useState(defaultCat)
   const [date,        setDate]        = useState(TODAY)
   const [description, setDescription] = useState('')
   const [notes,       setNotes]       = useState('')
   const [saving,      setSaving]      = useState(false)
   const [saved,       setSaved]       = useState(false)
   const [btnColour,   setBtnColour]   = useState<string | null>(null)
-  const [particles,   setParticles]   = useState<Particle[]>([])
-  const [fading,      setFading]      = useState(false)
+  const [particles,   setParticles]   = useState<Particle[]>([])\n  const [fading,      setFading]      = useState(false)
 
   const btnRef = useRef<HTMLButtonElement>(null)
 
-  const incomeHook  = useIncome(client.id, client.tax_year, client.user_id)
-  const expenseHook = useExpenses(client.id, client.tax_year, client.user_id)
-
   const isValid = description.trim().length > 0 && parseFloat(amount || '0') > 0
-  const calc    = taxCalc(amount, client.tax_year)
+  const calc    = taxCalc(amount, taxYear)
 
   function spawnParticles() {
     const shades = [colours.teal, colours.tealBar, colours.tealLight, colours.income]
@@ -125,25 +133,17 @@ export default function MobileFormSheet({ type, client, onClose }: Props) {
   const handleSave = useCallback(async () => {
     if (!isValid || saving) return
     setSaving(true)
-    const data = { description, amount, date, category }
     try {
-      if (type === 'income') {
-        await incomeHook.addIncomeWithData({ ...data, category: category as IncomeCategory })
-      } else {
-        await expenseHook.addExpenseWithData({ ...data, category: category as ExpenseCategory })
-      }
+      await onSave({ description, amount, date, category })
       setBtnColour(colours.teal)
       setSaved(true)
-      if (type === 'income') spawnParticles()
+      if (showTaxCalc) spawnParticles()
       if (typeof navigator !== 'undefined' && 'vibrate' in navigator) navigator.vibrate(50)
       setTimeout(() => { setFading(true); setTimeout(onClose, 300) }, 800)
     } catch {
       setSaving(false)
     }
-  }, [isValid, saving, type, description, amount, date, category, colours.teal, incomeHook, expenseHook, onClose])
-
-  const cats  = type === 'income' ? INCOME_CATS : EXPENSE_CATS
-  const label = type === 'income' ? 'Save Income' : 'Save Expense'
+  }, [isValid, saving, description, amount, date, category, onSave, onClose, colours.teal, showTaxCalc])
 
   const fieldStyle: React.CSSProperties = {
     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -206,7 +206,7 @@ export default function MobileFormSheet({ type, client, onClose }: Props) {
           </div>
           <div style={fieldStyle}>
             <span style={labelStyle}>Tax Year</span>
-            <span style={{ fontFamily: fonts.sans, fontSize: '14px', color: colours.textPrimary }}>{client.tax_year}</span>
+            <span style={{ fontFamily: fonts.sans, fontSize: '14px', color: colours.textPrimary }}>{taxYear}</span>
           </div>
           <div style={fieldStyle}>
             <span style={labelStyle}>Description</span>
@@ -219,7 +219,7 @@ export default function MobileFormSheet({ type, client, onClose }: Props) {
         </div>
 
         {/* Live tax breakdown — income only */}
-        {type === 'income' && (
+        {showTaxCalc && (
           <div style={{ marginTop: '20px', padding: '16px', background: colours.cardBg, borderRadius: radius.lg, border: `1px solid ${colours.cardBorder}` }}>
             {[
               { label: 'Gross',      value: `£${(calc.gross / 100).toFixed(2)}`,  colour: colours.textPrimary },
@@ -292,7 +292,7 @@ export default function MobileFormSheet({ type, client, onClose }: Props) {
                 style={{ strokeDasharray: 40, strokeDashoffset: 0, animation: 'draw-check 350ms ease forwards' }}
               />
             </svg>
-          ) : saving ? 'Saving…' : label}
+          ) : saving ? 'Saving…' : saveLabel}
 
           {particles.map(p => (
             <span key={p.id} style={{

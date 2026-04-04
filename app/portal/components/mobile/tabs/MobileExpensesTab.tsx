@@ -5,12 +5,12 @@
  */
 
 import { useState, useRef, useCallback } from 'react'
-import type { Client }        from '@/types'
+import type { Client, ExpenseCategory }  from '@/types'
 import { useExpenses }        from '@/app/portal/components/tabs/useExpenses'
 import { useColours }         from '@/styles/ThemeContext'
 import { fonts, fontWeight, fontSize } from '@/styles/tokens/typography'
 import { radius }             from '@/styles/tokens'
-import MobileFormSheet          from '../MobileFormSheet'
+import MobileFormSheet, { EXPENSE_CATS } from '../MobileFormSheet'
 import MobileTransactionRow    from '../MobileTransactionRow'
 import type { TxRowData }      from '../MobileTransactionRow'
 
@@ -28,7 +28,7 @@ export default function MobileExpensesTab({ client }: Props) {
   const startYRef = useRef(0)
   const triggered = useRef(false)
 
-  const { expenses, totalPence, entryCount, loading } = useExpenses(client.id, client.tax_year, client.user_id)
+  const { expenses, totalPence, entryCount, loading, addExpenseWithData } = useExpenses(client.id, client.tax_year, client.user_id)
 
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     startYRef.current = e.touches[0].clientY
@@ -67,7 +67,19 @@ export default function MobileExpensesTab({ client }: Props) {
     `£${(p / 100).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 
   if (formOpen) {
-    return <MobileFormSheet type="expense" client={client} onClose={() => setFormOpen(false)} />
+    return (
+      <MobileFormSheet
+        cats={EXPENSE_CATS}
+        defaultCat={EXPENSE_CATS[0].value}
+        taxYear={client.tax_year}
+        showTaxCalc={false}
+        saveLabel="Save Expense"
+        onSave={async (data) => {
+          await addExpenseWithData({ ...data, category: data.category as ExpenseCategory })
+        }}
+        onClose={() => setFormOpen(false)}
+      />
+    )
   }
 
   return (
