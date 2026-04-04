@@ -14,7 +14,7 @@
 import type { Client } from '@/types'
 import { useIncome }   from './useIncome'
 import { useExpenses } from './useExpenses'
-import { Spinner, formatGBP } from '../ui'
+import { Spinner, TabHeader, formatGBP } from '../ui'
 import { useColours, useThemeMode } from '@/styles/ThemeContext'
 import { fonts, fontSize, fontWeight, letterSpacing } from '@/styles/tokens/typography'
 import { radius, spacing } from '@/styles/tokens'
@@ -199,6 +199,7 @@ export default function IntelligenceTab({ client }: { client: Client }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.tab.gap }}>
+      <TabHeader title="Foundry Intelligence" />
 
       {/* ── Header card — 2-orb treatment ── */}
       <div style={{

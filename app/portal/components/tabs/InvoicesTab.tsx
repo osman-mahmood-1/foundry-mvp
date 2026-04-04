@@ -13,7 +13,7 @@
 
 import { useState, useEffect } from 'react'
 import type { Client } from '@/types'
-import { Panel, Label, EmptyState, Button, Input, Badge, formatGBP, formatDate } from '../ui'
+import { Panel, Label, TabHeader, EmptyState, Button, Input, Badge, formatGBP, formatDate } from '../ui'
 import { useColours } from '@/styles/ThemeContext'
 import { useShellSearch } from '@/app/components/shells/BaseShell'
 import { fonts, fontSize, fontWeight, letterSpacing } from '@/styles/tokens/typography'
@@ -361,6 +361,7 @@ export default function InvoicesTab({ client }: { client: Client }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.tab.gap, minHeight: 0, flex: 1 }}>
+      <TabHeader title="Invoices" subtitle={client.tax_year} />
 
       {/* ── Summary cards — spans full width above both columns ── */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: spacing.tab.gap }}>

@@ -11,7 +11,7 @@ import { useState, useEffect } from 'react'
 import type { Client } from '@/types'
 import { useIncome }   from './useIncome'
 import { useExpenses } from './useExpenses'
-import { Panel, Label, Spinner, Badge, ErrorBanner, formatGBP, formatDate } from '../ui'
+import { Panel, Label, TabHeader, Spinner, Badge, ErrorBanner, formatGBP, formatDate } from '../ui'
 import { useColours } from '@/styles/ThemeContext'
 import { useShellSearch } from '@/app/components/shells/BaseShell'
 import { fonts, fontSize, fontWeight, letterSpacing } from '@/styles/tokens/typography'
@@ -96,6 +96,7 @@ export default function TransactionsTab({ client }: { client: Client }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.tab.gap, flex: 1 }}>
+      <TabHeader title="Transactions" subtitle={client.tax_year} />
 
       {/* ── Summary row ── */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: spacing.tab.gap }}>

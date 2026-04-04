@@ -9,7 +9,7 @@
 
 import { useState, useEffect } from 'react'
 import type { Client } from '@/types'
-import { Panel, Label, EmptyState, Button, Input, Select } from '../ui'
+import { Panel, Label, TabHeader, EmptyState, Button, Input, Select } from '../ui'
 import { useColours } from '@/styles/ThemeContext'
 import { useShellSearch } from '@/app/components/shells/BaseShell'
 import { fonts, fontSize, fontWeight } from '@/styles/tokens/typography'
@@ -221,7 +221,9 @@ export default function ClientsTab({ client: _client }: { client: Client }) {
   ) : null
 
   return (
-    <div style={{ display: 'flex', gap: spacing.tab.gap, minHeight: 0, flex: 1, alignItems: 'stretch' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.tab.gap, minHeight: 0, flex: 1 }}>
+      <TabHeader title="Clients" />
+      <div style={{ display: 'flex', gap: spacing.tab.gap, minHeight: 0, flex: 1, alignItems: 'stretch' }}>
       {/* ── Left: client list ── */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
         <Panel padding="0" style={{ flex: 1 }}>
@@ -267,6 +269,7 @@ export default function ClientsTab({ client: _client }: { client: Client }) {
         >
           {sidebarChildren}
         </PersistentSidebar>
+      </div>
       </div>
     </div>
   )

@@ -20,7 +20,7 @@
 import { useEffect, useRef } from 'react'
 import type { Client } from '@/types'
 import { useMessages } from './useMessages'
-import { Spinner, EmptyState, ErrorBanner } from '../ui'
+import { Spinner, TabHeader, EmptyState, ErrorBanner } from '../ui'
 import { useColours } from '@/styles/ThemeContext'
 import { useShellSearch } from '@/app/components/shells/BaseShell'
 import { fonts, fontSize, fontWeight } from '@/styles/tokens/typography'
@@ -73,6 +73,7 @@ export default function MessagesTab({ client, readOnly = false }: Props) {
       minHeight:     0,
       gap:           spacing.tab.gap,
     }}>
+      <TabHeader title="Messages" />
 
       {/* ── Thread ── */}
       <div

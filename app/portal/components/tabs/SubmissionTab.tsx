@@ -14,7 +14,7 @@ import { useState, useEffect } from 'react'
 import type { Client } from '@/types'
 import { useIncome }   from './useIncome'
 import { useExpenses } from './useExpenses'
-import { Spinner, Button, formatGBP } from '../ui'
+import { Spinner, TabHeader, Button, formatGBP } from '../ui'
 import { useColours, useThemeMode } from '@/styles/ThemeContext'
 import { fonts, fontSize, fontWeight, letterSpacing } from '@/styles/tokens/typography'
 import { radius, transition, spacing } from '@/styles/tokens'
@@ -358,7 +358,9 @@ export default function SubmissionTab({ client }: { client: Client }) {
   }
 
   return (
-    <div style={{ display: 'flex', gap: spacing.tab.gap, alignItems: 'flex-start' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.tab.gap, flex: 1 }}>
+      <TabHeader title="Submission Centre" />
+      <div style={{ display: 'flex', gap: spacing.tab.gap, alignItems: 'flex-start' }}>
 
       {/* ── Left: stepper ── */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '12px', minWidth: 0 }}>
@@ -500,6 +502,7 @@ export default function SubmissionTab({ client }: { client: Client }) {
       {/* ── Right: HMRC calendar ── */}
       <div style={{ width: '280px', flexShrink: 0 }}>
         <HmrcCalendar taxYear={client.tax_year} />
+      </div>
       </div>
     </div>
   )

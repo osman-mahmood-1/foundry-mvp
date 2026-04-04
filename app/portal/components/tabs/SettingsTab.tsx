@@ -24,7 +24,7 @@ import type { ThemeMode } from '../PortalThemeProvider'
 import { fonts, fontSize, fontWeight, letterSpacing } from '@/styles/tokens/typography'
 import { radius, spacing, transition } from '@/styles/tokens'
 import { tabTransition }               from '@/styles/tokens/motion'
-import { Panel, Input, Select, Button, ErrorBanner } from '../ui'
+import { Panel, Input, Select, TabHeader, Button, ErrorBanner } from '../ui'
 import { useClientProfile } from './useClientProfile'
 import type { ProfileUpdate } from './useClientProfile'
 import { logTaxChange } from '@/app/actions/logTaxChange'
@@ -984,6 +984,7 @@ export default function SettingsTab({ client }: { client: Client }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.tab.gap }}>
+      <TabHeader title="Settings" />
 
       {/* ── Personal information ── */}
       <Panel padding={spacing.panel.padding}>

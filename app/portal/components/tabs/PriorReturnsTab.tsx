@@ -16,7 +16,7 @@
 
 import { useState } from 'react'
 import type { Client } from '@/types'
-import { Panel, Label, Badge, Button } from '../ui'
+import { Panel, Label, TabHeader, Badge, Button } from '../ui'
 import EntryPanel from '../ui/EntryPanel'
 import { useColours } from '@/styles/ThemeContext'
 import { fonts, fontSize, fontWeight, letterSpacing } from '@/styles/tokens/typography'
@@ -169,7 +169,9 @@ export default function PriorReturnsTab({ client }: { client: Client }) {
   const cfg = selected ? STATUS_CONFIG[selected.status] : null
 
   return (
-    <div style={{ display: 'flex', gap: spacing.tab.gap, minHeight: 0 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.tab.gap, minHeight: 0, flex: 1 }}>
+      <TabHeader title="Prior Returns" />
+      <div style={{ display: 'flex', gap: spacing.tab.gap, minHeight: 0 }}>
 
       {/* ── Left: returns list ── */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: spacing.tab.gap, minWidth: 0 }}>
@@ -257,6 +259,7 @@ export default function PriorReturnsTab({ client }: { client: Client }) {
           </div>
         )}
       </EntryPanel>
+      </div>
     </div>
   )
 }

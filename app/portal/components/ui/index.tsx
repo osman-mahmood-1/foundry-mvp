@@ -24,6 +24,7 @@ import {
   glass,
   radius,
   spacing,
+  space,
   transition,
   shadows,
 } from '@/styles/tokens'
@@ -247,6 +248,48 @@ export function Label({ children }: LabelProps) {
       marginBottom:  '14px',
     }}>
       {children}
+    </div>
+  )
+}
+
+// ─── TabHeader ────────────────────────────────────────────────────────────────
+
+interface TabHeaderProps {
+  title:     string
+  subtitle?: string
+}
+
+/**
+ * Consistent page-level heading for every non-overview tab.
+ * Mirrors the mobile tab header pattern: title + optional subtitle.
+ * Add as the first element inside each tab's root return.
+ */
+export function TabHeader({ title, subtitle }: TabHeaderProps) {
+  const colours = useColours()
+  return (
+    <div style={{ marginBottom: spacing.tab.gap, flexShrink: 0 }}>
+      <h1 style={{
+        fontFamily:    fonts.sans,
+        fontSize:      fontSize['3xl'],
+        fontWeight:    fontWeight.semibold,
+        color:         colours.textPrimary,
+        letterSpacing: letterSpacing.tight2,
+        lineHeight:    1.2,
+        margin:        0,
+      }}>
+        {title}
+      </h1>
+      {subtitle && (
+        <div style={{
+          fontFamily:    fonts.mono,
+          fontSize:      fontSize.xs,
+          color:         colours.textMuted,
+          letterSpacing: letterSpacing.wide,
+          marginTop:     space[1],
+        }}>
+          {subtitle}
+        </div>
+      )}
     </div>
   )
 }

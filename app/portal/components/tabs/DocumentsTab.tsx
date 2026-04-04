@@ -15,7 +15,7 @@ import { useRef, useState, useEffect } from 'react'
 import type { Client, DocumentCategory, Document as FoundryDocument } from '@/types'
 import { useDocuments } from './useDocuments'
 import {
-  Panel, Label, EmptyState, Spinner,
+  Panel, Label, TabHeader, EmptyState, Spinner,
   Badge, Button, Select, ErrorBanner, formatBytes, formatDate,
 } from '../ui'
 import EntryPanel from '../ui/EntryPanel'
@@ -254,7 +254,9 @@ export default function DocumentsTab({ client, readOnly = false }: Props) {
 
 
   return (
-    <div style={{ display: 'flex', gap: spacing.tab.gap, minHeight: 0, flex: 1 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.tab.gap, minHeight: 0, flex: 1 }}>
+      <TabHeader title="Documents" subtitle={client.tax_year} />
+      <div style={{ display: 'flex', gap: spacing.tab.gap, minHeight: 0, flex: 1 }}>
 
       {/* ── Left: upload + document list ── */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: spacing.tab.gap, minWidth: 0 }}>
@@ -467,6 +469,7 @@ export default function DocumentsTab({ client, readOnly = false }: Props) {
           </div>
         )}
       </EntryPanel>
+      </div>
     </div>
   )
 }

@@ -21,7 +21,7 @@ import type { Client, IncomeCategory } from '@/types'
 import { useIncome }   from './useIncome'
 import { useDraft }    from '@/lib/useDraft'
 import {
-  Panel, Label, StatCard, EmptyState,
+  Panel, Label, TabHeader, StatCard, EmptyState,
   Spinner, Badge, Button, Input, Select,
   ErrorBanner, formatGBP, formatDate,
 } from '../ui'
@@ -338,6 +338,7 @@ export default function IncomeTab({ client, readOnly = false }: Props) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.tab.gap, minHeight: 0, flex: 1 }}>
+      <TabHeader title="Income" subtitle={client.tax_year} />
 
       {/* ── Stat cards row — spans full width above both columns ── */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: spacing.tab.gap }}>
