@@ -744,13 +744,17 @@ export default function BaseShell({
           </div>
 
           {/* Scrollable content area */}
-            <div style={{
-              flex:          1,
-              overflowY:     'auto',
-              overflowX:     'hidden',
-              display:       'flex',
-              flexDirection: 'column',
-            }}>
+            <div
+              key={pathname}
+              style={{
+                flex:          1,
+                overflowY:     'auto',
+                overflowX:     'hidden',
+                display:       'flex',
+                flexDirection: 'column',
+                animation:     'tabIn 0.22s cubic-bezier(0.4,0,0.2,1)',
+              }}
+            >
               {children}
             </div>
           </div>

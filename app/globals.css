@@ -99,6 +99,12 @@ input, select, textarea, button {
   to   { opacity: 1; transform: translateY(0); }
 }
 
+/* ── Tab content transition — blur dissolve on tab switch ─────────────────── */
+@keyframes tabIn {
+  from { opacity: 0; filter: blur(4px); transform: translateY(6px); }
+  to   { opacity: 1; filter: blur(0);   transform: translateY(0); }
+}
+
 /* ── FadeDown keyframe (tooltips that appear below their anchor) ──────────── */
 @keyframes fadeDown {
   from { opacity: 0; transform: translateY(-6px); }
@@ -357,6 +363,10 @@ input, select, textarea, button {
   }
   .form-screen {
     animation: none;
+  }
+  /* Disable blur transitions on tab switch for motion-sensitive users */
+  [style*="tabIn"] {
+    animation: none !important;
   }
 }
 
