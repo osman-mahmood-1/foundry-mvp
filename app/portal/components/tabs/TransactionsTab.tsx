@@ -33,7 +33,7 @@ function FilterPill({ label, active, onClick }: { label: string; active: boolean
         gap:          '8px',
         padding:      '8px 16px',
         background:   active ? colours.accentLight : (hovered ? colours.accentLight : colours.hoverBg),
-        border:       `1px solid ${active ? colours.accentBorder : (hovered ? colours.accentBorder : colours.borderMedium)}`,
+        border:       'none',
         borderRadius: radius.md,
         cursor:       'pointer',
         fontSize:     '13.5px',

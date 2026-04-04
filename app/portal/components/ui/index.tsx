@@ -375,7 +375,7 @@ export function EmptyState({ icon, headline, sub, action, onAction }: EmptyState
             padding:      '8px 20px',
             background:   colours.cta,
             color:        colours.ctaText,
-            border:       mode === 'light' ? '1px solid rgba(59,130,246,0.18)' : 'none',
+            border:       'none',
             borderRadius: radius.md,
             fontSize:     '13.5px',
             fontWeight:   fontWeight.semibold,

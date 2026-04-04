@@ -198,7 +198,7 @@ function QuickAction({
         gap:          '8px',
         padding:      '8px 16px',
         background:   hovered ? colours.accentLight  : colours.hoverBg,
-        border:       `1px solid ${hovered ? colours.accentBorder : colours.borderMedium}`,
+        border:       'none',
         borderRadius: radius.md,
         cursor:       'pointer',
         fontSize:     fontSize.sm,
