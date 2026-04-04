@@ -11,7 +11,7 @@ import { useState, useEffect } from 'react'
 import type { Client } from '@/types'
 import { useIncome }   from './useIncome'
 import { useExpenses } from './useExpenses'
-import { Panel, Label, TabHeader, Spinner, Badge, ErrorBanner, formatGBP, formatDate } from '../ui'
+import { Panel, Label, TabHeader, Spinner, Badge, Button, ErrorBanner, formatGBP, formatDate } from '../ui'
 import { useColours } from '@/styles/ThemeContext'
 import { useShellSearch } from '@/app/components/shells/BaseShell'
 import { fonts, fontSize, fontWeight, letterSpacing } from '@/styles/tokens/typography'
@@ -20,32 +20,10 @@ import { radius, transition, spacing, space } from '@/styles/tokens'
 type Filter = 'all' | 'income' | 'expense'
 
 function FilterPill({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) {
-  const colours = useColours()
-  const [hovered, setHovered] = useState(false)
   return (
-    <button
-      onClick={onClick}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{
-        display:      'flex',
-        alignItems:   'center',
-        gap:          '8px',
-        padding:      '8px 16px',
-        background:   active ? colours.accentLight : (hovered ? colours.accentLight : colours.hoverBg),
-        border:       'none',
-        borderRadius: radius.md,
-        cursor:       'pointer',
-        fontSize:     '13.5px',
-        fontFamily:   fonts.sans,
-        fontWeight:   active ? fontWeight.medium : fontWeight.regular,
-        color:        active ? colours.accent : (hovered ? colours.accent : colours.textSecondary),
-        transition:   'all 0.15s ease',
-        flexShrink:   0,
-      }}
-    >
+    <Button variant="tint" active={active} onClick={onClick}>
       {label}
-    </button>
+    </Button>
   )
 }
 

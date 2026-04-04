@@ -1,7 +1,7 @@
 'use client'
 import React from 'react'
 import { useOverview } from './useOverview'
-import { ErrorBanner } from '../ui'
+import { ErrorBanner, Button } from '../ui'
 import { useColours, useThemeMode } from '@/styles/ThemeContext'
 import { fonts, fontSize, fontWeight, letterSpacing } from '@/styles/tokens/typography'
 import { radius, spacing, space } from '@/styles/tokens'
@@ -185,33 +185,11 @@ function QuickAction({
 }: {
   icon: string; label: string; onClick: () => void
 }) {
-  const colours = useColours()
-  const [hovered, setHovered] = React.useState(false)
   return (
-    <button
-      onClick={onClick}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{
-        display:      'flex',
-        alignItems:   'center',
-        gap:          '8px',
-        padding:      '8px 16px',
-        background:   hovered ? colours.accentLight  : colours.hoverBg,
-        border:       'none',
-        borderRadius: radius.md,
-        cursor:       'pointer',
-        fontSize:     fontSize.sm,
-        fontFamily:   fonts.sans,
-        fontWeight:   fontWeight.medium,
-        color:        hovered ? colours.accent : colours.textSecondary,
-        transition:   'all 0.15s ease',
-        flexShrink:   0,
-      }}
-    >
+    <Button variant="secondary" onClick={onClick}>
       <span>{icon}</span>
       <span>{label}</span>
-    </button>
+    </Button>
   )
 }
 

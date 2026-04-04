@@ -368,25 +368,9 @@ export function EmptyState({ icon, headline, sub, action, onAction }: EmptyState
         {sub}
       </div>
       {action && onAction && (
-        <button
-          onClick={onAction}
-          className="cta-btn"
-          style={{
-            padding:      '8px 20px',
-            background:   colours.cta,
-            color:        colours.ctaText,
-            border:       'none',
-            borderRadius: radius.md,
-            fontSize:     '13.5px',
-            fontWeight:   fontWeight.semibold,
-            cursor:       'pointer',
-            fontFamily:   fonts.sans,
-            boxShadow:    'none',
-            transition:   transition.snap,
-          }}
-        >
+        <Button variant="primary" shimmer onClick={onAction}>
           {action}
-        </button>
+        </Button>
       )}
     </div>
   )
