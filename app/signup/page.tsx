@@ -1,12 +1,12 @@
 import { Suspense } from 'react'
-import OnboardingClient from './OnboardingClient'
+import SignupClient from './SignupClient'
 
 export const dynamic = 'force-dynamic'
 
-export default function OnboardingPage() {
+export default function SignupPage() {
   return (
     <Suspense>
-      <OnboardingClient />
+      <SignupClient />
     </Suspense>
   )
 }

@@ -272,3 +272,46 @@ export const shadows = {
   expense:     '0 4px 20px rgba(248,113,113,0.25)',
   inset:       'inset 0 1px 0 rgba(255,255,255,0.08)',
 } as const
+
+/**
+ * Onboarding field card — the floating glass field shown one at a time.
+ * Light mode only (onboarding is always light).
+ */
+export const onboardingField: React.CSSProperties = {
+  background:           'rgba(255,255,255,0.82)',
+  backdropFilter:       'blur(48px) saturate(160%) brightness(1.04)',
+  WebkitBackdropFilter: 'blur(48px) saturate(160%) brightness(1.04)',
+  border:               '1px solid rgba(255,255,255,0.98)',
+  borderTop:            '1px solid rgba(255,255,255,1)',
+  borderRadius:         '20px',
+  boxShadow:            '0 8px 48px rgba(5,28,44,0.09), 0 2px 8px rgba(5,28,44,0.05), inset 0 1px 0 rgba(255,255,255,1)',
+}
+
+/**
+ * Onboarding ambient orbs — deeper, more saturated than portal.
+ * Two orbs: top-right sapphire, bottom-left teal. Light mode.
+ */
+export const onboardingOrbs = {
+  primary: {
+    position:     'fixed' as const,
+    top:          '-20%',
+    right:        '-15%',
+    width:        '900px',
+    height:       '900px',
+    borderRadius: '50%',
+    background:   'radial-gradient(circle, rgba(29,78,216,0.28) 0%, rgba(37,99,235,0.14) 35%, transparent 70%)',
+    filter:       'blur(80px)',
+    pointerEvents:'none' as const,
+  },
+  secondary: {
+    position:     'fixed' as const,
+    bottom:       '-20%',
+    left:         '-10%',
+    width:        '700px',
+    height:       '700px',
+    borderRadius: '50%',
+    background:   'radial-gradient(circle, rgba(13,148,136,0.22) 0%, rgba(20,184,166,0.10) 40%, transparent 70%)',
+    filter:       'blur(90px)',
+    pointerEvents:'none' as const,
+  },
+} as const
