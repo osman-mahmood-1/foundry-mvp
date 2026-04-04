@@ -5,13 +5,15 @@
  *
  * Data table for invite token management.
  * Shows: email, role, status (pending/used/expired), dates.
+ * Includes SendInviteForm for generating new invites.
  */
 
-import { useState }   from 'react'
-import { useColours } from '@/styles/ThemeContext'
+import { useState }       from 'react'
+import { useColours }     from '@/styles/ThemeContext'
 import { fonts, fontSize, fontWeight, letterSpacing } from '@/styles/tokens/typography'
 import { radius, transition } from '@/styles/tokens'
-import { spacing }    from '@/styles/tokens/spacing'
+import { spacing }        from '@/styles/tokens/spacing'
+import SendInviteForm     from './SendInviteForm'
 
 interface Invite {
   id:         string
@@ -77,7 +79,10 @@ export default function AdminInvitesTable({ invites }: Props) {
         borderRadius: radius.lg,
         overflow:     'hidden',
       }}>
-        {/* Header */}
+        {/* Send invite form */}
+        <SendInviteForm />
+
+        {/* Table header */}
         <div style={{
           display:       'grid',
           gridTemplateColumns: '2fr 1fr 1fr 1fr',

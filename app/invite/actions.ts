@@ -20,6 +20,7 @@
 
 import { createAdminClient } from '@/lib/supabase-admin'
 import { createClient } from '@/lib/supabase-server'
+import { sendInviteEmail } from '@/lib/resend'
 import type { InviteRole } from '@/types'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -215,4 +216,83 @@ export async function acceptInvite(token: string): Promise<AcceptInviteResult> {
       error: 'Setup failed. Please contact support and quote error INVITE_001.',
     }
   }
+}
+
+// ─── createInviteToken ────────────────────────────────────────────────────────
+
+export interface CreateInviteResult {
+  success: boolean
+  error?:  string
+}
+
+/**
+ * Generate an invite token, persist it, and dispatch the invite email.
+ * Only callable by platform_editors (middleware guards /admin/*).
+ *
+ * Security:
+ *   - Uses admin client for the insert — anon key cannot write invite_tokens.
+ *   - Token is crypto.randomUUID() — cryptographically random, 36 chars.
+ *   - Caller's email is read from their verified JWT, never from client input.
+ *   - Expires in 48 hours; single-use enforced in acceptInvite.
+ */
+export async function createInviteToken(
+  email: string,
+  role:  InviteRole,
+): Promise<CreateInviteResult> {
+  const { randomUUID } = await import('crypto')
+
+  // Validate inputs server-side — never trust client data
+  if (!email || typeof email !== 'string' || !email.includes('@')) {
+    return { success: false, error: 'A valid email address is required.' }
+  }
+  if (role !== 'accountant' && role !== 'platform_editor') {
+    return { success: false, error: 'Invalid role specified.' }
+  }
+
+  const supabase = await createClient()
+  const admin    = createAdminClient()
+  const appUrl   = process.env.NEXT_PUBLIC_APP_URL ?? 'https://taxfoundry.co.uk'
+
+  // Read the inviter's email from their verified session
+  const { data: { user }, error: userError } = await supabase.auth.getUser()
+  if (userError || !user?.email) {
+    return { success: false, error: 'You must be signed in to send invites.' }
+  }
+
+  const token     = randomUUID()
+  const expiresAt = new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString()
+
+  const { error: insertError } = await admin
+    .from('invite_tokens')
+    .insert({
+      token,
+      role,
+      email:      email.toLowerCase().trim(),
+      invited_by: user.id,
+      expires_at: expiresAt,
+    })
+
+  if (insertError) {
+    console.error('INVITE_CREATE_001', insertError)
+    return { success: false, error: 'Failed to create invite. Please try again.' }
+  }
+
+  try {
+    await sendInviteEmail({
+      to:             email.toLowerCase().trim(),
+      role,
+      inviteUrl:      `${appUrl}/invite/${token}`,
+      invitedByEmail: user.email,
+    })
+  } catch (emailError) {
+    // Token was created — log the email failure but don't delete the token.
+    // The admin can resend manually by re-creating if needed.
+    console.error('INVITE_CREATE_002_EMAIL', emailError)
+    return {
+      success: false,
+      error:   'Invite created but email failed to send. Check Resend logs.',
+    }
+  }
+
+  return { success: true }
 }

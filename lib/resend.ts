@@ -252,3 +252,158 @@ export async function sendMessageNotificationEmail({
     `,
   })
 }
+
+// ─── Invite email ─────────────────────────────────────────
+export async function sendInviteEmail({
+  to,
+  role,
+  inviteUrl,
+  invitedByEmail,
+}: {
+  to:             string
+  role:           'accountant' | 'platform_editor'
+  inviteUrl:      string
+  invitedByEmail: string
+}) {
+  const roleLabel = role === 'platform_editor' ? 'Platform Editor' : 'Accountant'
+
+  return getResend().emails.send({
+    from:    `Foundry <${FROM}>`,
+    to,
+    subject: `You've been invited to Tax Foundry as a ${roleLabel}`,
+    html: `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>You're invited to Foundry</title>
+</head>
+<body style="margin:0;padding:0;background:#F0F4FA;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#F0F4FA;padding:48px 20px;">
+    <tr>
+      <td align="center">
+        <table width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;">
+
+          <!-- Header -->
+          <tr>
+            <td style="padding-bottom:32px;" align="center">
+              <p style="margin:0;font-size:13px;letter-spacing:0.15em;color:#94A3B8;text-transform:uppercase;font-family:'Courier New',monospace;">
+                FOUNDRY
+              </p>
+            </td>
+          </tr>
+
+          <!-- Main card -->
+          <tr>
+            <td style="background:#ffffff;border-radius:20px;overflow:hidden;box-shadow:0 4px 32px rgba(5,28,44,0.08);">
+
+              <!-- Accent bar -->
+              <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td style="height:4px;background:linear-gradient(90deg,#1d4ed8,#3b82f6);"></td>
+                </tr>
+              </table>
+
+              <!-- Content -->
+              <table width="100%" cellpadding="0" cellspacing="0" style="padding:48px 48px 40px;">
+
+                <!-- Role badge -->
+                <tr>
+                  <td style="padding-bottom:8px;">
+                    <span style="display:inline-block;background:#EFF6FF;border-radius:20px;padding:4px 12px;font-size:11px;color:#1d4ed8;letter-spacing:0.08em;text-transform:uppercase;font-family:'Courier New',monospace;">
+                      ${roleLabel}
+                    </span>
+                  </td>
+                </tr>
+
+                <!-- Heading -->
+                <tr>
+                  <td style="padding-bottom:20px;">
+                    <h1 style="margin:0;font-size:28px;font-weight:400;color:#051C2C;line-height:1.25;letter-spacing:-0.02em;font-family:Georgia,'Times New Roman',serif;">
+                      You're invited to<br><em style="font-style:italic;color:#475569;">Tax Foundry.</em>
+                    </h1>
+                  </td>
+                </tr>
+
+                <!-- Body -->
+                <tr>
+                  <td style="padding-bottom:32px;">
+                    <p style="margin:0 0 16px;font-size:15px;color:#475569;line-height:1.7;">
+                      ${invitedByEmail} has invited you to join Tax Foundry as a <strong>${roleLabel}</strong>.
+                    </p>
+                    <p style="margin:0;font-size:15px;color:#475569;line-height:1.7;">
+                      Click the button below to accept your invitation and set up your account. This link expires in 48 hours and can only be used once.
+                    </p>
+                  </td>
+                </tr>
+
+                <!-- CTA -->
+                <tr>
+                  <td style="padding-bottom:32px;">
+                    <table cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td style="background:#1d4ed8;border-radius:100px;padding:14px 32px;">
+                          <a href="${inviteUrl}" style="color:#ffffff;text-decoration:none;font-size:14px;font-weight:500;letter-spacing:-0.01em;">
+                            Accept invitation →
+                          </a>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+
+                <!-- Fallback link -->
+                <tr>
+                  <td style="padding-bottom:32px;">
+                    <p style="margin:0;font-size:12px;color:#94A3B8;line-height:1.6;">
+                      If the button doesn't work, copy and paste this URL into your browser:<br>
+                      <a href="${inviteUrl}" style="color:#1d4ed8;word-break:break-all;">${inviteUrl}</a>
+                    </p>
+                  </td>
+                </tr>
+
+                <!-- Divider -->
+                <tr>
+                  <td style="padding-bottom:24px;">
+                    <table width="100%" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td style="height:1px;background:rgba(5,28,44,0.07);"></td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+
+                <!-- Footer note -->
+                <tr>
+                  <td>
+                    <p style="margin:0;font-size:12px;color:#94A3B8;line-height:1.6;font-family:'Courier New',monospace;letter-spacing:0.02em;">
+                      If you weren't expecting this invitation, you can safely ignore this email.
+                    </p>
+                  </td>
+                </tr>
+
+              </table>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="padding:32px 0 0;" align="center">
+              <p style="margin:0;font-size:11px;color:#94A3B8;letter-spacing:0.1em;font-family:'Courier New',monospace;text-transform:uppercase;">
+                Foundry · Tax Foundry Ltd
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+
+</body>
+</html>
+    `,
+  })
+}
