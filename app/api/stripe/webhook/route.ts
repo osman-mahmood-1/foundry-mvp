@@ -24,10 +24,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { createClient as createServerClient } from '@supabase/supabase-js'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-01-27.acacia',
-})
-
 // Admin client — bypasses RLS for provisioning
 function adminClient() {
   return createServerClient(
@@ -47,6 +43,12 @@ const PRICE_TO_TIER: Record<string, string> = {
 }
 
 export async function POST(req: NextRequest) {
+  const stripeKey = process.env.STRIPE_SECRET_KEY
+  if (!stripeKey) {
+    return NextResponse.json({ error: 'Stripe not configured' }, { status: 503 })
+  }
+  const stripe = new Stripe(stripeKey, { apiVersion: '2025-01-27.acacia' })
+
   const body      = await req.text()
   const signature = req.headers.get('stripe-signature') ?? ''
 
