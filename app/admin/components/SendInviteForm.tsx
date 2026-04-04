@@ -106,8 +106,24 @@ export default function SendInviteForm() {
         <select
           value={role}
           onChange={e => setRole(e.target.value as InviteRole)}
-          style={{ ...inputStyle, cursor: 'pointer' }}
           disabled={submitting}
+          style={{
+            height:       '38px',
+            width:        '100%',
+            padding:      `0 ${space[3]}`,
+            background:   colours.borderHairline,
+            color:        colours.textPrimary,
+            border:       'none',
+            borderRadius: radius.md,
+            fontSize:     fontSize.base,
+            fontFamily:   fonts.sans,
+            fontWeight:   fontWeight.regular,
+            cursor:       'pointer',
+            outline:      'none',
+            transition:   transition.snap,
+            boxSizing:    'border-box' as const,
+            appearance:   'auto' as const,
+          }}
         >
           <option value="accountant">Accountant</option>
           <option value="platform_editor">Platform Editor</option>

@@ -116,7 +116,7 @@ console.error('AUTH_003 — Sign-out failed')
       collapsible
       storageKey="foundry-admin-sidebar"
       showOrbs={true}
-      sidebarStyle="docked"
+      sidebarStyle="floating"
     >
       {children}
     </BaseShell>
