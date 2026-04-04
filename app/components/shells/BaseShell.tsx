@@ -26,7 +26,7 @@ import Link              from 'next/link'
 import { useColours, useThemeMode } from '@/styles/ThemeContext'
 import { fonts, fontSize, fontWeight, letterSpacing } from '@/styles/tokens/typography'
 import { radius }        from '@/styles/tokens/radius'
-import { transition }    from '@/styles/tokens/motion'
+import { transition, tabTransition } from '@/styles/tokens/motion'
 import { spacing }       from '@/styles/tokens/spacing'
 import { glass, orbs as orbStyles } from '@/styles/tokens/effects'
 
@@ -136,7 +136,7 @@ function FooterPopover({
         boxShadow:    '0 8px 32px rgba(0,0,0,0.28)',
         overflow:     'hidden',
         zIndex:       50,
-        animation:    'fadeUp 0.2s ease',
+        animation: tabTransition.animation,
         minWidth:     '160px',
       }}
     >

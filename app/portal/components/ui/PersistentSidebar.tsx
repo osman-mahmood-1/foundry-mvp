@@ -21,6 +21,7 @@ import { fonts, fontSize, fontWeight } from '@/styles/tokens/typography'
 import { spacing }         from '@/styles/tokens/spacing'
 import { radius }          from '@/styles/tokens'
 import { glass }           from '@/styles/tokens/effects'
+import { tabTransition }   from '@/styles/tokens/motion'
 import FoundryIntelligencePanel from './FoundryIntelligencePanel'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -57,7 +58,7 @@ export default function PersistentSidebar({
   const mode    = useThemeMode()
 
   const showIntelligence = children === null
-  // Key drives the 0.2s fadeIn keyframe on content switch
+  // Key drives the blur-in keyframe on content switch (intelligence ↔ form)
   const contentKey = showIntelligence ? 'intelligence' : 'form'
 
   return (
@@ -120,7 +121,7 @@ export default function PersistentSidebar({
         style={{
           flex:      1,
           overflowY: 'auto' as const,
-          animation: 'fadeIn 0.2s ease',
+          animation: tabTransition.animation,
         }}
       >
         {showIntelligence ? (

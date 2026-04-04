@@ -13,6 +13,7 @@ import { useState }                from 'react'
 import type { Client, PortalTab }  from '@/types'
 import { useColours }               from '@/styles/ThemeContext'
 import { fonts, fontWeight, fontSize } from '@/styles/tokens/typography'
+import { tabTransition }              from '@/styles/tokens/motion'
 import { useOfflineQueue }         from '@/hooks/useOfflineQueue'
 import SafariChromeFix             from './mobile/SafariChromeFix'
 
@@ -89,7 +90,7 @@ export default function MobilePortalShell({ client }: Props) {
         style={{
           flex:      1,
           overflowY: 'auto',
-          animation: 'fadeUp 0.25s ease',
+          animation: tabTransition.animation,
         }}
       >
         <TabContent

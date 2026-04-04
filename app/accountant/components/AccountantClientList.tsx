@@ -7,6 +7,7 @@ import { useShellSearch }            from '@/app/components/shells/BaseShell'
 import { fonts, fontSize, fontWeight, letterSpacing } from '@/styles/tokens/typography'
 import { glass }                     from '@/styles/tokens/effects'
 import { radius, transition }        from '@/styles/tokens'
+import { tabTransition }             from '@/styles/tokens/motion'
 import { spacing }                   from '@/styles/tokens/spacing'
 import type { Client }               from '@/types'
 
@@ -218,7 +219,7 @@ export default function AccountantClientList({ sorted, totalClients }: Accountan
   const urgentCount = sorted.filter(i => i.urgencyTier <= 1).length
 
   return (
-    <div style={{ maxWidth: '720px', animation: 'fadeUp 0.4s ease' }}>
+    <div style={{ maxWidth: '720px', animation: tabTransition.animation }}>
 
       {/* Page header */}
       <div style={{ marginBottom: '28px', padding: '4px' }}>

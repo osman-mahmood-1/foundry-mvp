@@ -23,6 +23,7 @@ import { useThemePreference } from '../PortalThemeProvider'
 import type { ThemeMode } from '../PortalThemeProvider'
 import { fonts, fontSize, fontWeight, letterSpacing } from '@/styles/tokens/typography'
 import { radius, spacing, transition } from '@/styles/tokens'
+import { tabTransition }               from '@/styles/tokens/motion'
 import { Panel, Input, Select, Button, ErrorBanner } from '../ui'
 import { useClientProfile } from './useClientProfile'
 import type { ProfileUpdate } from './useClientProfile'
@@ -599,7 +600,7 @@ function ConfirmModal({
         borderRadius:  radius.container,
         boxShadow:     '0 24px 64px rgba(0,0,0,0.40)',
         padding:       '28px',
-        animation:     'fadeUp 0.2s ease',
+        animation: tabTransition.animation,
       }}>
         <div style={{
           fontSize:     fontSize.base,
@@ -808,7 +809,7 @@ function DeleteFlow({ client, onClose }: { client: Client; onClose: () => void }
         borderRadius: radius.container,
         boxShadow:   '0 24px 64px rgba(0,0,0,0.40)',
         padding:     '28px',
-        animation:   'fadeUp 0.2s ease',
+        animation: tabTransition.animation,
       }}>
         <div style={{
           fontSize:     fontSize.base,

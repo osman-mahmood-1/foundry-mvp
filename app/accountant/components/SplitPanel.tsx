@@ -22,6 +22,7 @@ import type { Client, SplitPanelInitialData } from '@/types'
 import { useColours }         from '@/styles/ThemeContext'
 import { fonts, fontSize, fontWeight, letterSpacing } from '@/styles/tokens/typography'
 import { radius, transition } from '@/styles/tokens'
+import { tabTransition }    from '@/styles/tokens/motion'
 import { spacing }            from '@/styles/tokens/spacing'
 
 import OverviewTab   from '@/app/portal/components/tabs/OverviewTab'
@@ -244,7 +245,7 @@ export default function SplitPanel({ client, accountantId, accountantUserId, ini
               flex:      1,
               overflowY: 'auto',
               padding:   spacing.panel.padding,
-              animation: 'fadeUp 0.3s ease',
+              animation: tabTransition.animation,
             }}
           >
             <TabErrorBoundary key={activeTab}>

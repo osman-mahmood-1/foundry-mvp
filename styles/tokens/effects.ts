@@ -1,4 +1,5 @@
 import type { ColourMode } from './colours'
+import { tabTransition } from './motion'
 
 /**
  * styles/tokens/effects.ts
@@ -68,6 +69,8 @@ export const glass = {
     boxShadow:            mode === 'dark'
       ? 'inset 0 1px 0 rgba(255,255,255,0.07)'
       : '0 2px 16px rgba(15,23,42,0.08), inset 0 1px 0 rgba(255,255,255,0.95)',
+    animation:            tabTransition.animation,
+    willChange:           'opacity, filter',
   }),
 
   /** Right-side slide panel (near-opaque). No backdrop-filter in light to avoid seam. */

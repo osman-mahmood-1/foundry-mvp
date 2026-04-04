@@ -65,8 +65,8 @@ export const transition = {
  */
 export const tabTransition = {
   blur:     '6px',
-  duration: duration.slow,           // 0.4s
-  easing:   easing.decelerate,       // cubic-bezier(0.0, 0.0, 0.2, 1)
+  duration: duration.slow,
+  easing:   easing.decelerate,
   /** Pre-composed animation shorthand for use in style={{ animation: ... }} */
   animation: `tabIn ${duration.slow} ${easing.decelerate} both`,
 } as const

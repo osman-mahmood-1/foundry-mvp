@@ -95,22 +95,22 @@ input, select, textarea, button {
 
 /* ── FadeUp keyframe (tab transitions, panel entrances) ───────────────────── */
 @keyframes fadeUp {
-  from { opacity: 0; transform: translateY(12px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 /* ── Tab content transition — blur dissolve on tab switch ─────────────────── */
 /* Source of truth: styles/tokens/motion.ts → tabTransition                   */
 /* To change blur/speed/easing, edit tabTransition there — not here.           */
 @keyframes tabIn {
-  from { opacity: 0; filter: blur(6px); transform: translateY(8px); }
-  to   { opacity: 1; filter: blur(0);   transform: translateY(0); }
+  from { opacity: 0; filter: blur(6px); }
+  to   { opacity: 1; filter: blur(0); }
 }
 
 /* ── FadeDown keyframe (tooltips that appear below their anchor) ──────────── */
 @keyframes fadeDown {
-  from { opacity: 0; transform: translateY(-6px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 /* ── ExpandDown keyframe (locked-field popover expand from line) ──────────── */
@@ -374,8 +374,8 @@ input, select, textarea, button {
 
 /* ── Stagger animation for hamburger nav items ──────────────────────────────── */
 @keyframes navItemIn {
-  from { opacity: 0; filter: blur(8px); transform: translateY(-10px); }
-  to   { opacity: 1; filter: blur(0);   transform: translateY(0); }
+  from { opacity: 0; filter: blur(8px); }
+  to   { opacity: 1; filter: blur(0); }
 }
 @keyframes navItemOut {
   from { opacity: 1; }

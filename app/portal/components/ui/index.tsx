@@ -27,7 +27,6 @@ import {
   transition,
   shadows,
 } from '@/styles/tokens'
-import { tabTransition } from '@/styles/tokens/motion'
 import { useColours, useThemeMode } from '@/styles/ThemeContext'
 import type { AppError } from '@/lib/errors'
 
@@ -222,8 +221,6 @@ export function Panel({ children, padding = spacing.panel.padding, style }: Pane
     <div style={{
       ...glass.card(mode),
       padding,
-      animation:  tabTransition.animation,
-      willChange: 'opacity, filter, transform',
       ...style,
     }}>
       {children}
@@ -368,9 +365,7 @@ export function StatCard({ label, value, sub, colour }: StatCardProps) {
   return (
     <div style={{
       ...glass.card(mode),
-      padding:    spacing.panel.paddingTight,
-      animation:  tabTransition.animation,
-      willChange: 'opacity, filter, transform',
+      padding: spacing.panel.paddingTight,
     }}>
       <div style={{
         fontSize:      fontSize.label,
