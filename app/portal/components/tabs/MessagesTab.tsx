@@ -50,7 +50,7 @@ export default function MessagesTab({ client, readOnly = false }: Props) {
     draft,
     setDraft,
     sendMessage,
-  } = useMessages(client.id, client.user_id)
+  } = useMessages(client.id, client.user_id, readOnly ? 'accountant' : 'client')
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -113,8 +113,8 @@ export default function MessagesTab({ client, readOnly = false }: Props) {
       {/* ── Error banner ── */}
       {error && <ErrorBanner error={error} />}
 
-      {/* ── Compose area — hidden in read-only mode (accountant uses right panel) ── */}
-      {!readOnly && <div style={{
+      {/* ── Compose area ── */}
+      <div style={{
         background:   colours.panelBg,
         backdropFilter: 'blur(48px)',
         WebkitBackdropFilter: 'blur(48px)',
@@ -129,13 +129,12 @@ export default function MessagesTab({ client, readOnly = false }: Props) {
           value={draft}
           onChange={e => setDraft(e.target.value)}
           onKeyDown={e => {
-            // Send on Enter, new line on Shift+Enter
             if (e.key === 'Enter' && !e.shiftKey) {
               e.preventDefault()
               sendMessage()
             }
           }}
-          placeholder="Message your accountant…"
+          placeholder={readOnly ? 'Reply as accountant…' : 'Message your accountant…'}
           rows={2}
           style={{
             flex:       1,
@@ -175,20 +174,18 @@ export default function MessagesTab({ client, readOnly = false }: Props) {
         >
           {sending ? 'Sending…' : 'Send'}
         </button>
-      </div>}
+      </div>
 
-      {/* Send hint — hidden in read-only mode */}
-      {!readOnly && (
-        <div style={{
-          fontSize:   fontSize.xs,
-          color:      colours.textMuted,
-          fontFamily: fonts.mono,
-          textAlign:  'center' as const,
-          marginTop:  '-8px',
-        }}>
-          Enter to send · Shift+Enter for new line
-        </div>
-      )}
+      {/* Send hint */}
+      <div style={{
+        fontSize:   fontSize.xs,
+        color:      colours.textMuted,
+        fontFamily: fonts.mono,
+        textAlign:  'center' as const,
+        marginTop:  '-8px',
+      }}>
+        Enter to send · Shift+Enter for new line
+      </div>
 
     </div>
   )
