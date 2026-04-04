@@ -113,7 +113,7 @@ function RoleBadge({ role }: { role: string }) {
     <div style={{
       display:       'inline-block',
       background:    colours.accentSoft,
-      borderRadius:  radius.circle,
+      borderRadius:  radius.pill,
       padding:       `${space[1]} ${space[3]}`,
       fontSize:      fontSize.xs,
       fontFamily:    fonts.mono,
