@@ -216,7 +216,7 @@ export default function MobileFormSheet({ type, client, onClose }: Props) {
       style={{
         position:   'fixed',
         inset:      0,
-        zIndex:     100,
+        zIndex:     300,
         background: colours.pageBg,
         display:    'flex',
         flexDirection: 'column',
