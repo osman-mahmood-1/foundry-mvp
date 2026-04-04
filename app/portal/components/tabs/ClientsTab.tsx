@@ -235,7 +235,9 @@ export default function ClientsTab({ client: _client }: { client: Client }) {
             borderBottom:   `1px solid ${colours.borderHairline}`,
           }}>
             <Label>Clients & contacts</Label>
-            <Button size="sm" onClick={openNew}>+ Add client</Button>
+            {contacts.length > 0 && (
+              <Button size="sm" onClick={openNew}>+ Add client</Button>
+            )}
           </div>
 
           {filtered.length === 0 && contacts.length === 0 && (

@@ -15,7 +15,7 @@ import { Panel, Label, TabHeader, Spinner, Badge, ErrorBanner, formatGBP, format
 import { useColours } from '@/styles/ThemeContext'
 import { useShellSearch } from '@/app/components/shells/BaseShell'
 import { fonts, fontSize, fontWeight, letterSpacing } from '@/styles/tokens/typography'
-import { radius, transition, spacing } from '@/styles/tokens'
+import { radius, transition, spacing, space } from '@/styles/tokens'
 
 type Filter = 'all' | 'income' | 'expense'
 
@@ -96,7 +96,7 @@ export default function TransactionsTab({ client }: { client: Client }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.tab.gap, flex: 1 }}>
-      <TabHeader title="Transactions" subtitle={client.tax_year} />
+      <TabHeader title="Transactions" />
 
       {/* ── Summary row ── */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: spacing.tab.gap }}>
@@ -111,6 +111,9 @@ export default function TransactionsTab({ client }: { client: Client }) {
             </div>
             <div style={{ fontFamily: fonts.mono, fontSize: '24px', fontWeight: fontWeight.medium, color: colour, lineHeight: 1 }}>
               {value}
+            </div>
+            <div style={{ fontSize: fontSize.xs, color: colours.textMuted, fontFamily: fonts.sans, marginTop: space[1] }}>
+              {client.tax_year}
             </div>
           </Panel>
         ))}

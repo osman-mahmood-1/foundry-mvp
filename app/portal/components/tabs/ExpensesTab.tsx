@@ -375,7 +375,7 @@ export default function ExpensesTab({ client, readOnly = false, onExpenseSelect 
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.tab.gap, minHeight: 0, flex: 1 }}>
-      <TabHeader title="Expenses" subtitle={client.tax_year} />
+      <TabHeader title="Expenses" />
 
       {/* ── Stat cards row — spans full width above both columns ── */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: spacing.tab.gap }}>
@@ -406,7 +406,7 @@ export default function ExpensesTab({ client, readOnly = false, onExpenseSelect 
             borderBottom:   expenses.length > 0 ? `1px solid ${colours.borderHairline}` : 'none',
           }}>
             <Label>Expenses · {client.tax_year}</Label>
-            {!readOnly && (
+            {!readOnly && expenses.length > 0 && (
               <Button size="sm" shimmer onClick={openNewPanel}>
                 + Add entry
               </Button>

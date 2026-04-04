@@ -17,7 +17,7 @@ import { Panel, Label, TabHeader, EmptyState, Button, Input, Badge, formatGBP, f
 import { useColours } from '@/styles/ThemeContext'
 import { useShellSearch } from '@/app/components/shells/BaseShell'
 import { fonts, fontSize, fontWeight, letterSpacing } from '@/styles/tokens/typography'
-import { radius, transition, spacing } from '@/styles/tokens'
+import { radius, transition, spacing, space } from '@/styles/tokens'
 import PersistentSidebar from '../ui/PersistentSidebar'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -361,7 +361,7 @@ export default function InvoicesTab({ client }: { client: Client }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.tab.gap, minHeight: 0, flex: 1 }}>
-      <TabHeader title="Invoices" subtitle={client.tax_year} />
+      <TabHeader title="Invoices" />
 
       {/* ── Summary cards — spans full width above both columns ── */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: spacing.tab.gap }}>
@@ -372,6 +372,9 @@ export default function InvoicesTab({ client }: { client: Client }) {
           <div style={{ fontFamily: fonts.mono, fontSize: '24px', fontWeight: fontWeight.medium, color: colours.income, lineHeight: 1 }}>
             {formatGBP(totalPaid)}
           </div>
+          <div style={{ fontSize: fontSize.xs, color: colours.textMuted, fontFamily: fonts.sans, marginTop: space[1] }}>
+            {client.tax_year}
+          </div>
         </Panel>
         <Panel padding={spacing.panel.paddingTight}>
           <div style={{ fontSize: fontSize.label, color: colours.textMuted, textTransform: 'uppercase' as const, letterSpacing: '0.08em', fontFamily: fonts.mono, marginBottom: '10px' }}>
@@ -379,6 +382,9 @@ export default function InvoicesTab({ client }: { client: Client }) {
           </div>
           <div style={{ fontFamily: fonts.mono, fontSize: '24px', fontWeight: fontWeight.medium, color: colours.textPrimary, lineHeight: 1 }}>
             {formatGBP(totalOutstanding)}
+          </div>
+          <div style={{ fontSize: fontSize.xs, color: colours.textMuted, fontFamily: fonts.sans, marginTop: space[1] }}>
+            {client.tax_year}
           </div>
         </Panel>
       </div>
@@ -398,9 +404,11 @@ export default function InvoicesTab({ client }: { client: Client }) {
             borderBottom:   invoices.length > 0 ? `1px solid ${colours.borderHairline}` : 'none',
           }}>
             <Label>Invoices · {client.tax_year}</Label>
-            <Button size="sm" onClick={openNew}>
-              + New invoice
-            </Button>
+            {invoices.length > 0 && (
+              <Button size="sm" onClick={openNew}>
+                + New invoice
+              </Button>
+            )}
           </div>
 
           {invoices.length === 0 && (

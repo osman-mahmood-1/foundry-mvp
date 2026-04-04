@@ -338,7 +338,7 @@ export default function IncomeTab({ client, readOnly = false }: Props) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.tab.gap, minHeight: 0, flex: 1 }}>
-      <TabHeader title="Income" subtitle={client.tax_year} />
+      <TabHeader title="Income" />
 
       {/* ── Stat cards row — spans full width above both columns ── */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: spacing.tab.gap }}>
@@ -369,7 +369,7 @@ export default function IncomeTab({ client, readOnly = false }: Props) {
             borderBottom:   income.length > 0 ? `1px solid ${colours.borderHairline}` : 'none',
           }}>
             <Label>Income · {client.tax_year}</Label>
-            {!readOnly && (
+            {!readOnly && income.length > 0 && (
               <Button size="sm" shimmer onClick={openNewPanel}>
                 + Add entry
               </Button>
