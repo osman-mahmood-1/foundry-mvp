@@ -97,56 +97,115 @@ const LOCKED_REASON: Record<string, { title: string; body: string }> = {
 
 // ─── Primitives ───────────────────────────────────────────────────────────────
 
-/** Inline ? tooltip — expands below the label. No fixed positioning. */
+/**
+ * InfoSheet — bottom-sheet dialog for tooltip / locked-field explanations.
+ * Renders as position:fixed so it escapes SectionCard's overflow:hidden.
+ */
+function InfoSheet({
+  title, body, onClose,
+}: { title: string; body: React.ReactNode; onClose: () => void }) {
+  const colours = useColours()
+  return (
+    <div
+      onClick={onClose}
+      style={{
+        position:             'fixed',
+        inset:                0,
+        zIndex:               300,
+        background:           'rgba(0,0,0,0.5)',
+        backdropFilter:       'blur(4px)',
+        WebkitBackdropFilter: 'blur(4px)',
+        display:              'flex',
+        alignItems:           'flex-end',
+      }}
+    >
+      <div
+        onClick={e => e.stopPropagation()}
+        style={{
+          width:         '100%',
+          background:    colours.panelBgSolid,
+          borderRadius:  `${radius.lg} ${radius.lg} 0 0`,
+          padding:       '12px 20px calc(32px + env(safe-area-inset-bottom, 0px))',
+          borderTop:     `1px solid ${colours.borderHairline}`,
+          animation:     'fadeIn 0.18s ease',
+        }}
+      >
+        {/* drag handle */}
+        <div style={{ width: '36px', height: '4px', borderRadius: '2px', background: colours.borderMedium, margin: '0 auto 20px' }} />
+        <div style={{
+          fontFamily:   fonts.sans,
+          fontSize:     '15px',
+          fontWeight:   fontWeight.semibold,
+          color:        colours.textPrimary,
+          marginBottom: '10px',
+          lineHeight:   1.3,
+        }}>
+          {title}
+        </div>
+        <div style={{
+          fontFamily:   fonts.sans,
+          fontSize:     fontSize.sm,
+          color:        colours.textSecondary,
+          lineHeight:   1.65,
+          marginBottom: '22px',
+        }}>
+          {body}
+        </div>
+        <button
+          onClick={onClose}
+          style={{
+            width:        '100%',
+            height:       '48px',
+            borderRadius: radius.md,
+            border:       `1px solid ${colours.borderMedium}`,
+            background:   colours.hoverBg,
+            color:        colours.textPrimary,
+            fontFamily:   fonts.sans,
+            fontSize:     '15px',
+            fontWeight:   fontWeight.medium,
+            cursor:       'pointer',
+          }}
+        >
+          Got it
+        </button>
+      </div>
+    </div>
+  )
+}
+
+/** ? button — opens an InfoSheet dialog. */
 function InfoTip({ id }: { id: keyof typeof TOOLTIPS }) {
   const colours = useColours()
   const [open, setOpen] = useState(false)
   const tip = TOOLTIPS[id]
   return (
-    <span style={{ display: 'inline-flex', flexDirection: 'column' as const, verticalAlign: 'middle' }}>
+    <>
       <button
-        onClick={() => setOpen(o => !o)}
+        onClick={() => setOpen(true)}
+        aria-label={`Info: ${tip.title}`}
         style={{
           width:          '16px',
           height:         '16px',
           borderRadius:   '50%',
-          border:         `1px solid ${open ? colours.accent : colours.borderMedium}`,
-          background:     open ? colours.accentLight : 'transparent',
-          color:          open ? colours.accent : colours.textMuted,
+          border:         `1px solid ${colours.borderMedium}`,
+          background:     'transparent',
+          color:          colours.textMuted,
           fontSize:       '10px',
           fontFamily:     fonts.sans,
           fontWeight:     fontWeight.bold,
           cursor:         'pointer',
-          display:        'flex',
+          display:        'inline-flex',
           alignItems:     'center',
           justifyContent: 'center',
           flexShrink:     0,
           lineHeight:     1,
+          verticalAlign:  'middle',
         }}
       >
         ?
       </button>
-      {open && (
-        <span style={{
-          display:      'block',
-          marginTop:    '6px',
-          padding:      '10px 12px',
-          background:   colours.accentSoft,
-          border:       `1px solid ${colours.accentBorder}`,
-          borderRadius: radius.md,
-          fontSize:     fontSize.xs,
-          color:        colours.textSecondary,
-          fontFamily:   fonts.sans,
-          lineHeight:   1.55,
-          whiteSpace:   'normal' as const,
-        }}>
-          <span style={{ display: 'block', fontWeight: fontWeight.semibold, color: colours.accent, marginBottom: '4px' }}>
-            {tip.title}
-          </span>
-          {tip.body}
-        </span>
-      )}
-    </span>
+      {open && <InfoSheet title={tip.title} body={tip.body} onClose={() => setOpen(false)} />}
+    </>
   )
 }
 
@@ -206,7 +265,7 @@ function ReadField({ label, value, badge, tip }: {
   )
 }
 
-/** Locked field — tapping reveals inline explanation. */
+/** Locked field — tap the lock icon to open an explanation sheet. */
 function LockedField({ label, value, lockId }: {
   label:  string
   value:  string
@@ -228,68 +287,50 @@ function LockedField({ label, value, lockId }: {
         fontFamily:   fonts.sans,
       }}>
         {label}
-        <span style={{
-          fontSize:     '10px',
-          padding:      '1px 5px',
-          borderRadius: radius.xs,
-          background:   colours.borderLight,
-          color:        colours.textMuted,
-          letterSpacing:'0.03em',
-        }}>
-          locked
-        </span>
+        <button
+          onClick={() => setOpen(true)}
+          style={{
+            fontSize:     '10px',
+            padding:      '1px 6px',
+            borderRadius: radius.xs,
+            background:   colours.borderLight,
+            color:        colours.textMuted,
+            border:       'none',
+            cursor:       'pointer',
+            fontFamily:   fonts.sans,
+            letterSpacing:'0.03em',
+          }}
+        >
+          locked ›
+        </button>
       </div>
-      <button
-        onClick={() => setOpen(o => !o)}
-        style={{
-          width:        '100%',
-          minHeight:    '44px',
-          padding:      '0 12px',
-          display:      'flex',
-          alignItems:   'center',
-          justifyContent:'space-between',
-          border:       `1px solid ${open ? colours.accentBorder : colours.borderLight}`,
-          borderRadius: radius.md,
-          background:   open ? colours.accentSoft : colours.inputBg,
-          fontSize:     fontSize.base,
-          color:        colours.textPrimary,
-          fontFamily:   fonts.sans,
-          opacity:      0.65,
-          cursor:       'pointer',
-          transition:   transition.snap,
-          textAlign:    'left' as const,
-        }}
-      >
-        <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
-          {value || '—'}
-        </span>
-        <span style={{ fontSize: '11px', color: colours.textMuted, marginLeft: '8px', flexShrink: 0 }}>
-          {open ? '▴' : '▾'}
-        </span>
-      </button>
+      <div style={{
+        minHeight:    '44px',
+        padding:      '0 12px',
+        display:      'flex',
+        alignItems:   'center',
+        border:       `1px solid ${colours.borderLight}`,
+        borderRadius: radius.md,
+        background:   colours.inputBg,
+        fontSize:     fontSize.base,
+        color:        colours.textPrimary,
+        fontFamily:   fonts.sans,
+        opacity:      0.6,
+      }}>
+        {value || '—'}
+      </div>
       {open && (
-        <div style={{
-          marginTop:    '6px',
-          padding:      '10px 12px',
-          background:   colours.accentSoft,
-          border:       `1px solid ${colours.accentBorder}`,
-          borderRadius: radius.md,
-          fontSize:     fontSize.xs,
-          color:        colours.textSecondary,
-          fontFamily:   fonts.sans,
-          lineHeight:   1.55,
-        }}>
-          <div style={{ fontWeight: fontWeight.semibold, color: colours.accent, marginBottom: '4px' }}>
-            {reason.title}
-          </div>
-          {reason.body}
-        </div>
+        <InfoSheet
+          title={reason.title}
+          body={reason.body}
+          onClose={() => setOpen(false)}
+        />
       )}
     </div>
   )
 }
 
-/** Section card wrapper. */
+/** Section card wrapper. No overflow:hidden — lets InfoSheet overlays escape. */
 function SectionCard({ children }: { children: React.ReactNode }) {
   const colours = useColours()
   return (
@@ -297,28 +338,45 @@ function SectionCard({ children }: { children: React.ReactNode }) {
       background:   colours.cardBg,
       border:       `1px solid ${colours.cardBorder}`,
       borderRadius: radius.lg,
-      overflow:     'hidden',
-      padding:      '18px 16px',
+      padding:      '20px',
     }}>
       {children}
     </div>
   )
 }
 
-/** Section label (uppercase, muted). */
-function SectionLabel({ children, danger }: { children: React.ReactNode; danger?: boolean }) {
+/** Section label with optional subtitle. */
+function SectionLabel({
+  children, subtitle, danger,
+}: {
+  children: React.ReactNode
+  subtitle?: string
+  danger?:  boolean
+}) {
   const colours = useColours()
   return (
-    <div style={{
-      fontSize:      '11px',
-      fontWeight:    fontWeight.medium,
-      color:         danger ? colours.danger : colours.textMuted,
-      fontFamily:    fonts.sans,
-      letterSpacing: '0.10em',
-      textTransform: 'uppercase' as const,
-      marginBottom:  '14px',
-    }}>
-      {children}
+    <div style={{ marginBottom: '16px' }}>
+      <div style={{
+        fontSize:      '11px',
+        fontWeight:    fontWeight.medium,
+        color:         danger ? colours.danger : colours.textMuted,
+        fontFamily:    fonts.sans,
+        letterSpacing: '0.10em',
+        textTransform: 'uppercase' as const,
+        marginBottom:  subtitle ? '3px' : '0',
+      }}>
+        {children}
+      </div>
+      {subtitle && (
+        <div style={{
+          fontSize:   fontSize.xs,
+          color:      colours.textMuted,
+          fontFamily: fonts.sans,
+          lineHeight: 1.4,
+        }}>
+          {subtitle}
+        </div>
+      )}
     </div>
   )
 }
@@ -723,10 +781,10 @@ export default function MobileSettingsScreen({ client, onClose }: Props) {
       <div style={{
         flex:        1,
         overflowY:   'auto',
-        padding:     `16px 16px calc(env(safe-area-inset-bottom, 0px) + 24px)`,
+        padding:     `20px 16px calc(env(safe-area-inset-bottom, 0px) + 32px)`,
         display:     'flex',
         flexDirection:'column',
-        gap:         '12px',
+        gap:         '16px',
       }}>
 
         {/* Profile card */}
@@ -777,10 +835,7 @@ export default function MobileSettingsScreen({ client, onClose }: Props) {
 
         {/* Appearance */}
         <SectionCard>
-          <SectionLabel>Appearance</SectionLabel>
-          <div style={{ fontFamily: fonts.sans, fontSize: fontSize.sm, color: colours.textSecondary, marginBottom: '14px' }}>
-            Choose how Foundry looks on this device.
-          </div>
+          <SectionLabel subtitle="Choose how Foundry looks on this device.">Appearance</SectionLabel>
           <div style={{ display: 'flex', gap: '8px' }}>
             {THEME_OPTIONS.map(opt => {
               const active = prefMode === opt.mode
@@ -816,13 +871,8 @@ export default function MobileSettingsScreen({ client, onClose }: Props) {
 
         {/* Personal information */}
         <SectionCard>
-          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '16px' }}>
-            <div>
-              <SectionLabel>Personal information</SectionLabel>
-              <div style={{ fontFamily: fonts.sans, fontSize: fontSize.xs, color: colours.textMuted, marginTop: '-10px', marginBottom: '0' }}>
-                Name, contact details, date of birth
-              </div>
-            </div>
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '4px' }}>
+            <SectionLabel subtitle="Name, contact details, date of birth">Personal information</SectionLabel>
             {activeSection !== 'personal' && (
               <Button
                 variant="secondary"
@@ -924,13 +974,8 @@ export default function MobileSettingsScreen({ client, onClose }: Props) {
 
         {/* Tax information */}
         <SectionCard>
-          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '16px' }}>
-            <div>
-              <SectionLabel>Tax information</SectionLabel>
-              <div style={{ fontFamily: fonts.sans, fontSize: fontSize.xs, color: colours.textMuted, marginTop: '-10px', marginBottom: '0' }}>
-                HMRC reference numbers and filing configuration
-              </div>
-            </div>
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '4px' }}>
+            <SectionLabel subtitle="HMRC reference numbers and filing configuration">Tax information</SectionLabel>
             {activeSection !== 'tax' && (
               <Button
                 variant="secondary"
