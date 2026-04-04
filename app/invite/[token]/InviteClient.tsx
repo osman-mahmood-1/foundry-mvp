@@ -38,80 +38,6 @@ interface Props {
   currentUserEmail: string | null
 }
 
-// ─── Portal UI taster — static mock preview ───────────────────────────────────
-
-function PortalPreview() {
-  const colours = useColours()
-
-  const mockStats = [
-    { label: 'INCOME',    value: '£24,500', sub: '2024–25' },
-    { label: 'EXPENSES',  value: '£6,200',  sub: '2024–25' },
-    { label: 'TAX EST.',  value: '£3,660',  sub: 'estimate' },
-  ]
-
-  return (
-    <div style={{
-      width:      '100%',
-      opacity:    0.55,
-      pointerEvents: 'none',
-      userSelect: 'none',
-    }}>
-      {/* Mini portal shell hint */}
-      <div style={{
-        fontSize:      fontSize.xs,
-        fontFamily:    fonts.mono,
-        color:         colours.textMuted,
-        letterSpacing: letterSpacing.wide,
-        textTransform: 'uppercase',
-        marginBottom:  space[2],
-        textAlign:     'center',
-      }}>
-        Your portal — a preview
-      </div>
-
-      {/* Stat cards row */}
-      <div style={{
-        display:             'grid',
-        gridTemplateColumns: 'repeat(3, 1fr)',
-        gap:                 space[2],
-        marginBottom:        space[2],
-      }}>
-        {mockStats.map(s => (
-          <div key={s.label} style={{
-            ...glass.card('dark'),
-            padding:   `${space[2]} ${space[3]}`,
-            textAlign: 'center',
-          }}>
-            <div style={{ fontSize: fontSize.xs, fontFamily: fonts.mono, color: colours.textMuted, letterSpacing: letterSpacing.wide, textTransform: 'uppercase', marginBottom: space[1] }}>
-              {s.label}
-            </div>
-            <div style={{ fontSize: fontSize.base, fontFamily: fonts.mono, fontWeight: fontWeight.medium, color: colours.accent }}>
-              {s.value}
-            </div>
-            <div style={{ fontSize: fontSize.xs, fontFamily: fonts.mono, color: colours.textMuted, marginTop: '2px' }}>
-              {s.sub}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Mock message row */}
-      <div style={{
-        ...glass.card('dark'),
-        padding:     `${space[2]} ${space[3]}`,
-        display:     'flex',
-        alignItems:  'center',
-        gap:         space[3],
-      }}>
-        <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: colours.accent, flexShrink: 0 }} />
-        <div style={{ fontSize: fontSize.xs, color: colours.textSecondary, fontFamily: fonts.sans }}>
-          Your accountant reviewed 3 expenses this week
-        </div>
-      </div>
-    </div>
-  )
-}
-
 // ─── Shell ────────────────────────────────────────────────────────────────────
 
 function Shell({ children }: { children: React.ReactNode }) {
@@ -163,9 +89,6 @@ function Shell({ children }: { children: React.ReactNode }) {
         }}>
           {children}
         </div>
-
-        {/* Portal preview taster */}
-        <PortalPreview />
 
         {/* Footer */}
         <div style={{
