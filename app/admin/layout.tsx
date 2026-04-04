@@ -53,7 +53,7 @@ export default async function AdminLayout({
   if (!editor) redirect('/login')
 
   return (
-    <PortalThemeProvider storageKey="foundry-theme" defaultMode="system">
+    <PortalThemeProvider storageKey="foundry-theme" defaultMode="system" forceMode="light">
       <AdminShell editor={editor}>
         {children}
       </AdminShell>

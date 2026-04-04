@@ -80,7 +80,7 @@ export default async function AccountantLayout({
     }
 
     return (
-      <PortalThemeProvider storageKey="foundry-theme" defaultMode="system">
+      <PortalThemeProvider storageKey="foundry-theme" defaultMode="system" forceMode="light">
         <AccountantShell accountant={syntheticAccountant}>
           {children}
         </AccountantShell>
@@ -102,7 +102,7 @@ export default async function AccountantLayout({
   if (!accountant) redirect('/login')
 
   return (
-    <PortalThemeProvider storageKey="foundry-theme" defaultMode="system">
+    <PortalThemeProvider storageKey="foundry-theme" defaultMode="system" forceMode="light">
       <AccountantShell accountant={accountant}>
         {children}
       </AccountantShell>

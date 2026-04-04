@@ -450,7 +450,7 @@ export default function BaseShell({
   const colours  = useColours()
   const mode     = useThemeMode()
   const pathname = usePathname()
-  const { mode: prefMode, setMode } = useThemePreference()
+  const { mode: prefMode } = useThemePreference()
 
   const [collapsed,         setCollapsed]         = useState(false)
   const [popoverOpen,       setPopoverOpen]        = useState(false)
@@ -720,40 +720,6 @@ export default function BaseShell({
             }}
           />
 
-          {/* Theme toggle */}
-          <button
-            onClick={() => setMode(prefMode === 'dark' ? 'light' : 'dark')}
-            aria-label="Toggle theme"
-            style={{
-              width:          '32px',
-              height:         '32px',
-              display:        'flex',
-              alignItems:     'center',
-              justifyContent: 'center',
-              background:     colours.topbarItemBg,
-              backdropFilter: 'blur(20px)',
-              WebkitBackdropFilter: 'blur(20px)',
-              border:         `1px solid ${colours.topbarItemBorder}`,
-              borderRadius:   radius.md,
-              color:          colours.textMuted,
-              cursor:         'pointer',
-              fontSize:       '14px',
-              transition:     transition.snap,
-              flexShrink:     0,
-            }}
-            onMouseEnter={e => {
-              e.currentTarget.style.background  = colours.accentLight
-              e.currentTarget.style.borderColor = colours.accentBorder
-              e.currentTarget.style.color       = colours.accent
-            }}
-            onMouseLeave={e => {
-              e.currentTarget.style.background  = colours.topbarItemBg
-              e.currentTarget.style.borderColor = colours.topbarItemBorder
-              e.currentTarget.style.color       = colours.textMuted
-            }}
-          >
-            {mode === 'dark' ? '☀' : '◑'}
-          </button>
         </div>
 
         {/* Inner wrapper — adds the bottom + right margin/gap */}

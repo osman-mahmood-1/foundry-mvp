@@ -48,7 +48,7 @@ export default async function PortalPage() {
   if (!clientData?.onboarding_complete) redirect('/onboarding')
 
   return (
-    <PortalThemeProvider>
+    <PortalThemeProvider forceMode="light">
       <PortalShellRouter client={clientData as Client} />
     </PortalThemeProvider>
   )

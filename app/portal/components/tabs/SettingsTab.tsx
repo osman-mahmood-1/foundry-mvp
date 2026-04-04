@@ -984,34 +984,6 @@ export default function SettingsTab({ client }: { client: Client }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.tab.gap }}>
 
-      {/* ── Appearance ── */}
-      <Panel padding={spacing.panel.padding}>
-        <div style={{
-          fontSize:      fontSize.label,
-          color:         colours.textMuted,
-          textTransform: 'uppercase' as const,
-          letterSpacing: letterSpacing.wide,
-          fontFamily:    fonts.mono,
-          marginBottom:  '16px',
-        }}>
-          Appearance
-        </div>
-        <div style={{
-          fontSize:     fontSize.sm,
-          color:        colours.textSecondary,
-          marginBottom: '16px',
-          fontFamily:   fonts.sans,
-        }}>
-          Choose how Foundry looks on this device.
-        </div>
-        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' as const }}>
-          {THEME_OPTIONS.map(opt => (
-            <ThemePill key={opt.mode} label={opt.label} icon={opt.icon}
-              active={mode === opt.mode} onClick={() => setMode(opt.mode)} />
-          ))}
-        </div>
-      </Panel>
-
       {/* ── Personal information ── */}
       <Panel padding={spacing.panel.padding}>
         <SectionHeader
