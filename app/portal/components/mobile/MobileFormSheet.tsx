@@ -108,7 +108,8 @@ export default function MobileFormSheet({
   const [saving,      setSaving]      = useState(false)
   const [saved,       setSaved]       = useState(false)
   const [btnColour,   setBtnColour]   = useState<string | null>(null)
-  const [particles,   setParticles]   = useState<Particle[]>([])\n  const [fading,      setFading]      = useState(false)
+  const [particles,   setParticles]   = useState<Particle[]>([])
+  const [fading,      setFading]      = useState(false)
 
   const btnRef = useRef<HTMLButtonElement>(null)
 
