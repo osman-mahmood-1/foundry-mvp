@@ -540,8 +540,7 @@ export function Button({
 
   function variantStyles(): React.CSSProperties {
     switch (variant) {
-      case 'primary':\n        // Dark: sapphire gradient, brightens on hover
-        // Light: very subtle sapphire tint — low contrast, unobtrusive; brightens on hover
+      case 'primary':
         if (mode === 'dark') {
           return {
             padding:    '8px 20px',
@@ -554,12 +553,11 @@ export function Button({
             boxShadow:  hovered ? `0 6px 24px ${colours.ctaGlow}` : 'none',
           }
         }
-        // Light mode: very subtle fill, sapphire text
         return {
           padding:    '8px 20px',
           background: hovered ? 'rgba(59,130,246,0.14)' : colours.cta,
           color:      colours.ctaText,
-          border:     hovered ? '1px solid rgba(59,130,246,0.25)' : 'none',
+          border:     'none',
           fontWeight: fontWeight.semibold,
         }
       case 'secondary':
@@ -579,9 +577,7 @@ export function Button({
           color: hovered
             ? (mode === 'dark' ? 'rgba(255,255,255,0.70)' : 'rgba(15,23,42,0.80)')
             : (mode === 'dark' ? 'rgba(255,255,255,0.45)' : 'rgba(15,23,42,0.55)'),
-          border: hovered
-            ? (mode === 'dark' ? '1px solid rgba(255,255,255,0.14)' : '1px solid rgba(15,23,42,0.18)')
-            : 'none',
+          border:     'none',
           fontWeight: fontWeight.regular,
         }
       case 'tint':
@@ -589,7 +585,7 @@ export function Button({
           return {
             padding:    '8px 16px',
             background: mode === 'dark' ? 'rgba(255,255,255,0.10)' : 'rgba(30,64,175,0.08)',
-            border:     mode === 'dark' ? '1px solid rgba(255,255,255,0.14)' : '1px solid rgba(30,64,175,0.20)',
+            border:     'none',
             color:      mode === 'dark' ? 'rgba(255,255,255,0.85)' : colours.accentDark,
             fontWeight: fontWeight.medium,
           }
@@ -599,14 +595,13 @@ export function Button({
           background: hovered
             ? (mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)')
             : (mode === 'dark' ? 'rgba(255,255,255,0.06)' : 'rgba(15,23,42,0.05)'),
-          border: 'none',
-          color:  mode === 'dark' ? 'rgba(255,255,255,0.40)' : 'rgba(15,23,42,0.45)',
+          border:     'none',
+          color:      mode === 'dark' ? 'rgba(255,255,255,0.40)' : 'rgba(15,23,42,0.45)',
           fontWeight: fontWeight.regular,
         }
       case 'danger':
         return {
           padding:    '8px 16px',
-          // Resting: soft tint. Hover: bright red fill.
           background: hovered ? colours.danger : colours.dangerLight,
           color:      hovered ? colours.white : colours.danger,
           border:     'none',
