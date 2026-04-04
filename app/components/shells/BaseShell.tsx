@@ -24,7 +24,6 @@ import { useState, useRef, useEffect, useCallback, createContext, useContext } f
 import { usePathname }   from 'next/navigation'
 import Link              from 'next/link'
 import { useColours, useThemeMode } from '@/styles/ThemeContext'
-import { useThemePreference } from '@/app/portal/components/PortalThemeProvider'
 import { fonts, fontSize, fontWeight, letterSpacing } from '@/styles/tokens/typography'
 import { radius }        from '@/styles/tokens/radius'
 import { transition }    from '@/styles/tokens/motion'
@@ -450,11 +449,11 @@ export default function BaseShell({
   const colours  = useColours()
   const mode     = useThemeMode()
   const pathname = usePathname()
-  const { mode: prefMode } = useThemePreference()
 
   const [collapsed,         setCollapsed]         = useState(false)
   const [popoverOpen,       setPopoverOpen]        = useState(false)
   const [searchQuery,       setSearchQuery]        = useState('')
+  const [searchExpanded,    setSearchExpanded]     = useState(false)
   const [searchPlaceholderState, setSearchPlaceholderState] = useState(searchPlaceholder)
 
   // Hydrate collapse state from localStorage
@@ -689,43 +688,10 @@ export default function BaseShell({
         zIndex:        1,
       }}>
 
-        {/* ── Topbar — floats outside the glass panel, creates top gap ── */}
-        <div style={{
-          display:        'flex',
-          alignItems:     'center',
-          justifyContent: 'space-between',
-          padding:        '12px 12px 8px 0',
-          flexShrink:     0,
-        }}>
-          {/* Search input */}
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
-            placeholder={searchPlaceholderState || 'Search…'}
-            style={{
-              width:              '220px',
-              height:             '32px',
-              background:         colours.topbarItemBg,
-              backdropFilter:     'blur(20px)',
-              WebkitBackdropFilter: 'blur(20px)',
-              border:             `1px solid ${colours.topbarItemBorder}`,
-              borderRadius:       radius.pill,
-              padding:            '0 14px',
-              fontSize:           fontSize.sm,
-              color:              colours.textPrimary,
-              fontFamily:         fonts.sans,
-              outline:            'none',
-              transition:         transition.snap,
-            }}
-          />
-
-        </div>
-
-        {/* Inner wrapper — adds the bottom + right margin/gap */}
+        {/* Inner wrapper — fills the full right area with gap on all sides */}
         <div style={{
           flex:       1,
-          padding:    '0 12px 12px 0',
+          padding:    '12px 12px 12px 0',
           overflow:   'hidden',
           position:   'relative',
         }}>
@@ -739,7 +705,88 @@ export default function BaseShell({
             overflow:       'hidden',
             position:       'relative',
           }}>
-            {/* Scrollable content area */}
+          {/* ── Floating search — top-right inside glass panel ── */}
+          <div style={{
+            position:  'absolute',
+            top:       '14px',
+            right:     '14px',
+            zIndex:    10,
+            display:   'flex',
+            alignItems: 'center',
+            justifyContent: 'flex-end',
+          }}>
+            <div style={{
+              display:        'flex',
+              alignItems:     'center',
+              width:          searchExpanded ? '220px' : '32px',
+              height:         '32px',
+              borderRadius:   radius.pill,
+              background:     searchExpanded ? colours.inputBg : 'transparent',
+              border:         searchExpanded
+                ? `1px solid ${colours.inputBorder}`
+                : `1px solid transparent`,
+              overflow:       'hidden',
+              transition:     'width 0.25s cubic-bezier(0.4,0,0.2,1), background 0.2s ease, border-color 0.2s ease',
+              cursor:         searchExpanded ? 'text' : 'pointer',
+            }}
+              onClick={() => !searchExpanded && setSearchExpanded(true)}
+            >
+              {/* Search icon — always visible, left-anchored when expanded */}
+              <button
+                onClick={e => {
+                  e.stopPropagation()
+                  if (searchExpanded) {
+                    setSearchExpanded(false)
+                    setSearchQuery('')
+                  } else {
+                    setSearchExpanded(true)
+                  }
+                }}
+                style={{
+                  width:          '32px',
+                  height:         '32px',
+                  flexShrink:     0,
+                  display:        'flex',
+                  alignItems:     'center',
+                  justifyContent: 'center',
+                  background:     searchExpanded ? 'transparent' : colours.topbarItemBg,
+                  border:         searchExpanded ? 'none' : `1px solid ${colours.topbarItemBorder}`,
+                  borderRadius:   radius.pill,
+                  color:          colours.textMuted,
+                  cursor:         'pointer',
+                  fontSize:       '13px',
+                  transition:     'background 0.2s ease, border-color 0.2s ease',
+                }}
+                aria-label={searchExpanded ? 'Close search' : 'Open search'}
+              >
+                {searchExpanded ? '✕' : '⌕'}
+              </button>
+
+              {/* Input — only rendered when expanded */}
+              {searchExpanded && (
+                <input
+                  autoFocus
+                  type="text"
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  onKeyDown={e => e.key === 'Escape' && (setSearchExpanded(false), setSearchQuery(''))}
+                  placeholder={searchPlaceholderState || 'Search…'}
+                  style={{
+                    flex:       1,
+                    background: 'transparent',
+                    border:     'none',
+                    outline:    'none',
+                    fontSize:   fontSize.sm,
+                    color:      colours.textPrimary,
+                    fontFamily: fonts.sans,
+                    padding:    '0 10px 0 0',
+                  }}
+                />
+              )}
+            </div>
+          </div>
+
+          {/* Scrollable content area */}
             <div style={{
               flex:          1,
               overflowY:     'auto',
