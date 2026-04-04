@@ -525,24 +525,13 @@ export function Button({
   function variantStyles(): React.CSSProperties {
     switch (variant) {
       case 'primary':
-        if (mode === 'dark') {
-          return {
-            padding:    '8px 20px',
-            background: hovered
-              ? 'linear-gradient(150deg, #2563eb 0%, #3b82f6 60%, #60a5fa 100%)'
-              : colours.cta,
-            color:      colours.ctaText,
-            border:     'none',
-            fontWeight: fontWeight.semibold,
-            boxShadow:  hovered ? `0 6px 24px ${colours.ctaGlow}` : 'none',
-          }
-        }
         return {
           padding:    '8px 20px',
-          background: hovered ? 'rgba(59,130,246,0.14)' : colours.cta,
+          background: colours.cta,
           color:      colours.ctaText,
           border:     'none',
           fontWeight: fontWeight.semibold,
+          boxShadow:  hovered && mode === 'dark' ? `0 6px 24px ${colours.ctaGlow}` : 'none',
         }
       case 'secondary':
         return {

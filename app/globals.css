@@ -126,8 +126,10 @@ input, select, textarea, button {
 }
 
 /* ────────────────────────────────────────────────────────────────────────────
-   CTA BUTTON — copper/teal/sapphire shimmer border on hover
+   CTA BUTTON — sapphire shimmer border on hover
    Uses @property for animatable custom angle.
+   Background fill comes from the component's inline style (colours.cta token).
+   ::after is intentionally absent — no duplicate gradient here.
 ──────────────────────────────────────────────────────────────────────────── */
 @property --cta-angle {
   syntax: '<angle>';
@@ -149,8 +151,8 @@ input, select, textarea, button {
 .cta-btn::before {
   content: '';
   position: absolute;
-  inset: -2px;
-  border-radius: 12px; /* --radius-md (10px) + 2px */
+  inset: -1px;
+  border-radius: 11px; /* radius.md (10px) + 1px */
   background: conic-gradient(
     from var(--cta-angle),
     #1e3a8a   0deg,
@@ -168,16 +170,7 @@ input, select, textarea, button {
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
-  padding: 2px;
-}
-
-.cta-btn::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 10px; /* --radius-md */
-  background: linear-gradient(150deg, #1e3a8a 0%, #2563eb 60%, #3b82f6 100%);
-  z-index: -1;
+  padding: 1px;
 }
 
 .cta-btn:hover::before {
