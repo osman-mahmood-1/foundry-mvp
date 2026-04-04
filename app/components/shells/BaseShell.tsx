@@ -752,8 +752,6 @@ export default function BaseShell({
                 overflowX:     'hidden',
                 display:       'flex',
                 flexDirection: 'column',
-                animation:     'tabIn 0.35s cubic-bezier(0.4,0,0.2,1) both',
-                willChange:    'opacity, filter, transform',
               }}
             >
               {children}

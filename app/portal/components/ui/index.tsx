@@ -221,6 +221,8 @@ export function Panel({ children, padding = spacing.panel.padding, style }: Pane
     <div style={{
       ...glass.card(mode),
       padding,
+      animation: 'tabIn 0.35s cubic-bezier(0.4,0,0.2,1) both',
+      willChange: 'opacity, filter, transform',
       ...style,
     }}>
       {children}
@@ -365,7 +367,9 @@ export function StatCard({ label, value, sub, colour }: StatCardProps) {
   return (
     <div style={{
       ...glass.card(mode),
-      padding: spacing.panel.paddingTight,
+      padding:    spacing.panel.paddingTight,
+      animation:  'tabIn 0.35s cubic-bezier(0.4,0,0.2,1) both',
+      willChange: 'opacity, filter, transform',
     }}>
       <div style={{
         fontSize:      fontSize.label,

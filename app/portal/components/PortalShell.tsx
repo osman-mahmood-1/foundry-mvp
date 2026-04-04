@@ -194,7 +194,7 @@ console.error('AUTH_003 — Sign-out failed')
         </div>
 
         {/* Tab content */}
-        <div key={activeTab} style={{ flex: 1, padding: '0 20px 24px', animation: 'tabIn 0.35s cubic-bezier(0.4,0,0.2,1) both', willChange: 'opacity, filter, transform', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+        <div key={activeTab} style={{ flex: 1, padding: '0 20px 24px', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
           <TabErrorBoundary key={activeTab}>
             <TabRenderer activeTab={activeTab} client={client} onTabChange={id => setActiveTab(id as PortalTab)} />
           </TabErrorBoundary>
