@@ -453,7 +453,6 @@ export default function BaseShell({
   const [collapsed,         setCollapsed]         = useState(false)
   const [popoverOpen,       setPopoverOpen]        = useState(false)
   const [searchQuery,       setSearchQuery]        = useState('')
-  const [searchExpanded,    setSearchExpanded]     = useState(false)
   const [searchPlaceholderState, setSearchPlaceholderState] = useState(searchPlaceholder)
 
   // Hydrate collapse state from localStorage
@@ -705,85 +704,43 @@ export default function BaseShell({
             overflow:       'hidden',
             position:       'relative',
           }}>
-          {/* ── Floating search — top-right inside glass panel ── */}
+          {/* ── Search bar — always visible, top-right inside glass panel ── */}
           <div style={{
-            position:  'absolute',
-            top:       '14px',
-            right:     '14px',
-            zIndex:    10,
-            display:   'flex',
+            position: 'absolute',
+            top:      '14px',
+            right:    '14px',
+            zIndex:   10,
+            display:  'flex',
             alignItems: 'center',
-            justifyContent: 'flex-end',
+            gap:      '8px',
+            height:   '32px',
+            width:    '220px',
+            borderRadius: radius.pill,
+            background:   colours.inputBg,
+            border:       `1px solid ${colours.inputBorder}`,
+            padding:      '0 12px 0 10px',
           }}>
-            <div style={{
-              display:        'flex',
-              alignItems:     'center',
-              width:          searchExpanded ? '220px' : '32px',
-              height:         '32px',
-              borderRadius:   radius.pill,
-              background:     searchExpanded ? colours.inputBg : 'transparent',
-              border:         searchExpanded
-                ? `1px solid ${colours.inputBorder}`
-                : `1px solid transparent`,
-              overflow:       'hidden',
-              transition:     'width 0.25s cubic-bezier(0.4,0,0.2,1), background 0.2s ease, border-color 0.2s ease',
-              cursor:         searchExpanded ? 'text' : 'pointer',
-            }}
-              onClick={() => !searchExpanded && setSearchExpanded(true)}
-            >
-              {/* Search icon — always visible, left-anchored when expanded */}
-              <button
-                onClick={e => {
-                  e.stopPropagation()
-                  if (searchExpanded) {
-                    setSearchExpanded(false)
-                    setSearchQuery('')
-                  } else {
-                    setSearchExpanded(true)
-                  }
-                }}
-                style={{
-                  width:          '32px',
-                  height:         '32px',
-                  flexShrink:     0,
-                  display:        'flex',
-                  alignItems:     'center',
-                  justifyContent: 'center',
-                  background:     searchExpanded ? 'transparent' : colours.topbarItemBg,
-                  border:         searchExpanded ? 'none' : `1px solid ${colours.topbarItemBorder}`,
-                  borderRadius:   radius.pill,
-                  color:          colours.textMuted,
-                  cursor:         'pointer',
-                  fontSize:       '13px',
-                  transition:     'background 0.2s ease, border-color 0.2s ease',
-                }}
-                aria-label={searchExpanded ? 'Close search' : 'Open search'}
-              >
-                {searchExpanded ? '✕' : '⌕'}
-              </button>
-
-              {/* Input — only rendered when expanded */}
-              {searchExpanded && (
-                <input
-                  autoFocus
-                  type="text"
-                  value={searchQuery}
-                  onChange={e => setSearchQuery(e.target.value)}
-                  onKeyDown={e => e.key === 'Escape' && (setSearchExpanded(false), setSearchQuery(''))}
-                  placeholder={searchPlaceholderState || 'Search…'}
-                  style={{
-                    flex:       1,
-                    background: 'transparent',
-                    border:     'none',
-                    outline:    'none',
-                    fontSize:   fontSize.sm,
-                    color:      colours.textPrimary,
-                    fontFamily: fonts.sans,
-                    padding:    '0 10px 0 0',
-                  }}
-                />
-              )}
-            </div>
+            <span style={{ fontSize: '13px', color: colours.textMuted, flexShrink: 0, lineHeight: 1 }}>
+              ⌕
+            </span>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              onKeyDown={e => e.key === 'Escape' && setSearchQuery('')}
+              placeholder={searchPlaceholderState || 'Search…'}
+              style={{
+                flex:       1,
+                background: 'transparent',
+                border:     'none',
+                outline:    'none',
+                fontSize:   fontSize.sm,
+                color:      colours.textPrimary,
+                fontFamily: fonts.sans,
+                padding:    0,
+                minWidth:   0,
+              }}
+            />
           </div>
 
           {/* Scrollable content area */}
