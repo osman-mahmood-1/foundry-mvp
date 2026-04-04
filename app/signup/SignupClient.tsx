@@ -53,7 +53,7 @@ const FIELD_META: Record<FieldId, { heading: string; sub: string; label: string;
   },
   email: {
     heading:     'Your email address.',
-    sub:         'This is how you'll sign in. We'll never share it.',
+    sub:         "This is how you'll sign in. We'll never share it.",
     label:       'Email',
     placeholder: 'you@example.com',
   },
