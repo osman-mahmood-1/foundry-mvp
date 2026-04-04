@@ -547,8 +547,8 @@ export function Button({
       case 'secondary':
         return {
           padding:    '8px 16px',
-          background: hovered ? colours.accentSoft : colours.simpleBg,
-          color:      hovered ? colours.textPrimary : colours.textSecondary,
+          background: hovered ? colours.accentLight : colours.borderHairline,
+          color:      hovered ? colours.accent : colours.textSecondary,
           border:     'none',
           fontWeight: fontWeight.regular,
         }
