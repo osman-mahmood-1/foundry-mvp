@@ -59,6 +59,19 @@ export const transition = {
 } as const
 
 /**
+ * Tab content transition — blur-dissolve when switching tabs on desktop.
+ * Adjust tabBlur, tabDuration, and tabEasing here to change the effect
+ * globally across all Panel and StatCard components.
+ */
+export const tabTransition = {
+  blur:     '6px',
+  duration: duration.slow,           // 0.4s
+  easing:   easing.decelerate,       // cubic-bezier(0.0, 0.0, 0.2, 1)
+  /** Pre-composed animation shorthand for use in style={{ animation: ... }} */
+  animation: `tabIn ${duration.slow} ${easing.decelerate} both`,
+} as const
+
+/**
  * Keyframe animation names.
  * The actual @keyframes are injected once in the root layout.
  * Components reference these names in their animation properties.
@@ -66,6 +79,7 @@ export const transition = {
 export const animations = {
   fadeUp:  'fadeUp',
   fadeIn:  'fadeIn',
+  tabIn:   'tabIn',
   spin:    'spin',
   pulse:   'orbPulse',
   float1:  'orbFloat1',
