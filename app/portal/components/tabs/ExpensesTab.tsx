@@ -374,27 +374,28 @@ export default function ExpensesTab({ client, readOnly = false, onExpenseSelect 
   ) : null
 
   return (
-    <div style={{ display: 'flex', gap: spacing.tab.gap, minHeight: 0, flex: 1, alignItems: 'stretch' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.tab.gap, minHeight: 0, flex: 1 }}>
 
-      {/* ── Left: expense list (always visible) ── */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: spacing.tab.gap, minWidth: 0 }}>
+      {/* ── Stat cards row — spans full width above both columns ── */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: spacing.tab.gap }}>
+        <StatCard
+          label="Total expenses"
+          value={totalPence > 0 ? formatGBP(totalPence) : '—'}
+          sub={entryCount > 0
+            ? `${entryCount} entr${entryCount === 1 ? 'y' : 'ies'} · ${client.tax_year}`
+            : `No expenses logged yet · ${client.tax_year}`
+          }
+          colour={colours.expense}
+        />
+      </div>
 
-        {/* Summary stat */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: spacing.tab.gap }}>
-          <StatCard
-            label="Total expenses"
-            value={totalPence > 0 ? formatGBP(totalPence) : '—'}
-            sub={entryCount > 0
-              ? `${entryCount} entr${entryCount === 1 ? 'y' : 'ies'} · ${client.tax_year}`
-              : `No expenses logged yet · ${client.tax_year}`
-            }
-            colour={colours.expense}
-          />
-        </div>
+      {error && <ErrorBanner error={error} />}
 
-        {error && <ErrorBanner error={error} />}
+      {/* ── Main row: list panel + sidebar, top-aligned ── */}
+      <div style={{ display: 'flex', gap: spacing.tab.gap, minHeight: 0, flex: 1, alignItems: 'stretch' }}>
 
-        {/* Expense list */}
+        {/* ── Left: expense list ── */}
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
         <Panel padding="0" style={{ flex: 1 }}>
           <div style={{
             display:        'flex',
@@ -499,20 +500,19 @@ export default function ExpensesTab({ client, readOnly = false, onExpenseSelect 
         </Panel>
       </div>
 
-      {/* ── Right: persistent sidebar (always visible) ── */}
+      {/* ── Right: persistent sidebar — top aligns with list panel ── */}
       {!readOnly && (
-        <div style={{ width: '340px', flexShrink: 0, position: 'relative' }}>
-          <div style={{ position: 'sticky', top: 0, maxHeight: '100vh', overflowY: 'auto' }}>
-            <PersistentSidebar
-              title={editItem ? 'Expense entry' : 'New expense entry'}
-              subtitle={editItem ? formatDate(editItem.date) : client.tax_year}
-              intelligenceContext={{ tab: 'expenses', taxYear: client.tax_year, clientId: client.id }}
-            >
-              {sidebarChildren}
-            </PersistentSidebar>
-          </div>
+        <div style={{ width: '340px', flexShrink: 0, display: 'flex', flexDirection: 'column' }}>
+          <PersistentSidebar
+            title={editItem ? 'Expense entry' : 'New expense entry'}
+            subtitle={editItem ? formatDate(editItem.date) : client.tax_year}
+            intelligenceContext={{ tab: 'expenses', taxYear: client.tax_year, clientId: client.id }}
+          >
+            {sidebarChildren}
+          </PersistentSidebar>
         </div>
       )}
+      </div>
     </div>
   )
 }

@@ -360,29 +360,32 @@ export default function InvoicesTab({ client }: { client: Client }) {
   )
 
   return (
-    <div style={{ display: 'flex', gap: spacing.tab.gap, minHeight: 0, flex: 1, alignItems: 'stretch' }}>
-      {/* ── Left: invoice list ── */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: spacing.tab.gap, minWidth: 0 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.tab.gap, minHeight: 0, flex: 1 }}>
 
-        {/* Summary cards */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: spacing.tab.gap }}>
-          <Panel padding={spacing.panel.paddingTight}>
-            <div style={{ fontSize: fontSize.label, color: colours.textMuted, textTransform: 'uppercase' as const, letterSpacing: '0.08em', fontFamily: fonts.mono, marginBottom: '10px' }}>
-              Collected
-            </div>
-            <div style={{ fontFamily: fonts.mono, fontSize: '24px', fontWeight: fontWeight.medium, color: colours.income, lineHeight: 1 }}>
-              {formatGBP(totalPaid)}
-            </div>
-          </Panel>
-          <Panel padding={spacing.panel.paddingTight}>
-            <div style={{ fontSize: fontSize.label, color: colours.textMuted, textTransform: 'uppercase' as const, letterSpacing: '0.08em', fontFamily: fonts.mono, marginBottom: '10px' }}>
-              Outstanding
-            </div>
-            <div style={{ fontFamily: fonts.mono, fontSize: '24px', fontWeight: fontWeight.medium, color: colours.textPrimary, lineHeight: 1 }}>
-              {formatGBP(totalOutstanding)}
-            </div>
-          </Panel>
-        </div>
+      {/* ── Summary cards — spans full width above both columns ── */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: spacing.tab.gap }}>
+        <Panel padding={spacing.panel.paddingTight}>
+          <div style={{ fontSize: fontSize.label, color: colours.textMuted, textTransform: 'uppercase' as const, letterSpacing: '0.08em', fontFamily: fonts.mono, marginBottom: '10px' }}>
+            Collected
+          </div>
+          <div style={{ fontFamily: fonts.mono, fontSize: '24px', fontWeight: fontWeight.medium, color: colours.income, lineHeight: 1 }}>
+            {formatGBP(totalPaid)}
+          </div>
+        </Panel>
+        <Panel padding={spacing.panel.paddingTight}>
+          <div style={{ fontSize: fontSize.label, color: colours.textMuted, textTransform: 'uppercase' as const, letterSpacing: '0.08em', fontFamily: fonts.mono, marginBottom: '10px' }}>
+            Outstanding
+          </div>
+          <div style={{ fontFamily: fonts.mono, fontSize: '24px', fontWeight: fontWeight.medium, color: colours.textPrimary, lineHeight: 1 }}>
+            {formatGBP(totalOutstanding)}
+          </div>
+        </Panel>
+      </div>
+
+      {/* ── Main row: list panel + sidebar, top-aligned ── */}
+      <div style={{ display: 'flex', gap: spacing.tab.gap, minHeight: 0, flex: 1, alignItems: 'stretch' }}>
+        {/* ── Left: invoice list ── */}
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
 
         {/* Invoice list */}
         <Panel padding="0" style={{ flex: 1 }}>
@@ -419,11 +422,10 @@ export default function InvoicesTab({ client }: { client: Client }) {
             />
           ))}
         </Panel>
-      </div>
+        </div>
 
-      {/* ── Right: persistent sidebar (always visible) ── */}
-      <div style={{ width: '340px', flexShrink: 0, position: 'relative' }}>
-        <div style={{ position: 'sticky', top: 0, maxHeight: '100vh', overflowY: 'auto' }}>
+        {/* ── Right: persistent sidebar — top aligns with list panel ── */}
+        <div style={{ width: '340px', flexShrink: 0, display: 'flex', flexDirection: 'column' }}>
           <PersistentSidebar
             title={panelTitle}
             subtitle={panelSubtitle}

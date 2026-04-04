@@ -258,17 +258,15 @@ export default function ClientsTab({ client: _client }: { client: Client }) {
         </Panel>
       </div>
 
-      {/* ── Right: persistent sidebar (always visible) ── */}
-      <div style={{ width: '340px', flexShrink: 0, position: 'relative' }}>
-        <div style={{ position: 'sticky', top: 0, maxHeight: '100vh', overflowY: 'auto' }}>
-          <PersistentSidebar
-            title={selected ? 'Client details' : 'New client'}
-            subtitle={selected ? (selected.type === 'business' ? 'Business' : 'Individual') : undefined}
-            intelligenceContext={{ tab: 'clients', taxYear: '', clientId: '' }}
-          >
-            {sidebarChildren}
-          </PersistentSidebar>
-        </div>
+      {/* ── Right: persistent sidebar — fills remaining height ── */}
+      <div style={{ width: '340px', flexShrink: 0, display: 'flex', flexDirection: 'column' }}>
+        <PersistentSidebar
+          title={selected ? 'Client details' : 'New client'}
+          subtitle={selected ? (selected.type === 'business' ? 'Business' : 'Individual') : undefined}
+          intelligenceContext={{ tab: 'clients', taxYear: '', clientId: '' }}
+        >
+          {sidebarChildren}
+        </PersistentSidebar>
       </div>
     </div>
   )

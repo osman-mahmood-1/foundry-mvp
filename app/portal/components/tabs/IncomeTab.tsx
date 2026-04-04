@@ -337,27 +337,28 @@ export default function IncomeTab({ client, readOnly = false }: Props) {
   ) : null
 
   return (
-    <div style={{ display: 'flex', gap: spacing.tab.gap, minHeight: 0, flex: 1, alignItems: 'stretch' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.tab.gap, minHeight: 0, flex: 1 }}>
 
-      {/* ── Left: income list (always visible) ── */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: spacing.tab.gap, minWidth: 0 }}>
+      {/* ── Stat cards row — spans full width above both columns ── */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: spacing.tab.gap }}>
+        <StatCard
+          label="Total income"
+          value={totalPence > 0 ? formatGBP(totalPence) : '—'}
+          sub={entryCount > 0
+            ? `${entryCount} entr${entryCount === 1 ? 'y' : 'ies'} · ${client.tax_year}`
+            : `No income logged yet · ${client.tax_year}`
+          }
+          colour={colours.income}
+        />
+      </div>
 
-        {/* Summary stat */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: spacing.tab.gap }}>
-          <StatCard
-            label="Total income"
-            value={totalPence > 0 ? formatGBP(totalPence) : '—'}
-            sub={entryCount > 0
-              ? `${entryCount} entr${entryCount === 1 ? 'y' : 'ies'} · ${client.tax_year}`
-              : `No income logged yet · ${client.tax_year}`
-            }
-            colour={colours.income}
-          />
-        </div>
+      {error && <ErrorBanner error={error} />}
 
-        {error && <ErrorBanner error={error} />}
+      {/* ── Main row: list panel + sidebar, top-aligned ── */}
+      <div style={{ display: 'flex', gap: spacing.tab.gap, minHeight: 0, flex: 1, alignItems: 'stretch' }}>
 
-        {/* Income list */}
+        {/* ── Left: income list ── */}
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
         <Panel padding="0" style={{ flex: 1 }}>
           <div style={{
             display:        'flex',
@@ -462,20 +463,19 @@ export default function IncomeTab({ client, readOnly = false }: Props) {
         </Panel>
       </div>
 
-      {/* ── Right: persistent sidebar (always visible) ── */}
+      {/* ── Right: persistent sidebar — top aligns with list panel ── */}
       {!readOnly && (
-        <div style={{ width: '340px', flexShrink: 0, position: 'relative' }}>
-          <div style={{ position: 'sticky', top: 0, maxHeight: '100vh', overflowY: 'auto' }}>
-            <PersistentSidebar
-              title={editItem ? 'Income entry' : 'New income entry'}
-              subtitle={editItem ? formatDate(editItem.date) : client.tax_year}
-              intelligenceContext={{ tab: 'income', taxYear: client.tax_year, clientId: client.id }}
-            >
-              {sidebarChildren}
-            </PersistentSidebar>
-          </div>
+        <div style={{ width: '340px', flexShrink: 0, display: 'flex', flexDirection: 'column' }}>
+          <PersistentSidebar
+            title={editItem ? 'Income entry' : 'New income entry'}
+            subtitle={editItem ? formatDate(editItem.date) : client.tax_year}
+            intelligenceContext={{ tab: 'income', taxYear: client.tax_year, clientId: client.id }}
+          >
+            {sidebarChildren}
+          </PersistentSidebar>
         </div>
       )}
+      </div>
     </div>
   )
 }

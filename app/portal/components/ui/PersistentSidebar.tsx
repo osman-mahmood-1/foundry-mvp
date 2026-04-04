@@ -65,6 +65,7 @@ export default function PersistentSidebar({
       ...glass.card(mode),
       display:       'flex',
       flexDirection: 'column',
+      flex:          1,
       height:        '100%',
       overflow:      'hidden',
     }}>
