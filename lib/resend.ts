@@ -407,3 +407,104 @@ export async function sendInviteEmail({
     `,
   })
 }
+
+// ─── Deadline alert ───────────────────────────────────────
+export async function sendDeadlineAlertEmail({
+  to,
+  firstName,
+  deadlineLabel,
+  deadlineDate,
+  daysRemaining,
+}: {
+  to:            string
+  firstName:     string
+  deadlineLabel: string
+  deadlineDate:  string
+  daysRemaining: number
+}) {
+  const urgency = daysRemaining <= 7 ? 'urgent' : 'upcoming'
+  const colour  = urgency === 'urgent' ? '#DC2626' : '#D97706'
+  const label   = urgency === 'urgent' ? 'URGENT' : 'UPCOMING DEADLINE'
+
+  return getResend().emails.send({
+    from:    `Foundry <${FROM}>`,
+    to,
+    subject: `${daysRemaining <= 7 ? '⚠️ ' : ''}${deadlineLabel} — ${daysRemaining} day${daysRemaining === 1 ? '' : 's'} remaining`,
+    html: `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deadline Alert</title>
+</head>
+<body style="margin:0;padding:0;background:#F0F4FA;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#F0F4FA;padding:48px 20px;">
+    <tr>
+      <td align="center">
+        <table width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;">
+          <tr>
+            <td style="padding-bottom:32px;" align="center">
+              <p style="margin:0;font-size:13px;letter-spacing:0.15em;color:#94A3B8;text-transform:uppercase;font-family:'Courier New',monospace;">FOUNDRY</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="background:#ffffff;border-radius:20px;overflow:hidden;box-shadow:0 4px 32px rgba(5,28,44,0.08);">
+              <table width="100%" cellpadding="0" cellspacing="0">
+                <tr><td style="height:4px;background:${colour};"></td></tr>
+              </table>
+              <table width="100%" cellpadding="0" cellspacing="0" style="padding:48px 48px 40px;">
+                <tr>
+                  <td style="padding-bottom:8px;">
+                    <span style="display:inline-block;background:${urgency === 'urgent' ? '#FEF2F2' : '#FFFBEB'};border-radius:20px;padding:4px 12px;font-size:11px;color:${colour};letter-spacing:0.08em;text-transform:uppercase;font-family:'Courier New',monospace;">${label}</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding-bottom:20px;">
+                    <h1 style="margin:0;font-size:28px;font-weight:400;color:#051C2C;line-height:1.25;letter-spacing:-0.02em;font-family:Georgia,'Times New Roman',serif;">
+                      ${daysRemaining} day${daysRemaining === 1 ? '' : 's'} until<br><em style="font-style:italic;color:${colour};">${deadlineLabel}.</em>
+                    </h1>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding-bottom:24px;">
+                    <p style="margin:0;font-size:15px;color:#475569;line-height:1.7;">
+                      ${firstName}, your <strong>${deadlineLabel}</strong> deadline is on <strong>${deadlineDate}</strong>. Make sure your records are up to date and your accountant has everything they need.
+                    </p>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding-bottom:32px;">
+                    <table cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td style="background:#051C2C;border-radius:100px;padding:14px 32px;">
+                          <a href="${APP_URL}/portal" style="color:#ffffff;text-decoration:none;font-size:14px;font-weight:500;">Review your portal →</a>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <p style="margin:0;font-size:12px;color:#94A3B8;line-height:1.6;font-family:'Courier New',monospace;">
+                      This is an automated reminder from your Tax Foundry account.
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:32px 0 0;" align="center">
+              <p style="margin:0;font-size:11px;color:#94A3B8;letter-spacing:0.1em;font-family:'Courier New',monospace;text-transform:uppercase;">Foundry · Tax Foundry Ltd</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+    `,
+  })
+}

@@ -197,6 +197,12 @@ export function useDocuments(
     }
 
     void logAudit({ actorId: userId, clientId, action: 'document.uploaded', targetType: 'documents', targetId: storagePath })
+    // Fire-and-forget: notify accountant. Failure here must not block UX.
+    void fetch('/api/email/document', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ clientId, documentName: file.name }),
+    }).catch(e => console.error('DOC_EMAIL_001', e))
 
     const newMonth = inserted.created_at.slice(0, 7)
     setTotalCount(prev => prev + 1)

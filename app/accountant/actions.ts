@@ -16,6 +16,7 @@ import { createAdminClient } from '@/lib/supabase-admin'
 import { createClient }      from '@/lib/supabase-server'
 import { getAccountantId, getUserRole } from '@/lib/roles'
 import { logAudit }          from '@/lib/audit'
+import { sendDocumentReadyEmail } from '@/lib/resend'
 
 // ─── markDocumentReviewed ─────────────────────────────────────────────────────
 
@@ -87,6 +88,32 @@ export async function markDocumentReviewed(
     targetType: 'document',
     targetId:   documentId,
   })
+
+  // Notify client their document has been reviewed — fire-and-forget
+  try {
+    const { data: docWithClient } = await admin
+      .from('documents')
+      .select('original_filename, clients(full_name, user_id)')
+      .eq('id', documentId)
+      .single()
+
+    if (docWithClient) {
+      const clientRecord = docWithClient.clients as { full_name: string | null; user_id: string } | null
+      if (clientRecord?.user_id) {
+        const { data: authUser } = await admin.auth.admin.getUserById(clientRecord.user_id)
+        if (authUser?.user?.email) {
+          void sendDocumentReadyEmail({
+            to:           authUser.user.email,
+            firstName:    clientRecord.full_name?.split(' ')[0] ?? 'there',
+            documentName: (docWithClient.original_filename as string) ?? 'Your document',
+          })
+        }
+      }
+    }
+  } catch (notifyErr) {
+    // Notification failure must not affect the review action result
+    console.error('DOC_NOTIFY_001', notifyErr)
+  }
 
   return { error: null }
 }

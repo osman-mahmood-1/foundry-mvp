@@ -120,6 +120,12 @@ export function useMessages(
       setError(APP_ERRORS.MSG_002)
     } else {
       void logAudit({ actorId: userId, clientId, action: 'message.sent', targetType: 'messages', targetId: clientId })
+      // Fire-and-forget: notify accountant. Failure here must not block UX.
+      void fetch('/api/email/message', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ clientId, preview: body.slice(0, 200) }),
+      }).catch(e => console.error('MSG_EMAIL_001', e))
       setDraft('')
     }
     setSending(false)
