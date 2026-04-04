@@ -53,19 +53,30 @@ export default function PortalThemeProvider({
   storageKey  = 'foundry-theme',
   defaultMode = 'light',
 }: PortalThemeProviderProps) {
-  const [mode, setModeState] = useState<ThemeMode>(defaultMode)
-  const [resolved, setResolved] = useState<ColourMode>(resolveTheme(defaultMode))
+  // Lazy initialisers read localStorage synchronously on first render —
+  // before React commits to the DOM. This means the colour token context
+  // is correct on the very first render, eliminating the light→dark flash
+  // that occurred when the correction was deferred to useLayoutEffect.
+  const [mode, setModeState] = useState<ThemeMode>(() => {
+    if (typeof window === 'undefined') return defaultMode
+    const stored = localStorage.getItem(storageKey) as ThemeMode | null
+    return (stored === 'light' || stored === 'dark' || stored === 'system') ? stored : defaultMode
+  })
 
-  // useLayoutEffect fires before the browser paints, so the React context
-  // is updated to the correct theme before the first visual frame — no flash.
-  useIsomorphicLayoutEffect(() => {
+  const [resolved, setResolved] = useState<ColourMode>(() => {
+    if (typeof window === 'undefined') return resolveTheme(defaultMode)
     const stored = localStorage.getItem(storageKey) as ThemeMode | null
     const initial = (stored === 'light' || stored === 'dark' || stored === 'system') ? stored : defaultMode
-    setModeState(initial)
-    const r = resolveTheme(initial)
-    setResolved(r)
-    document.documentElement.setAttribute('data-theme', r)
-    updateThemeColorMeta(r)
+    return resolveTheme(initial)
+  })
+
+  // Sync data-theme attribute and theme-color meta on first client render.
+  // The lazy initialisers handle React state; this handles the DOM attributes
+  // which are set by the inline script in layout.tsx but may need confirming
+  // after hydration in edge cases (e.g. SSR mismatch).
+  useIsomorphicLayoutEffect(() => {
+    document.documentElement.setAttribute('data-theme', resolved)
+    updateThemeColorMeta(resolved)
   }, [])
 
   // Track system preference changes when mode = 'system'
