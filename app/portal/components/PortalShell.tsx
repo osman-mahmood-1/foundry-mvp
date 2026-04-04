@@ -166,7 +166,7 @@ console.error('AUTH_003 — Sign-out failed')
       onNavSelect={id => setActiveTab(id as PortalTab)}
     >
       {/* Tab content — each tab owns its own header */}
-      <div key={activeTab} style={{ flex: 1, padding: '0 20px 24px', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+      <div key={activeTab} style={{ flex: 1, padding: '20px 20px 24px', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
         <TabErrorBoundary key={activeTab}>
           <TabRenderer activeTab={activeTab} client={client} onTabChange={id => setActiveTab(id as PortalTab)} />
         </TabErrorBoundary>
