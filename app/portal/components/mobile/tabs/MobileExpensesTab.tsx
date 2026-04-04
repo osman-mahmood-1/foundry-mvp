@@ -66,6 +66,10 @@ export default function MobileExpensesTab({ client }: Props) {
   const formatGBP = (p: number) =>
     `£${(p / 100).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 
+  if (formOpen) {
+    return <MobileFormSheet type="expense" client={client} onClose={() => setFormOpen(false)} />
+  }
+
   return (
     <>
       <div
@@ -140,9 +144,6 @@ export default function MobileExpensesTab({ client }: Props) {
         )}
       </div>
 
-      {formOpen && (
-        <MobileFormSheet type="expense" client={client} onClose={() => setFormOpen(false)} />
-      )}
     </>
   )
 }
