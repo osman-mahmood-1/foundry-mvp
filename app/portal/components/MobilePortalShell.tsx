@@ -13,13 +13,12 @@ import { useState }                from 'react'
 import type { Client, PortalTab }  from '@/types'
 import { useColours }               from '@/styles/ThemeContext'
 import { fonts, fontWeight, fontSize } from '@/styles/tokens/typography'
-import { radius }                  from '@/styles/tokens'
 import { useOfflineQueue }         from '@/hooks/useOfflineQueue'
 import SafariChromeFix             from './mobile/SafariChromeFix'
 
 import MobileHeader            from './mobile/MobileHeader'
 import MobileHamburger         from './mobile/MobileHamburger'
-import MobileProfileSheet      from './mobile/MobileProfileSheet'
+import MobileSettingsScreen    from './mobile/MobileSettingsScreen'
 import MobileIntelligenceStrip from './mobile/MobileIntelligenceStrip'
 
 import MobileOverviewTab     from './mobile/tabs/MobileOverviewTab'
@@ -118,9 +117,9 @@ export default function MobilePortalShell({ client }: Props) {
         clientName={firstName}
       />
 
-      {/* Profile / settings sheet */}
+      {/* Settings screen */}
       {profileOpen && (
-        <MobileProfileSheet
+        <MobileSettingsScreen
           client={client}
           onClose={() => setProfileOpen(false)}
         />
