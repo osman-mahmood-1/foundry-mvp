@@ -18,7 +18,7 @@ import { useColours } from '@/styles/ThemeContext'
 import { useShellSearch } from '@/app/components/shells/BaseShell'
 import { fonts, fontSize, fontWeight, letterSpacing } from '@/styles/tokens/typography'
 import { radius, transition, spacing } from '@/styles/tokens'
-import EntryPanel from '../ui/EntryPanel'
+import PersistentSidebar from '../ui/PersistentSidebar'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -219,8 +219,7 @@ export default function InvoicesTab({ client }: { client: Client }) {
   const { query, setPlaceholder } = useShellSearch()
   useEffect(() => { setPlaceholder('Search invoices…') }, [setPlaceholder])
 
-  const [panelOpen, setPanelOpen]       = useState(false)
-  const [panelMode, setPanelMode]       = useState<'new' | 'view' | 'edit'>('new')
+  const [panelMode, setPanelMode]       = useState<'intelligence' | 'new' | 'view' | 'edit'>('intelligence')
   const [selectedInvoice, setSelected]  = useState<Invoice | null>(null)
   const [form, setForm]                 = useState<InvoiceForm>(EMPTY_FORM)
   const [editForm, setEditForm]         = useState<InvoiceForm>(EMPTY_FORM)
@@ -235,11 +234,15 @@ export default function InvoicesTab({ client }: { client: Client }) {
     setSelected(null)
     setForm(EMPTY_FORM)
     setPanelMode('new')
-    setPanelOpen(true)
   }
 
-  // ── Click existing row ──
+  // ── Click existing row (toggle to deselect) ──
   function openInvoice(invoice: Invoice) {
+    if (selectedInvoice?.id === invoice.id) {
+      setSelected(null)
+      setPanelMode('intelligence')
+      return
+    }
     setSelected(invoice)
     if (invoice.status === 'draft') {
       setEditForm({
@@ -253,7 +256,6 @@ export default function InvoicesTab({ client }: { client: Client }) {
     } else {
       setPanelMode('view')
     }
-    setPanelOpen(true)
   }
 
   // ── Save new ──
@@ -274,7 +276,7 @@ export default function InvoicesTab({ client }: { client: Client }) {
     setInvoices(prev => [next, ...prev])
     setForm(EMPTY_FORM)
     setSaving(false)
-    if (!keepOpen) setPanelOpen(false)
+    if (!keepOpen) { setSelected(null); setPanelMode('intelligence') }
   }
 
   // ── Save draft edits ──
@@ -284,19 +286,12 @@ export default function InvoicesTab({ client }: { client: Client }) {
     await new Promise(r => setTimeout(r, 400))
     setInvoices(prev => prev.map(inv =>
       inv.id === selectedInvoice.id
-        ? {
-            ...inv,
-            recipient:   editForm.recipient,
-            description: editForm.description,
-            amount:      Math.round(parseFloat(editForm.amount) * 100),
-            date:        editForm.date,
-            dueDate:     editForm.dueDate,
-          }
+        ? { ...inv, recipient: editForm.recipient, description: editForm.description, amount: Math.round(parseFloat(editForm.amount) * 100), date: editForm.date, dueDate: editForm.dueDate }
         : inv
     ))
     setSaving(false)
-    setPanelOpen(false)
     setSelected(null)
+    setPanelMode('intelligence')
   }
 
   // ── Mark as paid ──
@@ -305,8 +300,8 @@ export default function InvoicesTab({ client }: { client: Client }) {
     setInvoices(prev => prev.map(inv =>
       inv.id === selectedInvoice.id ? { ...inv, status: 'paid' } : inv
     ))
-    setSelected(prev => prev ? { ...prev, status: 'paid' } : null)
-    setPanelOpen(false)
+    setSelected(null)
+    setPanelMode('intelligence')
   }
 
   // ── Delete draft ──
@@ -314,13 +309,13 @@ export default function InvoicesTab({ client }: { client: Client }) {
     if (!selectedInvoice) return
     setInvoices(prev => prev.filter(inv => inv.id !== selectedInvoice.id))
     setSelected(null)
-    setPanelOpen(false)
+    setPanelMode('intelligence')
   }
 
   function handleClose() {
-    setPanelOpen(false)
     setSelected(null)
     setForm(EMPTY_FORM)
+    setPanelMode('intelligence')
   }
 
   const filteredInvoices = invoices.filter(i =>
@@ -332,7 +327,6 @@ export default function InvoicesTab({ client }: { client: Client }) {
   const totalPaid        = invoices.filter(i => i.status === 'paid').reduce((s, i) => s + i.amount, 0)
   const totalOutstanding = invoices.filter(i => i.status !== 'paid').reduce((s, i) => s + i.amount, 0)
 
-  // Panel title/subtitle
   const panelTitle = panelMode === 'new'
     ? 'New invoice'
     : panelMode === 'edit'
@@ -343,8 +337,65 @@ export default function InvoicesTab({ client }: { client: Client }) {
     ? STATUS_CONFIG[selectedInvoice.status].label
     : undefined
 
+  // Sidebar children — null = intelligence panel
+  const sidebarChildren = panelMode === 'intelligence' ? null : (
+    panelMode === 'view' && selectedInvoice ? (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.form.fieldGap }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ fontFamily: fonts.mono, fontSize: '22px', fontWeight: fontWeight.semibold, color: selectedInvoice.status === 'paid' ? colours.income : colours.textPrimary }}>
+            {formatGBP(selectedInvoice.amount)}
+          </div>
+          <Badge variant={STATUS_CONFIG[selectedInvoice.status].variant}>
+            {STATUS_CONFIG[selectedInvoice.status].label}
+          </Badge>
+        </div>
+        <ReadField label="Recipient"   value={selectedInvoice.recipient} />
+        <ReadField label="Description" value={selectedInvoice.description} />
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: spacing.form.fieldGap }}>
+          <ReadField label="Issued"   value={formatDate(selectedInvoice.date)} />
+          <ReadField label="Due date" value={formatDate(selectedInvoice.dueDate)} />
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '4px' }}>
+          {(selectedInvoice.status === 'sent' || selectedInvoice.status === 'overdue') && (
+            <Button size="sm" onClick={markAsPaid}>Mark as paid</Button>
+          )}
+          <Button size="sm" onClick={() => alert('PDF download — coming soon')}>Download PDF</Button>
+        </div>
+      </div>
+    ) : panelMode === 'edit' && selectedInvoice ? (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.form.fieldGap }}>
+        <Input label="Recipient" value={editForm.recipient} onChange={v => setEditForm(f => ({ ...f, recipient: v }))} placeholder="e.g. Acme Ltd" autoFocus />
+        <Input label="Description" value={editForm.description} onChange={v => setEditForm(f => ({ ...f, description: v }))} placeholder="e.g. Web development — July" />
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: spacing.form.fieldGap }}>
+          <Input label="Amount (£)" type="number" value={editForm.amount} onChange={v => setEditForm(f => ({ ...f, amount: v }))} placeholder="0.00" />
+          <Input label="Invoice date" type="date" value={editForm.date} onChange={v => setEditForm(f => ({ ...f, date: v }))} />
+        </div>
+        <Input label="Due date" type="date" value={editForm.dueDate} onChange={v => setEditForm(f => ({ ...f, dueDate: v }))} />
+        <div style={{ display: 'flex', gap: '8px', justifyContent: 'space-between', marginTop: '4px' }}>
+          <button onClick={deleteDraft} style={{ background: colours.dangerLight, border: `1px solid ${colours.danger}33`, borderRadius: radius.sm, color: colours.danger, fontSize: fontSize.sm, fontFamily: fonts.sans, fontWeight: fontWeight.medium, padding: '7px 14px', cursor: 'pointer', transition: transition.snap }}>Delete</button>
+          <Button size="sm" onClick={handleSaveEdit} disabled={saving || !isEditValid}>{saving ? 'Saving…' : 'Save changes'}</Button>
+        </div>
+      </div>
+    ) : (
+      /* new invoice form */
+      <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.form.fieldGap }}>
+        <Input label="Recipient" value={form.recipient} onChange={v => setForm(f => ({ ...f, recipient: v }))} placeholder="e.g. Acme Ltd" autoFocus />
+        <Input label="Description" value={form.description} onChange={v => setForm(f => ({ ...f, description: v }))} placeholder="e.g. Web development — July" />
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: spacing.form.fieldGap }}>
+          <Input label="Amount (£)" type="number" value={form.amount} onChange={v => setForm(f => ({ ...f, amount: v }))} placeholder="0.00" />
+          <Input label="Invoice date" type="date" value={form.date} onChange={v => setForm(f => ({ ...f, date: v }))} />
+        </div>
+        <Input label="Due date" type="date" value={form.dueDate} onChange={v => setForm(f => ({ ...f, dueDate: v }))} />
+        <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', marginTop: '4px' }}>
+          <Button variant="secondary" size="sm" onClick={() => handleSaveNew(true)} disabled={saving || !isNewValid}>{saving ? 'Saving…' : 'Add another'}</Button>
+          <Button size="sm" onClick={() => handleSaveNew(false)} disabled={saving || !isNewValid}>{saving ? 'Saving…' : 'Done'}</Button>
+        </div>
+      </div>
+    )
+  )
+
   return (
-    <div style={{ display: 'flex', gap: spacing.tab.gap, minHeight: 0, flex: 1 }}>
+    <div style={{ display: 'flex', gap: spacing.tab.gap, minHeight: 0, flex: 1, alignItems: 'stretch' }}>
       {/* ── Left: invoice list ── */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: spacing.tab.gap, minWidth: 0 }}>
 
@@ -378,11 +429,9 @@ export default function InvoicesTab({ client }: { client: Client }) {
             borderBottom:   invoices.length > 0 ? `1px solid ${colours.borderHairline}` : 'none',
           }}>
             <Label>Invoices · {client.tax_year}</Label>
-            {!panelOpen && (
-              <Button size="sm" onClick={openNew}>
-                + New invoice
-              </Button>
-            )}
+            <Button size="sm" onClick={openNew}>
+              + New invoice
+            </Button>
           </div>
 
           {invoices.length === 0 && (
@@ -407,174 +456,18 @@ export default function InvoicesTab({ client }: { client: Client }) {
         </Panel>
       </div>
 
-      {/* ── Right: panel ── */}
-      <EntryPanel
-        open={panelOpen}
-        title={panelTitle}
-        subtitle={panelSubtitle}
-        onClose={handleClose}
-      >
-        {panelMode === 'view' && selectedInvoice ? (
-          /* ── Read-only view (sent / paid / overdue) ── */
-          <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.form.fieldGap }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div style={{ fontFamily: fonts.mono, fontSize: '22px', fontWeight: fontWeight.semibold, color: selectedInvoice.status === 'paid' ? colours.income : colours.textPrimary }}>
-                {formatGBP(selectedInvoice.amount)}
-              </div>
-              <Badge variant={STATUS_CONFIG[selectedInvoice.status].variant}>
-                {STATUS_CONFIG[selectedInvoice.status].label}
-              </Badge>
-            </div>
-            <ReadField label="Recipient"    value={selectedInvoice.recipient} />
-            <ReadField label="Description"  value={selectedInvoice.description} />
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: spacing.form.fieldGap }}>
-              <ReadField label="Issued"   value={formatDate(selectedInvoice.date)} />
-              <ReadField label="Due date" value={formatDate(selectedInvoice.dueDate)} />
-            </div>
-
-            {/* Actions */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '4px' }}>
-              {selectedInvoice.status === 'sent' && (
-                <Button size="sm" onClick={markAsPaid}>
-                  Mark as paid
-                </Button>
-              )}
-              {selectedInvoice.status === 'overdue' && (
-                <Button size="sm" onClick={markAsPaid}>
-                  Mark as paid
-                </Button>
-              )}
-              <Button
-                size="sm"
-                onClick={() => alert('PDF download — coming soon')}
-              >
-                Download PDF
-              </Button>
-            </div>
-          </div>
-        ) : panelMode === 'edit' && selectedInvoice ? (
-          /* ── Edit draft invoice ── */
-          <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.form.fieldGap }}>
-            <Input
-              label="Recipient"
-              value={editForm.recipient}
-              onChange={v => setEditForm(f => ({ ...f, recipient: v }))}
-              placeholder="e.g. Acme Ltd"
-              autoFocus
-            />
-            <Input
-              label="Description"
-              value={editForm.description}
-              onChange={v => setEditForm(f => ({ ...f, description: v }))}
-              placeholder="e.g. Web development — July"
-            />
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: spacing.form.fieldGap }}>
-              <Input
-                label="Amount (£)"
-                type="number"
-                value={editForm.amount}
-                onChange={v => setEditForm(f => ({ ...f, amount: v }))}
-                placeholder="0.00"
-              />
-              <Input
-                label="Invoice date"
-                type="date"
-                value={editForm.date}
-                onChange={v => setEditForm(f => ({ ...f, date: v }))}
-              />
-            </div>
-            <Input
-              label="Due date"
-              type="date"
-              value={editForm.dueDate}
-              onChange={v => setEditForm(f => ({ ...f, dueDate: v }))}
-            />
-
-            <div style={{ display: 'flex', gap: '8px', justifyContent: 'space-between', marginTop: '4px' }}>
-              <button
-                onClick={deleteDraft}
-                style={{
-                  background:   colours.dangerLight,
-                  border:       `1px solid ${colours.danger}33`,
-                  borderRadius: radius.sm,
-                  color:        colours.danger,
-                  fontSize:     fontSize.sm,
-                  fontFamily:   fonts.sans,
-                  fontWeight:   fontWeight.medium,
-                  padding:      '7px 14px',
-                  cursor:       'pointer',
-                  transition:   transition.snap,
-                }}
-              >
-                Delete
-              </button>
-              <Button
-                size="sm"
-                onClick={handleSaveEdit}
-                disabled={saving || !isEditValid}
-              >
-                {saving ? 'Saving…' : 'Save changes'}
-              </Button>
-            </div>
-          </div>
-        ) : (
-          /* ── New invoice form ── */
-          <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.form.fieldGap }}>
-            <Input
-              label="Recipient"
-              value={form.recipient}
-              onChange={v => setForm(f => ({ ...f, recipient: v }))}
-              placeholder="e.g. Acme Ltd"
-              autoFocus
-            />
-            <Input
-              label="Description"
-              value={form.description}
-              onChange={v => setForm(f => ({ ...f, description: v }))}
-              placeholder="e.g. Web development — July"
-            />
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: spacing.form.fieldGap }}>
-              <Input
-                label="Amount (£)"
-                type="number"
-                value={form.amount}
-                onChange={v => setForm(f => ({ ...f, amount: v }))}
-                placeholder="0.00"
-              />
-              <Input
-                label="Invoice date"
-                type="date"
-                value={form.date}
-                onChange={v => setForm(f => ({ ...f, date: v }))}
-              />
-            </div>
-            <Input
-              label="Due date"
-              type="date"
-              value={form.dueDate}
-              onChange={v => setForm(f => ({ ...f, dueDate: v }))}
-            />
-
-            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', marginTop: '4px' }}>
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => handleSaveNew(true)}
-                disabled={saving || !isNewValid}
-              >
-                {saving ? 'Saving…' : 'Add another'}
-              </Button>
-              <Button
-                size="sm"
-                onClick={() => handleSaveNew(false)}
-                disabled={saving || !isNewValid}
-              >
-                {saving ? 'Saving…' : 'Done'}
-              </Button>
-            </div>
-          </div>
-        )}
-      </EntryPanel>
+      {/* ── Right: persistent sidebar (always visible) ── */}
+      <div style={{ width: '340px', flexShrink: 0, position: 'relative' }}>
+        <div style={{ position: 'sticky', top: 0, maxHeight: '100vh', overflowY: 'auto' }}>
+          <PersistentSidebar
+            title={panelTitle}
+            subtitle={panelSubtitle}
+            intelligenceContext={{ tab: 'invoices', taxYear: client.tax_year, clientId: client.id }}
+          >
+            {sidebarChildren}
+          </PersistentSidebar>
+        </div>
+      </div>
     </div>
   )
 }

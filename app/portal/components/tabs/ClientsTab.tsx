@@ -14,7 +14,7 @@ import { useColours } from '@/styles/ThemeContext'
 import { useShellSearch } from '@/app/components/shells/BaseShell'
 import { fonts, fontSize, fontWeight } from '@/styles/tokens/typography'
 import { radius, transition, spacing } from '@/styles/tokens'
-import EntryPanel from '../ui/EntryPanel'
+import PersistentSidebar from '../ui/PersistentSidebar'
 
 interface ContactEntry {
   id:       string
@@ -138,7 +138,7 @@ export default function ClientsTab({ client: _client }: { client: Client }) {
   useEffect(() => { setPlaceholder('Search clients…') }, [setPlaceholder])
 
   const [contacts, setContacts]       = useState<ContactEntry[]>(INITIAL_CONTACTS)
-  const [panelOpen, setPanelOpen]     = useState(false)
+  const [isAdding,  setIsAdding]      = useState(false)
   const [selected, setSelected]       = useState<ContactEntry | null>(null)
   const [form, setForm]               = useState<ClientForm>(EMPTY_FORM)
   const [saving, setSaving]           = useState(false)
@@ -151,14 +151,19 @@ export default function ClientsTab({ client: _client }: { client: Client }) {
 
   function openNew() {
     setSelected(null)
+    setIsAdding(true)
     setForm(EMPTY_FORM)
-    setPanelOpen(true)
   }
 
   function openContact(contact: ContactEntry) {
+    if (selected?.id === contact.id) {
+      setSelected(null)
+      setIsAdding(false)
+      return
+    }
+    setIsAdding(false)
     setSelected(contact)
     setForm({ name: contact.name, type: contact.type, email: contact.email ?? '' })
-    setPanelOpen(true)
   }
 
   async function handleSave(keepOpen: boolean) {
@@ -176,14 +181,14 @@ export default function ClientsTab({ client: _client }: { client: Client }) {
     setContacts(prev => [next, ...prev])
     setForm(EMPTY_FORM)
     setSaving(false)
-    if (!keepOpen) setPanelOpen(false)
+    if (!keepOpen) { setIsAdding(false) }
   }
 
   async function handleDelete() {
     if (!selected) return
     setContacts(prev => prev.filter(c => c.id !== selected.id))
     setSelected(null)
-    setPanelOpen(false)
+    setIsAdding(false)
   }
 
   async function handleSaveEdit() {
@@ -197,25 +202,42 @@ export default function ClientsTab({ client: _client }: { client: Client }) {
     ))
     setSaving(false)
     setSelected(null)
-    setPanelOpen(false)
+    setIsAdding(false)
   }
 
+  const sidebarChildren = (selected || isAdding) ? (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.form.fieldGap }}>
+      <Input label="Name" value={form.name} onChange={v => setForm(f => ({ ...f, name: v }))} placeholder={form.type === 'business' ? 'e.g. Acme Ltd' : 'e.g. James Thornton'} autoFocus />
+      <Select label="Type" value={form.type} onChange={v => setForm(f => ({ ...f, type: v as 'business' | 'individual' }))} options={TYPE_OPTIONS} />
+      <Input label="Email (optional)" value={form.email} onChange={v => setForm(f => ({ ...f, email: v }))} placeholder="billing@example.com" />
+      {selected ? (
+        <div style={{ display: 'flex', gap: '8px', justifyContent: 'space-between', marginTop: '4px' }}>
+          <Button variant="danger" size="sm" onClick={handleDelete}>Delete</Button>
+          <Button size="sm" onClick={handleSaveEdit} disabled={saving || !isFormValid}>{saving ? 'Saving…' : 'Save changes'}</Button>
+        </div>
+      ) : (
+        <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', marginTop: '4px' }}>
+          <Button variant="secondary" size="sm" onClick={() => handleSave(true)} disabled={saving || !isFormValid}>{saving ? 'Saving…' : 'Add another'}</Button>
+          <Button size="sm" onClick={() => handleSave(false)} disabled={saving || !isFormValid}>{saving ? 'Saving…' : 'Done'}</Button>
+        </div>
+      )}
+    </div>
+  ) : null
+
   return (
-    <div style={{ display: 'flex', gap: spacing.tab.gap, minHeight: 0, flex: 1 }}>
+    <div style={{ display: 'flex', gap: spacing.tab.gap, minHeight: 0, flex: 1, alignItems: 'stretch' }}>
       {/* ── Left: client list ── */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
         <Panel padding="0" style={{ flex: 1 }}>
           <div style={{
-            display:      'flex',
-            alignItems:   'center',
+            display:        'flex',
+            alignItems:     'center',
             justifyContent: 'space-between',
-            padding:      `${spacing.panel.paddingTight} ${spacing.panel.padding}`,
-            borderBottom: `1px solid ${colours.borderHairline}`,
+            padding:        `${spacing.panel.paddingTight} ${spacing.panel.padding}`,
+            borderBottom:   `1px solid ${colours.borderHairline}`,
           }}>
             <Label>Clients & contacts</Label>
-            {!panelOpen && (
-              <Button size="sm" onClick={openNew}>+ Add client</Button>
-            )}
+            <Button size="sm" onClick={openNew}>+ Add client</Button>
           </div>
 
           {filtered.length === 0 && contacts.length === 0 && (
@@ -240,55 +262,18 @@ export default function ClientsTab({ client: _client }: { client: Client }) {
         </Panel>
       </div>
 
-      {/* ── Right: entry panel ── */}
-      <EntryPanel
-        open={panelOpen}
-        title={selected ? 'Client details' : 'New client'}
-        subtitle={selected ? (selected.type === 'business' ? 'Business' : 'Individual') : undefined}
-        onClose={() => { setPanelOpen(false); setSelected(null) }}
-      >
-        <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.form.fieldGap }}>
-          <Input
-            label="Name"
-            value={form.name}
-            onChange={v => setForm(f => ({ ...f, name: v }))}
-            placeholder={form.type === 'business' ? 'e.g. Acme Ltd' : 'e.g. James Thornton'}
-            autoFocus
-          />
-          <Select
-            label="Type"
-            value={form.type}
-            onChange={v => setForm(f => ({ ...f, type: v as 'business' | 'individual' }))}
-            options={TYPE_OPTIONS}
-          />
-          <Input
-            label="Email (optional)"
-            value={form.email}
-            onChange={v => setForm(f => ({ ...f, email: v }))}
-            placeholder="billing@example.com"
-          />
-
-          {selected ? (
-            <div style={{ display: 'flex', gap: '8px', justifyContent: 'space-between', marginTop: '4px' }}>
-              <Button variant="danger" size="sm" onClick={handleDelete}>
-                Delete
-              </Button>
-              <Button size="sm" onClick={handleSaveEdit} disabled={saving || !isFormValid}>
-                {saving ? 'Saving…' : 'Save changes'}
-              </Button>
-            </div>
-          ) : (
-            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', marginTop: '4px' }}>
-              <Button variant="secondary" size="sm" onClick={() => handleSave(true)} disabled={saving || !isFormValid}>
-                {saving ? 'Saving…' : 'Add another'}
-              </Button>
-              <Button size="sm" onClick={() => handleSave(false)} disabled={saving || !isFormValid}>
-                {saving ? 'Saving…' : 'Done'}
-              </Button>
-            </div>
-          )}
+      {/* ── Right: persistent sidebar (always visible) ── */}
+      <div style={{ width: '340px', flexShrink: 0, position: 'relative' }}>
+        <div style={{ position: 'sticky', top: 0, maxHeight: '100vh', overflowY: 'auto' }}>
+          <PersistentSidebar
+            title={selected ? 'Client details' : 'New client'}
+            subtitle={selected ? (selected.type === 'business' ? 'Business' : 'Individual') : undefined}
+            intelligenceContext={{ tab: 'clients', taxYear: '', clientId: '' }}
+          >
+            {sidebarChildren}
+          </PersistentSidebar>
         </div>
-      </EntryPanel>
+      </div>
     </div>
   )
 }

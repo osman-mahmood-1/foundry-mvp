@@ -25,7 +25,7 @@ import {
   Spinner, Badge, Button, Input, Select,
   ErrorBanner, formatGBP, formatDate,
 } from '../ui'
-import EntryPanel from '../ui/EntryPanel'
+import PersistentSidebar from '../ui/PersistentSidebar'
 import { useColours } from '@/styles/ThemeContext'
 import { useShellSearch } from '@/app/components/shells/BaseShell'
 import { fonts, fontSize, fontWeight, letterSpacing } from '@/styles/tokens/typography'
@@ -125,7 +125,7 @@ export default function IncomeTab({ client, readOnly = false }: Props) {
   const { query, setPlaceholder } = useShellSearch()
   useEffect(() => { setPlaceholder('Search income…') }, [setPlaceholder])
 
-  const [panelOpen, setPanelOpen] = useState(false)
+  const [isAdding,  setIsAdding]  = useState(false)
   const [editItem, setEditItem]   = useState<IncomeItem | null>(null)
   const [editNotes, setEditNotes] = useState('')
   const [editForm, setEditForm]   = useState<IncomeFormState>(EMPTY_FORM)
@@ -148,13 +148,13 @@ export default function IncomeTab({ client, readOnly = false }: Props) {
 
   function openNewPanel() {
     setEditItem(null)
+    setIsAdding(true)
     hookSetForm(() => ({
       description: draftForm.description,
       amount:      draftForm.amount,
       date:        draftForm.date,
       category:    draftForm.category,
     }))
-    setPanelOpen(true)
   }
 
   function handleFieldChange(field: keyof IncomeFormState, value: string) {
@@ -168,12 +168,13 @@ export default function IncomeTab({ client, readOnly = false }: Props) {
     clearDraft()
     hookSetForm(() => EMPTY_FORM)
     setDraftForm(EMPTY_FORM)
-    if (!keepOpen) setPanelOpen(false)
+    if (!keepOpen) { setIsAdding(false) }
   }
 
   // ── Edit existing ──
 
   function openEditPanel(item: IncomeItem) {
+    setIsAdding(false)
     setEditItem(item)
     setEditNotes('')
     setEditForm({
@@ -183,12 +184,10 @@ export default function IncomeTab({ client, readOnly = false }: Props) {
       category:    item.category as IncomeCategory,
       notes:       '',
     })
-    setPanelOpen(true)
   }
 
   async function handleEditSave() {
     if (!editItem) return
-    // Delete old, add updated (upsert-style for demo)
     await deleteIncome(editItem.id, editItem.amount_pence)
     hookSetForm(() => ({
       description: editForm.description,
@@ -200,20 +199,18 @@ export default function IncomeTab({ client, readOnly = false }: Props) {
     resetForm()
     hookSetForm(() => EMPTY_FORM)
     setEditItem(null)
-    setPanelOpen(false)
   }
 
   async function handleEditDelete() {
     if (!editItem) return
     await deleteIncome(editItem.id, editItem.amount_pence)
     setEditItem(null)
-    setPanelOpen(false)
   }
 
   function handleClose() {
     resetForm()
     setEditItem(null)
-    setPanelOpen(false)
+    setIsAdding(false)
   }
 
   // Filter by shell search query
@@ -238,8 +235,109 @@ export default function IncomeTab({ client, readOnly = false }: Props) {
   const isNewFormValid = isFormValid && !editItem
   const isEditFormValid = editForm.description.trim() && editForm.amount && editForm.date
 
+  // ── Sidebar content — null collapses to intelligence panel ──
+  const sidebarChildren = (editItem || isAdding) ? (
+    editItem ? (
+      /* ── Edit mode ── */
+      <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.form.fieldGap }}>
+        <Input
+          label="Description"
+          value={editForm.description}
+          onChange={v => setEditForm(f => ({ ...f, description: v }))}
+          placeholder="e.g. Invoice #023 — Acme Ltd"
+          autoFocus
+        />
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: spacing.form.fieldGap }}>
+          <Input
+            label="Amount (£)"
+            type="number"
+            value={editForm.amount}
+            onChange={v => setEditForm(f => ({ ...f, amount: v }))}
+            placeholder="0.00"
+          />
+          <Input
+            label="Date"
+            type="date"
+            value={editForm.date}
+            onChange={v => setEditForm(f => ({ ...f, date: v }))}
+          />
+        </div>
+        <Select
+          label="Category"
+          value={editForm.category}
+          onChange={v => setEditForm(f => ({ ...f, category: v as IncomeCategory }))}
+          options={INCOME_CATEGORIES}
+        />
+        <div>
+          <div style={{ fontSize: fontSize.xs, fontWeight: fontWeight.medium, color: colours.textSecondary, fontFamily: fonts.sans, marginBottom: '6px', textTransform: 'uppercase' as const, letterSpacing: '0.05em' }}>
+            Notes
+          </div>
+          <textarea
+            value={editNotes}
+            onChange={e => setEditNotes(e.target.value)}
+            placeholder="Optional notes for your records…"
+            rows={3}
+            style={{ width: '100%', padding: '8px 10px', background: colours.inputBg, border: `1px solid ${colours.borderMedium}`, borderRadius: radius.sm, fontSize: fontSize.sm, fontFamily: fonts.sans, color: colours.textPrimary, resize: 'vertical' as const, outline: 'none', lineHeight: 1.5, boxSizing: 'border-box' as const }}
+          />
+        </div>
+        <div style={{ display: 'flex', gap: '8px', justifyContent: 'space-between', marginTop: '4px' }}>
+          <button
+            onClick={handleEditDelete}
+            style={{ background: colours.dangerLight, border: `1px solid ${colours.danger}33`, borderRadius: radius.sm, color: colours.danger, fontSize: fontSize.sm, fontFamily: fonts.sans, fontWeight: fontWeight.medium, padding: '7px 14px', cursor: 'pointer', transition: transition.snap }}
+          >
+            Delete
+          </button>
+          <Button size="sm" onClick={handleEditSave} disabled={saving || !isEditFormValid}>
+            {saving ? 'Saving…' : 'Save changes'}
+          </Button>
+        </div>
+      </div>
+    ) : (
+      /* ── New entry mode ── */
+      <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.form.fieldGap }}>
+        {hasDraft && <DraftBanner onDiscard={() => { clearDraft(); hookSetForm(() => EMPTY_FORM) }} />}
+        <Input
+          label="Description"
+          value={draftForm.description}
+          onChange={v => handleFieldChange('description', v)}
+          placeholder="e.g. Invoice #023 — Acme Ltd"
+          autoFocus
+        />
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: spacing.form.fieldGap }}>
+          <Input
+            label="Amount (£)"
+            type="number"
+            value={draftForm.amount}
+            onChange={v => handleFieldChange('amount', v)}
+            placeholder="0.00"
+          />
+          <Input
+            label="Date"
+            type="date"
+            value={draftForm.date}
+            onChange={v => handleFieldChange('date', v)}
+          />
+        </div>
+        <Select
+          label="Category"
+          value={draftForm.category}
+          onChange={v => handleFieldChange('category', v)}
+          options={INCOME_CATEGORIES}
+        />
+        <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', marginTop: '4px' }}>
+          <Button variant="secondary" size="sm" onClick={() => handleSave(true)} disabled={saving || !isNewFormValid}>
+            {saving ? 'Saving…' : 'Add another'}
+          </Button>
+          <Button size="sm" onClick={() => handleSave(false)} disabled={saving || !isNewFormValid}>
+            {saving ? 'Saving…' : 'Done'}
+          </Button>
+        </div>
+      </div>
+    )
+  ) : null
+
   return (
-    <div style={{ display: 'flex', gap: spacing.tab.gap, minHeight: 0, flex: 1 }}>
+    <div style={{ display: 'flex', gap: spacing.tab.gap, minHeight: 0, flex: 1, alignItems: 'stretch' }}>
 
       {/* ── Left: income list (always visible) ── */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: spacing.tab.gap, minWidth: 0 }}>
@@ -269,7 +367,7 @@ export default function IncomeTab({ client, readOnly = false }: Props) {
             borderBottom:   income.length > 0 ? `1px solid ${colours.borderHairline}` : 'none',
           }}>
             <Label>Income · {client.tax_year}</Label>
-            {!readOnly && !panelOpen && (
+            {!readOnly && (
               <Button size="sm" shimmer onClick={openNewPanel}>
                 + Add entry
               </Button>
@@ -325,7 +423,9 @@ export default function IncomeTab({ client, readOnly = false }: Props) {
                     item={item}
                     isLast={idx === rows.length - 1}
                     selected={editItem?.id === item.id}
-                    onSelect={readOnly ? undefined : () => openEditPanel(item)}
+                    onSelect={readOnly ? undefined : () =>
+                      editItem?.id === item.id ? handleClose() : openEditPanel(item)
+                    }
                     onDelete={readOnly ? undefined : () => deleteIncome(item.id, item.amount_pence)}
                   />
                 ))}
@@ -362,163 +462,19 @@ export default function IncomeTab({ client, readOnly = false }: Props) {
         </Panel>
       </div>
 
-      {/* ── Right: entry / detail panel ── */}
+      {/* ── Right: persistent sidebar (always visible) ── */}
       {!readOnly && (
-        <EntryPanel
-          open={panelOpen}
-          title={editItem ? 'Income entry' : 'New income entry'}
-          subtitle={editItem ? formatDate(editItem.date) : client.tax_year}
-          onClose={handleClose}
-        >
-          {editItem ? (
-            /* ── Edit / view mode ── */
-            <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.form.fieldGap }}>
-              <Input
-                label="Description"
-                value={editForm.description}
-                onChange={v => setEditForm(f => ({ ...f, description: v }))}
-                placeholder="e.g. Invoice #023 — Acme Ltd"
-                autoFocus
-              />
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: spacing.form.fieldGap }}>
-                <Input
-                  label="Amount (£)"
-                  type="number"
-                  value={editForm.amount}
-                  onChange={v => setEditForm(f => ({ ...f, amount: v }))}
-                  placeholder="0.00"
-                />
-                <Input
-                  label="Date"
-                  type="date"
-                  value={editForm.date}
-                  onChange={v => setEditForm(f => ({ ...f, date: v }))}
-                />
-              </div>
-              <Select
-                label="Category"
-                value={editForm.category}
-                onChange={v => setEditForm(f => ({ ...f, category: v as IncomeCategory }))}
-                options={INCOME_CATEGORIES}
-              />
-
-              {/* Notes */}
-              <div>
-                <div style={{
-                  fontSize:     fontSize.xs,
-                  fontWeight:   fontWeight.medium,
-                  color:        colours.textSecondary,
-                  fontFamily:   fonts.sans,
-                  marginBottom: '6px',
-                  textTransform: 'uppercase' as const,
-                  letterSpacing: '0.05em',
-                }}>
-                  Notes
-                </div>
-                <textarea
-                  value={editNotes}
-                  onChange={e => setEditNotes(e.target.value)}
-                  placeholder="Optional notes for your records…"
-                  rows={3}
-                  style={{
-                    width:        '100%',
-                    padding:      '8px 10px',
-                    background:   colours.inputBg,
-                    border:       `1px solid ${colours.borderMedium}`,
-                    borderRadius: radius.sm,
-                    fontSize:     fontSize.sm,
-                    fontFamily:   fonts.sans,
-                    color:        colours.textPrimary,
-                    resize:       'vertical' as const,
-                    outline:      'none',
-                    lineHeight:   1.5,
-                    boxSizing:    'border-box' as const,
-                  }}
-                />
-              </div>
-
-              {/* Actions */}
-              <div style={{ display: 'flex', gap: '8px', justifyContent: 'space-between', marginTop: '4px' }}>
-                <button
-                  onClick={handleEditDelete}
-                  style={{
-                    background:   colours.dangerLight,
-                    border:       `1px solid ${colours.danger}33`,
-                    borderRadius: radius.sm,
-                    color:        colours.danger,
-                    fontSize:     fontSize.sm,
-                    fontFamily:   fonts.sans,
-                    fontWeight:   fontWeight.medium,
-                    padding:      '7px 14px',
-                    cursor:       'pointer',
-                    transition:   transition.snap,
-                  }}
-                >
-                  Delete
-                </button>
-                <Button
-                  size="sm"
-                  onClick={handleEditSave}
-                  disabled={saving || !isEditFormValid}
-                >
-                  {saving ? 'Saving…' : 'Save changes'}
-                </Button>
-              </div>
-            </div>
-          ) : (
-            /* ── New entry mode ── */
-            <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.form.fieldGap }}>
-              {hasDraft && <DraftBanner onDiscard={() => { clearDraft(); hookSetForm(() => EMPTY_FORM) }} />}
-
-              <Input
-                label="Description"
-                value={draftForm.description}
-                onChange={v => handleFieldChange('description', v)}
-                placeholder="e.g. Invoice #023 — Acme Ltd"
-                autoFocus
-              />
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: spacing.form.fieldGap }}>
-                <Input
-                  label="Amount (£)"
-                  type="number"
-                  value={draftForm.amount}
-                  onChange={v => handleFieldChange('amount', v)}
-                  placeholder="0.00"
-                />
-                <Input
-                  label="Date"
-                  type="date"
-                  value={draftForm.date}
-                  onChange={v => handleFieldChange('date', v)}
-                />
-              </div>
-              <Select
-                label="Category"
-                value={draftForm.category}
-                onChange={v => handleFieldChange('category', v)}
-                options={INCOME_CATEGORIES}
-              />
-
-              <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', marginTop: '4px' }}>
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => handleSave(true)}
-                  disabled={saving || !isNewFormValid}
-                >
-                  {saving ? 'Saving…' : 'Add another'}
-                </Button>
-                <Button
-                  size="sm"
-                  onClick={() => handleSave(false)}
-                  disabled={saving || !isNewFormValid}
-                >
-                  {saving ? 'Saving…' : 'Done'}
-                </Button>
-              </div>
-            </div>
-          )}
-        </EntryPanel>
+        <div style={{ width: '340px', flexShrink: 0, position: 'relative' }}>
+          <div style={{ position: 'sticky', top: 0, maxHeight: '100vh', overflowY: 'auto' }}>
+            <PersistentSidebar
+              title={editItem ? 'Income entry' : 'New income entry'}
+              subtitle={editItem ? formatDate(editItem.date) : client.tax_year}
+              intelligenceContext={{ tab: 'income', taxYear: client.tax_year, clientId: client.id }}
+            >
+              {sidebarChildren}
+            </PersistentSidebar>
+          </div>
+        </div>
       )}
     </div>
   )

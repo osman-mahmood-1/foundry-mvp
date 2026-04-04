@@ -25,7 +25,7 @@ import {
   Spinner, Badge, Button, Input, Select,
   ErrorBanner, formatGBP, formatDate,
 } from '../ui'
-import EntryPanel from '../ui/EntryPanel'
+import PersistentSidebar from '../ui/PersistentSidebar'
 import { useColours } from '@/styles/ThemeContext'
 import { useShellSearch } from '@/app/components/shells/BaseShell'
 import { fonts, fontSize, fontWeight, letterSpacing } from '@/styles/tokens/typography'
@@ -189,7 +189,7 @@ export default function ExpensesTab({ client, readOnly = false, onExpenseSelect 
 
   useEffect(() => { setPlaceholder('Search expenses…') }, [setPlaceholder])
 
-  const [panelOpen, setPanelOpen]       = useState(false)
+  const [isAdding,  setIsAdding]        = useState(false)
   const [editItem, setEditItem]         = useState<ExpenseItem | null>(null)
   const [editForm, setEditForm]         = useState<ExpenseFormState>(EMPTY_FORM)
   const [receiptFile, setReceiptFile]   = useState<File | null>(null)
@@ -214,13 +214,13 @@ export default function ExpensesTab({ client, readOnly = false, onExpenseSelect 
 
   function openNewPanel() {
     setEditItem(null)
+    setIsAdding(true)
     hookSetForm(() => ({
       description: draftForm.description,
       amount:      draftForm.amount,
       date:        draftForm.date,
       category:    draftForm.category,
     }))
-    setPanelOpen(true)
   }
 
   function handleFieldChange(field: keyof ExpenseFormState, value: string) {
@@ -235,12 +235,13 @@ export default function ExpensesTab({ client, readOnly = false, onExpenseSelect 
     setReceiptFile(null)
     hookSetForm(() => EMPTY_FORM)
     setDraftForm(EMPTY_FORM)
-    if (!keepOpen) setPanelOpen(false)
+    if (!keepOpen) { setIsAdding(false) }
   }
 
   // ── Edit existing ──
 
   function openEditPanel(item: ExpenseItem) {
+    setIsAdding(false)
     setEditItem(item)
     setEditReceipt(null)
     setEditForm({
@@ -250,7 +251,6 @@ export default function ExpensesTab({ client, readOnly = false, onExpenseSelect 
       category:    item.category as ExpenseCategory,
       notes:       '',
     })
-    setPanelOpen(true)
   }
 
   async function handleEditSave() {
@@ -266,20 +266,18 @@ export default function ExpensesTab({ client, readOnly = false, onExpenseSelect 
     resetForm()
     hookSetForm(() => EMPTY_FORM)
     setEditItem(null)
-    setPanelOpen(false)
   }
 
   async function handleEditDelete() {
     if (!editItem) return
     await deleteExpense(editItem.id, editItem.amount_pence)
     setEditItem(null)
-    setPanelOpen(false)
   }
 
   function handleClose() {
     resetForm()
     setEditItem(null)
-    setPanelOpen(false)
+    setIsAdding(false)
   }
 
   // Search filter
@@ -304,8 +302,79 @@ export default function ExpensesTab({ client, readOnly = false, onExpenseSelect 
   const isNewFormValid = isFormValid && !editItem
   const isEditFormValid = editForm.description.trim() && editForm.amount && editForm.date
 
+  const sidebarChildren = (editItem || isAdding) ? (
+    editItem ? (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.form.fieldGap }}>
+        <Input label="Description" value={editForm.description} onChange={v => setEditForm(f => ({ ...f, description: v }))} placeholder="e.g. Boiler repair — 14 Ashford Rd" autoFocus />
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: spacing.form.fieldGap }}>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'flex-end', gap: '6px' }}>
+              <div style={{ flex: 1 }}>
+                <Input label="Amount (£)" type="number" value={editForm.amount} onChange={v => setEditForm(f => ({ ...f, amount: v }))} placeholder="0.00" />
+              </div>
+              <ReceiptButton file={editReceipt} onClick={() => editReceiptRef.current?.click()} />
+              <input ref={editReceiptRef} type="file" accept="image/*,.pdf" style={{ display: 'none' }} onChange={e => setEditReceipt(e.target.files?.[0] ?? null)} />
+            </div>
+            {editReceipt && (
+              <div style={{ marginTop: '4px', fontSize: fontSize.xs, color: colours.accent, display: 'flex', gap: '4px', alignItems: 'center' }}>
+                <span>✓</span>
+                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>{editReceipt.name}</span>
+                <button onClick={() => setEditReceipt(null)} style={{ background: 'none', border: 'none', color: colours.textMuted, cursor: 'pointer', padding: '0 2px', fontSize: fontSize.xs }}>✕</button>
+              </div>
+            )}
+          </div>
+          <Input label="Date" type="date" value={editForm.date} onChange={v => setEditForm(f => ({ ...f, date: v }))} />
+        </div>
+        <Select label="Category" value={editForm.category} onChange={v => setEditForm(f => ({ ...f, category: v as ExpenseCategory }))} options={EXPENSE_CATEGORIES} />
+        <div>
+          <div style={{ fontSize: fontSize.xs, fontWeight: fontWeight.medium, color: colours.textSecondary, fontFamily: fonts.sans, marginBottom: '6px', textTransform: 'uppercase' as const, letterSpacing: '0.05em' }}>Notes</div>
+          <textarea value={editForm.notes} onChange={e => setEditForm(f => ({ ...f, notes: e.target.value }))} placeholder="Optional notes…" rows={3} style={{ width: '100%', padding: '8px 10px', background: colours.inputBg, border: `1px solid ${colours.borderMedium}`, borderRadius: radius.sm, fontSize: fontSize.sm, fontFamily: fonts.sans, color: colours.textPrimary, resize: 'vertical' as const, outline: 'none', lineHeight: 1.5, boxSizing: 'border-box' as const }} />
+        </div>
+        <div style={{ padding: '8px 10px', background: colours.warningLight, borderRadius: radius.sm, fontSize: fontSize.xs, color: colours.warning, lineHeight: 1.5 }}>
+          <AllowableBadge allowable={editItem.allowable ?? null} /> Your accountant will confirm allowability.
+        </div>
+        <div style={{ display: 'flex', gap: '8px', justifyContent: 'space-between', marginTop: '4px' }}>
+          <button onClick={handleEditDelete} style={{ background: colours.dangerLight, border: `1px solid ${colours.danger}33`, borderRadius: radius.sm, color: colours.danger, fontSize: fontSize.sm, fontFamily: fonts.sans, fontWeight: fontWeight.medium, padding: '7px 14px', cursor: 'pointer', transition: transition.snap }}>Delete</button>
+          <Button size="sm" onClick={handleEditSave} disabled={saving || !isEditFormValid}>{saving ? 'Saving…' : 'Save changes'}</Button>
+        </div>
+      </div>
+    ) : (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.form.fieldGap }}>
+        {hasDraft && <DraftBanner onDiscard={() => { clearDraft(); hookSetForm(() => EMPTY_FORM) }} />}
+        <Input label="Description" value={draftForm.description} onChange={v => handleFieldChange('description', v)} placeholder="e.g. Boiler repair — 14 Ashford Rd" autoFocus />
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: spacing.form.fieldGap }}>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'flex-end', gap: '6px' }}>
+              <div style={{ flex: 1 }}>
+                <Input label="Amount (£)" type="number" value={draftForm.amount} onChange={v => handleFieldChange('amount', v)} placeholder="0.00" />
+              </div>
+              <ReceiptButton file={receiptFile} onClick={() => receiptInputRef.current?.click()} />
+              <input ref={receiptInputRef} type="file" accept="image/*,.pdf" style={{ display: 'none' }} onChange={e => setReceiptFile(e.target.files?.[0] ?? null)} />
+            </div>
+            {receiptFile && (
+              <div style={{ marginTop: '4px', fontSize: fontSize.xs, color: colours.accent, display: 'flex', gap: '4px', alignItems: 'center' }}>
+                <span>✓</span>
+                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>{receiptFile.name}</span>
+                <button onClick={() => setReceiptFile(null)} style={{ background: 'none', border: 'none', color: colours.textMuted, cursor: 'pointer', padding: '0 2px', fontSize: fontSize.xs }}>✕</button>
+              </div>
+            )}
+          </div>
+          <Input label="Date" type="date" value={draftForm.date} onChange={v => handleFieldChange('date', v)} />
+        </div>
+        <Select label="Category" value={draftForm.category} onChange={v => handleFieldChange('category', v)} options={EXPENSE_CATEGORIES} />
+        <div style={{ padding: '8px 10px', background: colours.warningLight, borderRadius: radius.sm, fontSize: fontSize.xs, color: colours.warning, lineHeight: 1.5 }}>
+          Your accountant will review allowability. Entries are marked pending until confirmed.
+        </div>
+        <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', marginTop: '4px' }}>
+          <Button variant="secondary" size="sm" onClick={() => handleSave(true)} disabled={saving || !isNewFormValid}>{saving ? 'Saving…' : 'Add another'}</Button>
+          <Button size="sm" onClick={() => handleSave(false)} disabled={saving || !isNewFormValid}>{saving ? 'Saving…' : 'Done'}</Button>
+        </div>
+      </div>
+    )
+  ) : null
+
   return (
-    <div style={{ display: 'flex', gap: spacing.tab.gap, minHeight: 0, flex: 1 }}>
+    <div style={{ display: 'flex', gap: spacing.tab.gap, minHeight: 0, flex: 1, alignItems: 'stretch' }}>
 
       {/* ── Left: expense list (always visible) ── */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: spacing.tab.gap, minWidth: 0 }}>
@@ -335,7 +404,7 @@ export default function ExpensesTab({ client, readOnly = false, onExpenseSelect 
             borderBottom:   expenses.length > 0 ? `1px solid ${colours.borderHairline}` : 'none',
           }}>
             <Label>Expenses · {client.tax_year}</Label>
-            {!readOnly && !panelOpen && (
+            {!readOnly && (
               <Button size="sm" shimmer onClick={openNewPanel}>
                 + Add entry
               </Button>
@@ -391,7 +460,9 @@ export default function ExpensesTab({ client, readOnly = false, onExpenseSelect 
                     item={item}
                     isLast={idx === rows.length - 1}
                     selected={editItem?.id === item.id}
-                    onSelect={readOnly ? undefined : () => openEditPanel(item)}
+                    onSelect={readOnly ? undefined : () =>
+                      editItem?.id === item.id ? handleClose() : openEditPanel(item)
+                    }
                     onDelete={readOnly ? undefined : () => deleteExpense(item.id, item.amount_pence)}
                   />
                 ))}
@@ -428,231 +499,19 @@ export default function ExpensesTab({ client, readOnly = false, onExpenseSelect 
         </Panel>
       </div>
 
-      {/* ── Right: entry / detail panel ── */}
+      {/* ── Right: persistent sidebar (always visible) ── */}
       {!readOnly && (
-        <EntryPanel
-          open={panelOpen}
-          title={editItem ? 'Expense entry' : 'New expense entry'}
-          subtitle={editItem ? formatDate(editItem.date) : client.tax_year}
-          onClose={handleClose}
-        >
-          {editItem ? (
-            /* ── Edit mode ── */
-            <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.form.fieldGap }}>
-              <Input
-                label="Description"
-                value={editForm.description}
-                onChange={v => setEditForm(f => ({ ...f, description: v }))}
-                placeholder="e.g. Boiler repair — 14 Ashford Rd"
-                autoFocus
-              />
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: spacing.form.fieldGap }}>
-                {/* Amount + receipt */}
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'flex-end', gap: '6px' }}>
-                    <div style={{ flex: 1 }}>
-                      <Input
-                        label="Amount (£)"
-                        type="number"
-                        value={editForm.amount}
-                        onChange={v => setEditForm(f => ({ ...f, amount: v }))}
-                        placeholder="0.00"
-                      />
-                    </div>
-                    <ReceiptButton file={editReceipt} onClick={() => editReceiptRef.current?.click()} />
-                    <input
-                      ref={editReceiptRef}
-                      type="file"
-                      accept="image/*,.pdf"
-                      style={{ display: 'none' }}
-                      onChange={e => setEditReceipt(e.target.files?.[0] ?? null)}
-                    />
-                  </div>
-                  {editReceipt && (
-                    <div style={{ marginTop: '4px', fontSize: fontSize.xs, color: colours.accent, display: 'flex', gap: '4px', alignItems: 'center' }}>
-                      <span>✓</span>
-                      <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>{editReceipt.name}</span>
-                      <button onClick={() => setEditReceipt(null)} style={{ background: 'none', border: 'none', color: colours.textMuted, cursor: 'pointer', padding: '0 2px', fontSize: fontSize.xs }}>✕</button>
-                    </div>
-                  )}
-                </div>
-                <Input
-                  label="Date"
-                  type="date"
-                  value={editForm.date}
-                  onChange={v => setEditForm(f => ({ ...f, date: v }))}
-                />
-              </div>
-              <Select
-                label="Category"
-                value={editForm.category}
-                onChange={v => setEditForm(f => ({ ...f, category: v as ExpenseCategory }))}
-                options={EXPENSE_CATEGORIES}
-              />
-
-              {/* Notes */}
-              <div>
-                <div style={{
-                  fontSize:      fontSize.xs,
-                  fontWeight:    fontWeight.medium,
-                  color:         colours.textSecondary,
-                  fontFamily:    fonts.sans,
-                  marginBottom:  '6px',
-                  textTransform: 'uppercase' as const,
-                  letterSpacing: '0.05em',
-                }}>
-                  Notes
-                </div>
-                <textarea
-                  value={editForm.notes}
-                  onChange={e => setEditForm(f => ({ ...f, notes: e.target.value }))}
-                  placeholder="Optional notes for your records…"
-                  rows={3}
-                  style={{
-                    width:        '100%',
-                    padding:      '8px 10px',
-                    background:   colours.inputBg,
-                    border:       `1px solid ${colours.borderMedium}`,
-                    borderRadius: radius.sm,
-                    fontSize:     fontSize.sm,
-                    fontFamily:   fonts.sans,
-                    color:        colours.textPrimary,
-                    resize:       'vertical' as const,
-                    outline:      'none',
-                    lineHeight:   1.5,
-                    boxSizing:    'border-box' as const,
-                  }}
-                />
-              </div>
-
-              {/* Allowability note */}
-              <div style={{
-                padding:      '8px 10px',
-                background:   colours.warningLight,
-                borderRadius: radius.sm,
-                fontSize:     fontSize.xs,
-                color:        colours.warning,
-                lineHeight:   1.5,
-              }}>
-                <AllowableBadge allowable={editItem.allowable ?? null} /> Your accountant will confirm allowability.
-              </div>
-
-              {/* Actions */}
-              <div style={{ display: 'flex', gap: '8px', justifyContent: 'space-between', marginTop: '4px' }}>
-                <button
-                  onClick={handleEditDelete}
-                  style={{
-                    background:   colours.dangerLight,
-                    border:       `1px solid ${colours.danger}33`,
-                    borderRadius: radius.sm,
-                    color:        colours.danger,
-                    fontSize:     fontSize.sm,
-                    fontFamily:   fonts.sans,
-                    fontWeight:   fontWeight.medium,
-                    padding:      '7px 14px',
-                    cursor:       'pointer',
-                    transition:   transition.snap,
-                  }}
-                >
-                  Delete
-                </button>
-                <Button
-                  size="sm"
-                  onClick={handleEditSave}
-                  disabled={saving || !isEditFormValid}
-                >
-                  {saving ? 'Saving…' : 'Save changes'}
-                </Button>
-              </div>
-            </div>
-          ) : (
-            /* ── New entry mode ── */
-            <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.form.fieldGap }}>
-              {hasDraft && <DraftBanner onDiscard={() => { clearDraft(); hookSetForm(() => EMPTY_FORM) }} />}
-
-              <Input
-                label="Description"
-                value={draftForm.description}
-                onChange={v => handleFieldChange('description', v)}
-                placeholder="e.g. Boiler repair — 14 Ashford Rd"
-                autoFocus
-              />
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: spacing.form.fieldGap }}>
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'flex-end', gap: '6px' }}>
-                    <div style={{ flex: 1 }}>
-                      <Input
-                        label="Amount (£)"
-                        type="number"
-                        value={draftForm.amount}
-                        onChange={v => handleFieldChange('amount', v)}
-                        placeholder="0.00"
-                      />
-                    </div>
-                    <ReceiptButton file={receiptFile} onClick={() => receiptInputRef.current?.click()} />
-                    <input
-                      ref={receiptInputRef}
-                      type="file"
-                      accept="image/*,.pdf"
-                      style={{ display: 'none' }}
-                      onChange={e => setReceiptFile(e.target.files?.[0] ?? null)}
-                    />
-                  </div>
-                  {receiptFile && (
-                    <div style={{ marginTop: '4px', fontSize: fontSize.xs, color: colours.accent, display: 'flex', gap: '4px', alignItems: 'center' }}>
-                      <span>✓</span>
-                      <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>{receiptFile.name}</span>
-                      <button onClick={() => setReceiptFile(null)} style={{ background: 'none', border: 'none', color: colours.textMuted, cursor: 'pointer', padding: '0 2px', fontSize: fontSize.xs }}>✕</button>
-                    </div>
-                  )}
-                </div>
-                <Input
-                  label="Date"
-                  type="date"
-                  value={draftForm.date}
-                  onChange={v => handleFieldChange('date', v)}
-                />
-              </div>
-
-              <Select
-                label="Category"
-                value={draftForm.category}
-                onChange={v => handleFieldChange('category', v)}
-                options={EXPENSE_CATEGORIES}
-              />
-
-              <div style={{
-                padding:      '8px 10px',
-                background:   colours.warningLight,
-                borderRadius: radius.sm,
-                fontSize:     fontSize.xs,
-                color:        colours.warning,
-                lineHeight:   1.5,
-              }}>
-                Your accountant will review allowability. Entries are marked pending until confirmed.
-              </div>
-
-              <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', marginTop: '4px' }}>
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => handleSave(true)}
-                  disabled={saving || !isNewFormValid}
-                >
-                  {saving ? 'Saving…' : 'Add another'}
-                </Button>
-                <Button
-                  size="sm"
-                  onClick={() => handleSave(false)}
-                  disabled={saving || !isNewFormValid}
-                >
-                  {saving ? 'Saving…' : 'Done'}
-                </Button>
-              </div>
-            </div>
-          )}
-        </EntryPanel>
+        <div style={{ width: '340px', flexShrink: 0, position: 'relative' }}>
+          <div style={{ position: 'sticky', top: 0, maxHeight: '100vh', overflowY: 'auto' }}>
+            <PersistentSidebar
+              title={editItem ? 'Expense entry' : 'New expense entry'}
+              subtitle={editItem ? formatDate(editItem.date) : client.tax_year}
+              intelligenceContext={{ tab: 'expenses', taxYear: client.tax_year, clientId: client.id }}
+            >
+              {sidebarChildren}
+            </PersistentSidebar>
+          </div>
+        </div>
       )}
     </div>
   )
