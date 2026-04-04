@@ -65,10 +65,9 @@ export const transition = {
  */
 export const tabTransition = {
   blur:     '6px',
-  duration: duration.slow,
+  duration: duration.normal,      // 0.3s — faster feels snappier in Chrome
   easing:   easing.decelerate,
-  /** Pre-composed animation shorthand for use in style={{ animation: ... }} */
-  animation: `tabIn ${duration.slow} ${easing.decelerate} both`,
+  animation: `tabIn ${duration.normal} ${easing.decelerate} both`,
 } as const
 
 /**
