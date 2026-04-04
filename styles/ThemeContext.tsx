@@ -29,17 +29,37 @@ import type { ColourMode } from './tokens/colours'
 /** Widened colour token set — keys match both light and dark objects. */
 export type ColourTokens = { [K in keyof typeof light]: string }
 
-// ─── Context ────────────────────────────────────────────────────────────────
-
-const ColourContext = createContext<ColourTokens>(light as ColourTokens)
-const ThemeModeContext = createContext<ColourMode>('light')
-
 // ─── Provider ───────────────────────────────────────────────────────────────
 
 const TOKEN_SETS: Record<ColourMode, ColourTokens> = {
   light: light as ColourTokens,
   dark:  dark  as ColourTokens,
 }
+
+// ─── Context default ────────────────────────────────────────────────────────
+//
+// Evaluated once at module load time — synchronously, before any component
+// renders. This means the very first call to useColours() anywhere in the
+// tree returns the correct token set, eliminating the white flash caused
+// by the previous hardcoded 'light' default.
+//
+// Priority: localStorage → system preference → light fallback (SSR safe).
+//
+function getInitialTheme(): ColourMode {
+  if (typeof window === 'undefined') return 'light'
+  try {
+    const stored = localStorage.getItem('foundry-theme')
+    if (stored === 'dark')  return 'dark'
+    if (stored === 'light') return 'light'
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+  } catch {
+    return 'light'
+  }
+}
+
+const initialTheme                   = getInitialTheme()
+const ColourContext    = createContext<ColourTokens>(TOKEN_SETS[initialTheme])
+const ThemeModeContext = createContext<ColourMode>(initialTheme)
 
 export function ThemeProvider({
   theme,
