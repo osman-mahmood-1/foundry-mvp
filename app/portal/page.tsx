@@ -19,7 +19,6 @@
 
 import { redirect }           from 'next/navigation'
 import { createClient }       from '@/lib/supabase-server'
-import PortalThemeProvider    from './components/PortalThemeProvider'
 import PortalShellRouter      from './components/PortalShellRouter'
 import type { Client }        from '@/types'
 
@@ -48,8 +47,6 @@ export default async function PortalPage() {
   if (!clientData?.onboarding_complete) redirect('/onboarding')
 
   return (
-    <PortalThemeProvider forceMode="light">
-      <PortalShellRouter client={clientData as Client} />
-    </PortalThemeProvider>
+    <PortalShellRouter client={clientData as Client} />
   )
 }
