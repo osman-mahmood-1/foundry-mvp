@@ -51,15 +51,25 @@ const ORB_SPEED         = 0.4   // px per frame — gentle drift
 
 // ─── Bouncing orb ─────────────────────────────────────────────────────────────
 
-function BouncingOrb({ opacity }: { opacity: number }) {
+function BouncingOrb({
+  opacity,
+  size,
+  background,
+  filter,
+}: {
+  opacity:    number
+  size:       number
+  background: string
+  filter:     string
+}) {
   const [pos, setPos] = useState({ x: 0, y: 0 })
   const velRef        = useRef({ vx: ORB_SPEED, vy: ORB_SPEED * 0.7 })
   const posRef        = useRef({ x: 0, y: 0 })
   const frameRef      = useRef<number>(0)
 
   useEffect(() => {
-    const startX = Math.random() * Math.max(0, window.innerWidth  - ORB_SIZE)
-    const startY = Math.random() * Math.max(0, window.innerHeight - ORB_SIZE)
+    const startX = Math.random() * Math.max(0, window.innerWidth  - size)
+    const startY = Math.random() * Math.max(0, window.innerHeight - size)
     const angle  = Math.random() * Math.PI * 2
     posRef.current = { x: startX, y: startY }
     velRef.current = {
@@ -76,10 +86,10 @@ function BouncingOrb({ opacity }: { opacity: number }) {
       x += vx
       y += vy
 
-      if (x + ORB_SIZE > vp.w) { x = vp.w - ORB_SIZE; vx = -Math.abs(vx) }
-      if (x < 0)                { x = 0;                vx =  Math.abs(vx) }
-      if (y + ORB_SIZE > vp.h)  { y = vp.h - ORB_SIZE; vy = -Math.abs(vy) }
-      if (y < 0)                { y = 0;                vy =  Math.abs(vy) }
+      if (x + size > vp.w) { x = vp.w - size; vx = -Math.abs(vx) }
+      if (x < 0)           { x = 0;            vx =  Math.abs(vx) }
+      if (y + size > vp.h) { y = vp.h - size;  vy = -Math.abs(vy) }
+      if (y < 0)           { y = 0;             vy =  Math.abs(vy) }
 
       posRef.current = { x, y }
       velRef.current = { vx, vy }
@@ -98,11 +108,11 @@ function BouncingOrb({ opacity }: { opacity: number }) {
         position:     'absolute',
         left:         pos.x,
         top:          pos.y,
-        width:        ORB_SIZE,
-        height:       ORB_SIZE,
+        width:        size,
+        height:       size,
         borderRadius: '50%',
-        background:   orbs.ambient.background,
-        filter:       orbs.ambient.filter,
+        background,
+        filter,
         opacity,
         pointerEvents: 'none',
         zIndex:        0,
@@ -327,7 +337,7 @@ function DesktopLayout({
   onSubmit:  () => void
 }) {
   const colours    = useColours()
-  const orbOpacity = orbs.ambientOpacityLight
+  const orbOpacity = orbs.ambientOpacityDesktopLight
 
   const cardStyle: React.CSSProperties = {
     ...glass.panel('light'),
@@ -348,7 +358,12 @@ function DesktopLayout({
       boxSizing:      'border-box',
       overflow:       'hidden',
     }}>
-      <BouncingOrb opacity={orbOpacity} />
+      <BouncingOrb
+        opacity={orbOpacity}
+        size={parseInt(orbs.ambientDesktop.width)}
+        background={orbs.ambientDesktop.background}
+        filter={orbs.ambientDesktop.filter}
+      />
 
       <div style={{ position: 'relative', zIndex: 1, width: '100%', maxWidth: '400px' }}>
         {submitted ? (
@@ -459,7 +474,12 @@ function MobileLayout({
       boxSizing:   'border-box',
       overflow:    'hidden',
     }}>
-      <BouncingOrb opacity={orbOpacity} />
+      <BouncingOrb
+        opacity={orbOpacity}
+        size={parseInt(orbs.ambient.width)}
+        background={orbs.ambient.background}
+        filter={orbs.ambient.filter}
+      />
 
       {/* Content — sits above orb, fills the screen naturally */}
       <div style={{ position: 'relative', zIndex: 1, flex: 1, display: 'flex', flexDirection: 'column' }}>

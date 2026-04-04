@@ -174,6 +174,25 @@ export const orbs = {
   ambientOpacityDark:  0.60,
   ambientOpacityLight: 0.50,
 
+  /**
+   * Desktop ambient orb — 20% larger (1296px), 10% more intense colour stops.
+   * Use on desktop layouts only. Mobile uses the standard ambient values above.
+   */
+  ambientDesktop: {
+    position:     'fixed' as const,
+    top:          '-360px',
+    right:        '-288px',
+    width:        '1296px',
+    height:       '1296px',
+    borderRadius: '50%',
+    background:   'radial-gradient(circle, rgba(59,130,246,0.22) 0%, rgba(59,130,246,0.066) 45%, transparent 72%)',
+    filter:       'blur(90px)',
+    pointerEvents:'none' as const,
+    zIndex:       0,
+  },
+  ambientOpacityDesktopDark:  0.66,
+  ambientOpacityDesktopLight: 0.55,
+
   /** Legacy names kept for any existing references */
   blueTopRight: {
     top:          '-300px',
