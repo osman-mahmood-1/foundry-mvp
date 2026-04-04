@@ -467,6 +467,8 @@ interface ButtonProps {
    * Do NOT set on Save changes, Cancel, Edit, modal confirms, etc.
    */
   shimmer?:   boolean
+  /** Native button title attribute — shown as tooltip on hover */
+  title?:     string
 }
 
 /**
@@ -487,6 +489,7 @@ export function Button({
   type      = 'button',
   active    = false,
   shimmer   = false,
+  title,
 }: ButtonProps) {
   const colours            = useColours()
   const mode               = useThemeMode()
@@ -575,6 +578,7 @@ export function Button({
       type={type}
       onClick={onClick}
       disabled={disabled}
+      title={title}
       className={shimmer && variant === 'primary' ? 'cta-btn' : undefined}
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
