@@ -13,6 +13,7 @@
  */
 
 import { useState, useRef, useCallback } from 'react'
+import { createPortal }                  from 'react-dom'
 import type { Client, IncomeCategory, ExpenseCategory } from '@/types'
 import { useIncome }   from '@/app/portal/components/tabs/useIncome'
 import { useExpenses } from '@/app/portal/components/tabs/useExpenses'
@@ -210,7 +211,7 @@ export default function MobileFormSheet({ type, client, onClose }: Props) {
     minWidth:     0,
   }
 
-  return (
+  const sheet = (
     <div
       className="form-screen"
       style={{
@@ -510,4 +511,7 @@ export default function MobileFormSheet({ type, client, onClose }: Props) {
       </div>
     </div>
   )
+
+  if (typeof document === 'undefined') return null
+  return createPortal(sheet, document.body)
 }
