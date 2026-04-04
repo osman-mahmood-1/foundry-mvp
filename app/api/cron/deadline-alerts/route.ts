@@ -71,7 +71,7 @@ export async function GET(request: NextRequest) {
         if (hoursSince < 24) { skipped++; continue }
       }
 
-      const client = deadline.clients as { id: string; full_name: string | null; user_id: string } | null
+      const client = deadline.clients as unknown as { id: string; full_name: string | null; user_id: string } | null
       if (!client?.user_id) { skipped++; continue }
 
       const { data: authData } = await admin.auth.admin.getUserById(client.user_id)
