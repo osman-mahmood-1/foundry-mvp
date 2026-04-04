@@ -3,11 +3,11 @@
 /**
  * app/admin/components/AdminInvitesTable.tsx
  *
- * Invite management table with:
- * - Status filter (All / Pending / Expired / Used)
- * - Timestamp on date column
+ * Invite management table.
+ * - Timestamp (date + time) on sent column
  * - Resend on pending + expired rows
  * - Withdraw on pending rows only
+ * - Used rows: no actions
  */
 
 import { useState }         from 'react'
@@ -32,8 +32,6 @@ interface Props {
   invites: Invite[]
 }
 
-type StatusFilter = 'all' | 'pending' | 'expired' | 'used'
-
 function isPending(inv: Invite): boolean {
   return !inv.used_at && new Date(inv.expires_at) >= new Date()
 }
@@ -56,7 +54,7 @@ function formatDateTime(iso: string): { date: string; time: string } {
   }
 }
 
-// ─── Shared inline button helper ─────────────────────────────────────────────
+// ─── Shared inline button style ───────────────────────────────────────────────
 
 function inlineBtn(colour: string, loading: boolean): React.CSSProperties {
   return {
@@ -145,20 +143,11 @@ function ResendButton({ inviteId }: { inviteId: string }) {
 // ─── Main component ───────────────────────────────────────────────────────────
 
 export default function AdminInvitesTable({ invites }: Props) {
-  const colours        = useColours()
-  const [filter, setFilter] = useState<StatusFilter>('all')
+  const colours     = useColours()
   const [hoveredRow, setHoveredRow] = useState<string | null>(null)
 
   const pending = invites.filter(isPending).length
   const used    = invites.filter(i => !!i.used_at).length
-
-  // Client-side filter — no extra fetch needed
-  const filtered = invites.filter(inv => {
-    if (filter === 'pending') return isPending(inv)
-    if (filter === 'expired') return isExpired(inv)
-    if (filter === 'used')    return !!inv.used_at
-    return true
-  })
 
   function statusColour(inv: Invite): string {
     const s = inviteStatus(inv)
@@ -167,88 +156,73 @@ export default function AdminInvitesTable({ invites }: Props) {
     return colours.warning
   }
 
-  // Shared select style — matches button aesthetic, all tokens
-  const filterSelectStyle: React.CSSProperties = {
-    height:       '32px',
-    padding:      `0 ${space[3]}`,
-    background:   colours.borderHairline,
-    color:        colours.textSecondary,
-    border:       'none',
-    borderRadius: radius.md,
-    fontSize:     fontSize.sm,
-    fontFamily:   fonts.sans,
-    fontWeight:   fontWeight.regular,
-    cursor:       'pointer',
-    outline:      'none',
-    transition:   transition.snap,
-    appearance:   'auto' as const,
-  }
-
   return (
     <div style={{ padding: spacing.panel.padding }}>
 
-      {/* Page header with filter */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '24px', flexWrap: 'wrap' as const, gap: space[3] }}>
-        <div>
-          <h1 style={{
-            fontFamily: fonts.sans, fontSize: '24px', fontWeight: fontWeight.medium,
-            color: colours.textPrimary, margin: 0, marginBottom: '4px',
-          }}>Invites</h1>
-          <p style={{ fontSize: fontSize.sm, color: colours.textMuted, margin: 0 }}>
-            {pending} pending · {used} accepted · {invites.length} total
-          </p>
-        </div>
-
-        {/* Status filter */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: space[2] }}>
-          <span style={{ fontSize: fontSize.xs, color: colours.textMuted, fontFamily: fonts.mono, letterSpacing: '0.06em', textTransform: 'uppercase' as const }}>
-            Filter
-          </span>
-          <select value={filter} onChange={e => setFilter(e.target.value as StatusFilter)} style={filterSelectStyle}>
-            <option value="all">All</option>
-            <option value="pending">Pending</option>
-            <option value="expired">Expired</option>
-            <option value="used">Accepted</option>
-          </select>
-        </div>
+      <div style={{ marginBottom: space[6] }}>
+        <h1 style={{
+          fontFamily:   fonts.sans,
+          fontSize:     fontSize['2xl'],
+          fontWeight:   fontWeight.medium,
+          color:        colours.textPrimary,
+          margin:       0,
+          marginBottom: space[1],
+        }}>Invites</h1>
+        <p style={{ fontSize: fontSize.sm, color: colours.textMuted, margin: 0 }}>
+          {pending} pending · {used} accepted · {invites.length} total
+        </p>
       </div>
 
       <div style={{
-        background: colours.panelBgSolid, border: `1px solid ${colours.borderHairline}`,
-        borderRadius: radius.lg, overflow: 'hidden',
+        background:   colours.panelBgSolid,
+        border:       `1px solid ${colours.borderHairline}`,
+        borderRadius: radius.lg,
+        overflow:     'hidden',
       }}>
         <SendInviteForm />
 
         {/* Header — email | role | status | sent | actions */}
         <div style={{
-          display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1.2fr 160px',
-          padding: '12px 20px', borderBottom: `1px solid ${colours.borderHairline}`,
-          background: colours.hoverBg,
+          display:             'grid',
+          gridTemplateColumns: '2fr 1fr 1fr 1.2fr 160px',
+          padding:             spacing.table.headerPadding,
+          borderBottom:        `1px solid ${colours.borderHairline}`,
+          background:          colours.hoverBg,
         }}>
           {['Email', 'Role', 'Status', 'Sent', ''].map((col, i) => (
             <div key={i} style={{
-              fontSize: fontSize.label, fontFamily: fonts.mono,
-              letterSpacing: letterSpacing.wide, color: colours.textMuted,
+              fontSize:      fontSize.label,
+              fontFamily:    fonts.mono,
+              letterSpacing: letterSpacing.wide,
+              color:         colours.textMuted,
               textTransform: 'uppercase' as const,
             }}>{col}</div>
           ))}
         </div>
 
-        {filtered.length === 0 ? (
-          <div style={{ padding: '40px 20px', textAlign: 'center', fontSize: fontSize.sm, color: colours.textMuted }}>
-            {filter === 'all' ? 'No invites sent yet.' : `No ${filter} invites.`}
+        {invites.length === 0 ? (
+          <div style={{
+            padding:   spacing.panel.padding,
+            textAlign: 'center',
+            fontSize:  fontSize.sm,
+            color:     colours.textMuted,
+          }}>
+            No invites sent yet.
           </div>
         ) : (
-          filtered.map(inv => {
+          invites.map(inv => {
             const { date, time } = formatDateTime(inv.created_at)
             return (
               <div
                 key={inv.id}
                 style={{
-                  display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1.2fr 160px',
-                  padding: '12px 20px', borderBottom: `1px solid ${colours.borderHairline}`,
-                  background: hoveredRow === inv.id ? colours.hoverBg : 'transparent',
-                  transition: transition.snap, alignItems: 'center',
+                  display:             'grid',
+                  gridTemplateColumns: '2fr 1fr 1fr 1.2fr 160px',
+                  padding:             spacing.table.rowPadding,
+                  borderBottom:        `1px solid ${colours.borderHairline}`,
+                  background:          hoveredRow === inv.id ? colours.hoverBg : 'transparent',
+                  transition:          transition.snap,
+                  alignItems:          'center',
                 }}
                 onMouseEnter={() => setHoveredRow(inv.id)}
                 onMouseLeave={() => setHoveredRow(null)}
@@ -261,10 +235,14 @@ export default function AdminInvitesTable({ invites }: Props) {
                 {/* Role badge */}
                 <div>
                   <span style={{
-                    fontSize: fontSize.label, fontFamily: fonts.mono,
-                    letterSpacing: letterSpacing.wide, color: colours.textMuted,
-                    background: colours.borderLight, padding: '2px 7px',
-                    borderRadius: radius.xs, textTransform: 'uppercase' as const,
+                    fontSize:      fontSize.label,
+                    fontFamily:    fonts.mono,
+                    letterSpacing: letterSpacing.wide,
+                    color:         colours.textMuted,
+                    background:    colours.borderLight,
+                    padding:       `${space[1]} ${space[2]}`,
+                    borderRadius:  radius.xs,
+                    textTransform: 'uppercase' as const,
                   }}>
                     {inv.role.replace('_', ' ')}
                   </span>
@@ -280,7 +258,7 @@ export default function AdminInvitesTable({ invites }: Props) {
                   <div style={{ fontSize: fontSize.xs, fontFamily: fonts.mono, color: colours.textSecondary }}>
                     {date}
                   </div>
-                  <div style={{ fontSize: fontSize.xs, fontFamily: fonts.mono, color: colours.textMuted, marginTop: '1px' }}>
+                  <div style={{ fontSize: fontSize.xs, fontFamily: fonts.mono, color: colours.textMuted, marginTop: space[1] }}>
                     {time}
                   </div>
                 </div>

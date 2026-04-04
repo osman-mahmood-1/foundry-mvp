@@ -4,10 +4,9 @@
  * app/admin/components/SendInviteForm.tsx
  *
  * Form to generate and dispatch an invite token.
- * Calls createInviteToken server action — all token generation,
- * DB writes, and email dispatch happen server-side.
- *
- * On success: calls onSuccess() so the parent can refresh the invite list.
+ * All sizing, colour, and typography from design tokens.
+ * Role <select> shares controlStyle with email <input> — same control type.
+ * spacing.form.controlHeight is the single source for the 38px control height.
  */
 
 import { useState }            from 'react'
@@ -23,11 +22,11 @@ export default function SendInviteForm() {
   const colours = useColours()
   const router  = useRouter()
 
-  const [email,       setEmail]       = useState('')
-  const [role,        setRole]        = useState<InviteRole>('accountant')
-  const [submitting,  setSubmitting]  = useState(false)
-  const [error,       setError]       = useState<string | null>(null)
-  const [successMsg,  setSuccessMsg]  = useState<string | null>(null)
+  const [email,      setEmail]      = useState('')
+  const [role,       setRole]       = useState<InviteRole>('accountant')
+  const [submitting, setSubmitting] = useState(false)
+  const [error,      setError]      = useState<string | null>(null)
+  const [successMsg, setSuccessMsg] = useState<string | null>(null)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -41,7 +40,7 @@ export default function SendInviteForm() {
       setSuccessMsg(`Invite sent to ${email.trim()}.`)
       setEmail('')
       setRole('accountant')
-      router.refresh() // re-fetches the invite list server-side
+      router.refresh()
     } else {
       setError(result.error ?? 'Something went wrong.')
     }
@@ -49,9 +48,10 @@ export default function SendInviteForm() {
     setSubmitting(false)
   }
 
-  const inputStyle: React.CSSProperties = {
+  // Shared style for all text controls — input and select are the same control type
+  const controlStyle: React.CSSProperties = {
     width:        '100%',
-    height:       '38px',
+    height:       spacing.form.controlHeight,
     background:   colours.inputBg,
     border:       `1px solid ${colours.inputBorder}`,
     borderRadius: radius.md,
@@ -60,30 +60,32 @@ export default function SendInviteForm() {
     color:        colours.textPrimary,
     fontFamily:   fonts.sans,
     outline:      'none',
-    boxSizing:    'border-box',
+    boxSizing:    'border-box' as const,
     transition:   transition.snap,
   }
 
   const labelStyle: React.CSSProperties = {
-    display:      'block',
-    fontSize:     fontSize.xs,
-    color:        colours.textMuted,
-    fontFamily:   fonts.mono,
+    display:       'block',
+    fontSize:      fontSize.xs,
+    color:         colours.textMuted,
+    fontFamily:    fonts.mono,
     letterSpacing: '0.06em',
-    textTransform: 'uppercase',
-    marginBottom: space[1],
+    textTransform: 'uppercase' as const,
+    marginBottom:  space[1],
   }
+
+  const isDisabled = submitting || !email.trim()
 
   return (
     <form
       onSubmit={handleSubmit}
       style={{
-        display:       'flex',
-        gap:           space[3],
-        alignItems:    'flex-end',
-        flexWrap:      'wrap' as const,
-        padding:       spacing.panel.paddingTight,
-        borderBottom:  `1px solid ${colours.borderHairline}`,
+        display:      'flex',
+        gap:          space[3],
+        alignItems:   'flex-end',
+        flexWrap:     'wrap' as const,
+        padding:      spacing.panel.paddingTight,
+        borderBottom: `1px solid ${colours.borderHairline}`,
       }}
     >
       {/* Email */}
@@ -95,35 +97,19 @@ export default function SendInviteForm() {
           value={email}
           onChange={e => setEmail(e.target.value)}
           placeholder="colleague@example.com"
-          style={inputStyle}
+          style={controlStyle}
           disabled={submitting}
         />
       </div>
 
-      {/* Role */}
+      {/* Role — same controlStyle as email, cursor differs */}
       <div style={{ flex: '0 0 180px' }}>
         <label style={labelStyle}>Role</label>
         <select
           value={role}
           onChange={e => setRole(e.target.value as InviteRole)}
           disabled={submitting}
-          style={{
-            height:       '38px',
-            width:        '100%',
-            padding:      `0 ${space[3]}`,
-            background:   colours.borderHairline,
-            color:        colours.textPrimary,
-            border:       'none',
-            borderRadius: radius.md,
-            fontSize:     fontSize.base,
-            fontFamily:   fonts.sans,
-            fontWeight:   fontWeight.regular,
-            cursor:       'pointer',
-            outline:      'none',
-            transition:   transition.snap,
-            boxSizing:    'border-box' as const,
-            appearance:   'auto' as const,
-          }}
+          style={{ ...controlStyle, cursor: 'pointer' }}
         >
           <option value="accountant">Accountant</option>
           <option value="platform_editor">Platform Editor</option>
@@ -131,21 +117,21 @@ export default function SendInviteForm() {
       </div>
 
       {/* Submit */}
-      <div style={{ flex: '0 0 auto', paddingBottom: '0' }}>
+      <div style={{ flex: '0 0 auto' }}>
         <button
           type="submit"
-          disabled={submitting || !email.trim()}
+          disabled={isDisabled}
           style={{
-            height:       '38px',
+            height:       spacing.form.controlHeight,
             padding:      `0 ${space[4]}`,
-            background:   submitting || !email.trim() ? colours.borderHairline : colours.cta,
-            color:        submitting || !email.trim() ? colours.textMuted : colours.ctaText,
+            background:   isDisabled ? colours.borderHairline : colours.cta,
+            color:        isDisabled ? colours.textMuted : colours.ctaText,
             border:       'none',
             borderRadius: radius.md,
             fontSize:     fontSize.base,
             fontWeight:   fontWeight.medium,
             fontFamily:   fonts.sans,
-            cursor:       submitting || !email.trim() ? 'not-allowed' : 'pointer',
+            cursor:       isDisabled ? 'not-allowed' : 'pointer',
             transition:   transition.snap,
             whiteSpace:   'nowrap' as const,
           }}
@@ -154,7 +140,7 @@ export default function SendInviteForm() {
         </button>
       </div>
 
-      {/* Feedback — spans full width */}
+      {/* Feedback */}
       {error && (
         <div style={{
           flex:         '1 1 100%',

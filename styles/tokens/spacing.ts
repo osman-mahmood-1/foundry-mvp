@@ -44,9 +44,10 @@ export const spacing = {
     itemGap:       '1px',        // gap between individual nav items
   },
   form: {
-    fieldGap:     space[3],   // 12px — between form fields
-    labelGap:     space[1],   // 6px  — between label and input (using 1.5x)
-    sectionGap:   space[8],   // 32px — between form sections
+    fieldGap:      space[3],   // 12px — between form fields
+    labelGap:      space[1],   // 6px  — between label and input (using 1.5x)
+    sectionGap:    space[8],   // 32px — between form sections
+    controlHeight: '38px',     // standard height for inputs, selects, and buttons
   },
   table: {
     rowPadding:   `${space[3]} ${space[5]}`,  // 12px 20px
