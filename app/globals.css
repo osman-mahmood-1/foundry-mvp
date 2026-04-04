@@ -101,7 +101,7 @@ input, select, textarea, button {
 
 /* ── Tab content transition — blur dissolve on tab switch ─────────────────── */
 @keyframes tabIn {
-  from { opacity: 0; filter: blur(4px); transform: translateY(6px); }
+  from { opacity: 0; filter: blur(6px); transform: translateY(8px); }
   to   { opacity: 1; filter: blur(0);   transform: translateY(0); }
 }
 
