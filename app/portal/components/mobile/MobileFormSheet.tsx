@@ -248,7 +248,7 @@ export default function MobileFormSheet({ type, client, onClose }: Props) {
             minWidth:   '60px',
           }}
         >
-          ← Back
+          Cancel
         </button>
         <span style={{
           fontFamily:    fonts.sans,
