@@ -198,11 +198,11 @@ export const light = {
   accentBorder:    'rgba(29,78,216,0.18)',
   accentText:      '#1d4ed8',
 
-  // ── CTA — light mode: very subtle sapphire tint, no gradient fill
-  cta:             'rgba(59,130,246,0.08)',
-  ctaHover:        'rgba(59,130,246,0.14)',
-  ctaGlow:         'rgba(59,130,246,0.20)',
-  ctaText:         '#1d4ed8',
+  // ── CTA — light mode: filled sapphire gradient, white text (mirrors dark mode weight)
+  cta:             'linear-gradient(150deg, #1d4ed8 0%, #2563eb 55%, #3b82f6 100%)',
+  ctaHover:        'linear-gradient(150deg, #1e40af 0%, #1d4ed8 55%, #2563eb 100%)',
+  ctaGlow:         'rgba(37,99,235,0.25)',
+  ctaText:         'rgba(255,255,255,0.95)',
 
   // ── Teal / extra palette
   orange:          '#0d9488',   // teal — replaces copper
