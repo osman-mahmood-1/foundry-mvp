@@ -60,6 +60,16 @@ html, body {
 [data-theme='dark']  { background-color: #000000 !important; }
 [data-theme='light'] { background-color: #ffffff !important; }
 
+/* Layer 2b: Portal pages — body background matches the portal pageBg gradient  */
+/* so Safari's toolbar area samples the gradient rather than plain white.       */
+/* Scoped to .portal-bg class applied by MobilePortalShell on the body.        */
+body.portal-light {
+  background: radial-gradient(ellipse 110% 90% at 100% 0%, #fdf5ec 0%, #faf7f3 50%, #ffffff 100%) !important;
+}
+body.portal-dark {
+  background: radial-gradient(ellipse 110% 90% at 100% 0%, #0c1826 0%, #050810 55%, #000000 100%) !important;
+}
+
 /* Layer 3: Login / auth pages — navy background scoped to auth routes.        */
 /* Applied as a CSS class so the background is present before hydration,       */
 /* without waiting for any inline style or component to mount.                 */

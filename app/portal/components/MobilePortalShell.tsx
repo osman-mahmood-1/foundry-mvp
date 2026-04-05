@@ -72,8 +72,10 @@ export default function MobilePortalShell({ client }: Props) {
       <div style={{
       display:        'flex',
       flexDirection:  'column',
-      minHeight:      '100dvh',
+      height:         '100dvh',
+      minHeight:      '100vh',
       background:     colours.pageBg,
+      overflow:       'hidden',
     }}>
       {/* Header */}
       <MobileHeader
@@ -89,7 +91,6 @@ export default function MobilePortalShell({ client }: Props) {
           flex:          1,
           overflowY:     'auto',
           animation:     tabTransition.animation,
-          height:        'calc(100dvh - 52px - env(safe-area-inset-top, 0px))',
           paddingBottom: 'calc(32px + env(safe-area-inset-bottom, 34px))',
         }}
       >
