@@ -86,7 +86,7 @@ export default function MobileExpensesTab({ client }: Props) {
     <>
       <div
         ref={scrollRef}
-        style={{ paddingBottom: 'calc(24px + env(safe-area-inset-bottom, 0px))' }}
+        style={{ paddingBottom: '24px' }}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}

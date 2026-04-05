@@ -88,9 +88,10 @@ export default function MobilePortalShell({ client }: Props) {
         key={activeTab}
         className="mobile-scroll-area"
         style={{
-          flex:      1,
-          overflowY: 'auto',
-          animation: tabTransition.animation,
+          flex:          1,
+          overflowY:     'auto',
+          animation:     tabTransition.animation,
+          paddingBottom: 'calc(32px + env(safe-area-inset-bottom, 34px))',
         }}
       >
         <TabContent

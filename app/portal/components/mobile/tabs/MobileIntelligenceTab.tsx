@@ -281,7 +281,7 @@ export default function MobileIntelligenceTab({ client }: Props) {
   }
 
   return (
-    <div style={{ paddingBottom: 'calc(32px + env(safe-area-inset-bottom, 0px))' }}>
+    <div style={{ paddingBottom: '32px' }}>
       {/* Header */}
       <div style={{
         margin:       '16px 16px 0',
