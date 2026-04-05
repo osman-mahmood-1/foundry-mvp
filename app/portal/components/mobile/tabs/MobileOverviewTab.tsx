@@ -47,7 +47,7 @@ export default function MobileOverviewTab({ client, onTabChange }: Props) {
   }))
 
   return (
-    <div style={{ paddingBottom: '24px' }}>
+    <div style={{ paddingBottom: 'calc(24px + env(safe-area-inset-bottom, 0px))' }}>
       {/* Greeting */}
       <div style={{ padding: '20px 16px 8px' }}>
         <div style={{

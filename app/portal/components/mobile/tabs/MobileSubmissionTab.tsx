@@ -68,7 +68,7 @@ export default function MobileSubmissionTab({ client, onTabChange }: Props) {
   const fmt = (p: number) => `£${(p / 100).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 
   return (
-    <div style={{ paddingBottom: '32px' }}>
+    <div style={{ paddingBottom: 'calc(32px + env(safe-area-inset-bottom, 0px))' }}>
       {/* Section 1 — Current submission */}
       <div style={{ padding: '20px 16px 0' }}>
         <div style={{

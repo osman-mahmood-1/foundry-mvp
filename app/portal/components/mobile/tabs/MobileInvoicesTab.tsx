@@ -19,7 +19,7 @@ export default function MobileInvoicesTab({ client }: Props) {
   const colours = useColours()
 
   return (
-    <div style={{ paddingBottom: '24px' }}>
+    <div style={{ paddingBottom: 'calc(24px + env(safe-area-inset-bottom, 0px))' }}>
       <div style={{ padding: '20px 16px 16px' }}>
         <h2 style={{ fontFamily: fonts.sans, fontSize: '22px', fontWeight: fontWeight.semibold, color: colours.textPrimary, letterSpacing: '-0.02em', margin: 0, marginBottom: '4px' }}>
           Invoices
